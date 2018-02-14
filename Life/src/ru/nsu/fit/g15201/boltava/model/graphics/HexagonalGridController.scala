@@ -1,6 +1,6 @@
 package ru.nsu.fit.g15201.boltava.model.graphics
 
-import ru.nsu.fit.g15201.boltava.model.Hexagon
+import ru.nsu.fit.g15201.boltava.model.logic.Hexagon
 
 import scala.collection.mutable.ArrayBuffer
 
