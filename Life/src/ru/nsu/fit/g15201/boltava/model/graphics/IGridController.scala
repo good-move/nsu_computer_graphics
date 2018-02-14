@@ -11,7 +11,7 @@ import ru.nsu.fit.g15201.boltava.model.logic.Cell
   */
 trait IGridController[CellType <: Cell] {
 
-  def generateGrid(width: Int, height: Int): Array[CellType]
+  def generateGrid(width: Int, height: Int): Array[Array[CellType]]
 
   /**
     * Get cartesian coordinates for cell with coordinates `point`,
