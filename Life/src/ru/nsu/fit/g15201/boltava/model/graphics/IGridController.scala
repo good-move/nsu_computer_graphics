@@ -19,6 +19,6 @@ trait IGridController[CellType <: Cell] {
     * @param point point to convert to Cartesian
     * @return new point, which represents the passed point in Cartesian coordinates
     */
-  def getHexCenter(point: Point): DoublePoint
+  def getCellCenter(point: Point): DoublePoint
 
 }
