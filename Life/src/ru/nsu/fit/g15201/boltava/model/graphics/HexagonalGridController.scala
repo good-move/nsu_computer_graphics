@@ -65,4 +65,41 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     Hexagon(new Point(center.x, center.y), vertices)
   }
 
+  /**
+    * Get cell coordinate by Cartesian coordinate point
+    *
+    * @param point a point in Cartesian coordinate system
+    * @return cell coordinate in custom (internal) coordinate system
+    */
+  override def getCellByPoint(point: DoublePoint): Point = {
+    val H = 1.5*R
+    val W = 2.0*r
+    // figure out hexagon box coordinates
+    val yt: Int = Math.floor(point.y / H).toInt
+    val xBiased: Double = point.x - r*(yt%2)
+    val xt: Int = Math.floor(xBiased / W).toInt
+
+    // figure out point coordinates inside the box
+    val yIn: Double = point.y- H*yt.toDouble
+    val xIn: Double = xBiased - W*xt.toDouble
+
+    // figure out, what hexagon part we're in
+    var error = false
+    val slope = R/r/2
+    var sign = if (xIn < W/2) -1 else 1
+    val lineValue = slope*Math.abs(xIn - W/2)
+    if (yIn < lineValue) {
+//      sign = if (xIn > W/2) 1 else 1
+      if (sign == -1) {
+        (yt - 1, xt - (yt+1)%2)
+      } else {
+        (yt - 1, xt + yt%2)
+      }
+    } else if (yIn > lineValue) {
+      (yt, xt)
+    } else {
+      (-1, -1)
+    }
+  }
+
 }
