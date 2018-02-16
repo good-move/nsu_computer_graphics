@@ -1,8 +1,11 @@
 package ru.nsu.fit.g15201.boltava.model.graphics
 
-import java.util.function.DoubleBinaryOperator
-
 class Point(private var _x: Int, private var _y: Int) {
+
+  def this(_x: Double, _y: Double) {
+    this(_x.toInt, _y.toInt)
+  }
+
   def x: Int = _x
   def x_=(x: Int): Unit = {
     this._x = x
