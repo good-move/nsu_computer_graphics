@@ -6,7 +6,7 @@ import ru.nsu.fit.g15201.boltava.model.logic.Cell
 /**
   * This class is intended to control various grid systems.
   *
-  * 1. Creates arbitrary cell space with its own coordinate system
+  * Creates arbitrary cell space with its own coordinate system
   * @tparam CellType
   */
 trait IGridController[CellType <: Cell] {
@@ -19,6 +19,6 @@ trait IGridController[CellType <: Cell] {
     * @param point point to convert to Cartesian
     * @return new point, which represents the passed point in Cartesian coordinates
     */
-  def getCenterPixelCoords(point: Point): Point
+  def getHexCenter(point: Point): DoublePoint
 
 }
