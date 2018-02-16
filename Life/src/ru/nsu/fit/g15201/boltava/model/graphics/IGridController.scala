@@ -16,9 +16,17 @@ trait IGridController[CellType <: Cell] {
   /**
     * Get cartesian coordinates for cell with coordinates `point`,
     * given in terms of this space
-    * @param point point to convert to Cartesian
+    * @param point point to convert to Cartesian coordinates
     * @return new point, which represents the passed point in Cartesian coordinates
     */
   def getCellCenter(point: Point): DoublePoint
+
+  /**
+    * Get cell coordinate by Cartesian coordinate point
+    *
+    * @param point a point in Cartesian coordinate system
+    * @return cell coordinate in custom (internal) coordinate system
+    */
+  def getCellByPoint(point: DoublePoint): Point
 
 }
