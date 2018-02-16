@@ -11,24 +11,24 @@ object BresenhamLineCreator extends LineCreator {
 
     val yStep = if (from.y <= to.y) 1 else -1
     val xStep = if (from.x <= to.x) 1 else -1
-    var error: Double = 0
+    var error: Int = 0
     var x = from.x
     var y = from.y
 
-    val pointsToAdd: Int = Math.max(dx, dy) + 1
+    val pointsToAdd: Int = Math.max(dx, dy)+1
 
     for (_ <- 1 to pointsToAdd) {
       linePoints.append((x, y))
       if (dx >= dy) {
         error += dy
-        if (2 * error >= 1) {
+        if (2 * error >= dx) {
           y += yStep
           error -= dx
         }
         x += xStep
       } else {
         error += dx
-        if (2 * error >= 1) {
+        if (2 * error >= dy) {
           x += xStep
           error -= dy
         }
