@@ -1,11 +1,10 @@
 package ru.nsu.fit.g15201.boltava.model
 
-import ru.nsu.fit.g15201.boltava.model.canvas.IGridController
-import ru.nsu.fit.g15201.boltava.model.logic.Cell
+import ru.nsu.fit.g15201.boltava.model.canvas.{Polygon, IGridController}
 
-class GameController[T <: Cell](private val fieldWidth: Int = 10,
-                                private val fieldHeight: Int = 10,
-                                private val gridController: IGridController[T]) {
+class GameController[T <: Polygon](private val fieldWidth: Int = 10,
+                                   private val fieldHeight: Int = 10,
+                                   private val gridController: IGridController[T]) {
 
   private var cellGrid: Array[Array[T]] = _
   private var cellSelectionMode = CellSelectionMode.REPLACE

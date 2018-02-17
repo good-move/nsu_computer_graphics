@@ -1,8 +1,8 @@
 package ru.nsu.fit.g15201.boltava.model.logic
 
-import ru.nsu.fit.g15201.boltava.model.canvas.Point
+import ru.nsu.fit.g15201.boltava.model.canvas.{Polygon, Point}
 
-class Hexagon(private val _center: Point, private val _vertices: Array[Point]) extends Cell {
+class Hexagon(private val _center: Point, private val _vertices: Array[Point]) extends Polygon {
 
   def center: Point = _center
 

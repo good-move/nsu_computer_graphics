@@ -1,15 +1,14 @@
 package ru.nsu.fit.g15201.boltava.model.canvas
 
-import ru.nsu.fit.g15201.boltava.model.logic.Cell
-
 
 /**
   * This class is intended to control various grid systems.
   *
   * Creates arbitrary cell space with its own coordinate system
+  *
   * @tparam CellType
   */
-trait IGridController[CellType <: Cell] {
+trait IGridController[CellType <: Polygon] {
 
   def generateGrid(width: Int, height: Int): Array[Array[CellType]]
 
