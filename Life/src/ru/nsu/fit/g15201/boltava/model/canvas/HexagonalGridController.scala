@@ -1,7 +1,5 @@
 package ru.nsu.fit.g15201.boltava.model.canvas
 
-import ru.nsu.fit.g15201.boltava.model.logic.Hexagon
-
 import scala.collection.mutable.ArrayBuffer
 
 class HexagonalGridController(private val hexSideSize: Int) extends IGridController[Hexagon] {

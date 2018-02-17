@@ -10,7 +10,6 @@ import javafx.stage.Stage
 import ru.nsu.fit.g15201.boltava.model.GameController
 import ru.nsu.fit.g15201.boltava.model.canvas._
 import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
-import ru.nsu.fit.g15201.boltava.model.logic.Hexagon
 
 class LifeGame extends Application {
 
