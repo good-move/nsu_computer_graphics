@@ -7,7 +7,7 @@ import ru.nsu.fit.g15201.boltava.model.logic.Hexagon
 
 import scala.collection.mutable
 
-object ScanLineFiller extends IColorFiller[Hexagon] {
+class ScanLineFiller extends IColorFiller[Hexagon] {
 
   override def fillCell(drawable: IDrawable, hex: Hexagon, newColor: Color): Unit = {
     val oldColor = drawable.getColor(hex.center.x, hex.center.y)
