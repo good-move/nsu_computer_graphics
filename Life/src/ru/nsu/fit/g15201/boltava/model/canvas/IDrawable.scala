@@ -7,5 +7,5 @@ trait IDrawable {
   def getWidth: Double
   def setColor(point: Point, color: Color): Unit
   def getColor(point: Point): Color
-  def draw(points: Array[Point], color: Color): Unit
+  def draw(points: Array[Point], color: Color = Color.BLACK): Unit
 }
