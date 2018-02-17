@@ -86,11 +86,9 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     // figure out, what hexagon part we're in
     var error = false
     val slope = R/r/2
-    var sign = if (xIn < W/2) -1 else 1
     val lineValue = slope*Math.abs(xIn - W/2)
     if (yIn < lineValue) {
-//      sign = if (xIn > W/2) 1 else 1
-      if (sign == -1) {
+      if (xIn < W/2) {
         (yt - 1, xt - (yt+1)%2)
       } else {
         (yt - 1, xt + yt%2)
