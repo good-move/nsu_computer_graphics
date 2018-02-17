@@ -78,13 +78,26 @@ class LifeGame extends Application {
 
   private def setEventHandlers(): Unit = {
     scene.addEventHandler(MouseEvent.MOUSE_CLICKED, (event: MouseEvent) => {
-      val x = event.getSceneX
-      val y = event.getSceneY
-      val hexCoords = gridController.getCellByPoint((x,y))
-//      println(s"($x, $y) -> $hexCoords")
-      colorFiller.fillCell(drawable, cellGrid(hexCoords.x)(hexCoords.y), Color.GRAY)
+      fillHexagon((event.getSceneX, event.getSceneY))
       event.consume()
     })
+
+    scene.addEventHandler(MouseEvent.DRAG_DETECTED, (event: MouseEvent)=> {
+      scene.startFullDrag()
+      event.consume()
+    })
+
+    scene.setOnMouseDragOver((event: MouseEvent) => {
+      fillHexagon((event.getSceneX, event.getSceneY))
+    })
+
+  }
+
+  private def fillHexagon(point: DoublePoint): Unit = {
+    val hexCoords = gridController.getCellByPoint(point)
+    if (hexCoords.x < 0 || hexCoords.y < 0) return
+    //      println(s"($x, $y) -> $hexCoords")
+    colorFiller.fillCell(drawable, cellGrid(hexCoords.x)(hexCoords.y), Color.GRAY)
   }
 
 }
