@@ -8,6 +8,7 @@ class GameController[T <: Cell](private val fieldWidth: Int = 10,
                                 private val gridController: IGridController[T]) {
 
   private var cellGrid: Array[Array[T]] = _
+  private var cellSelectionMode = CellSelectionMode.REPLACE
 
   { // constructor code
     generateGrid()
@@ -17,8 +18,21 @@ class GameController[T <: Cell](private val fieldWidth: Int = 10,
 
   def getGridController: IGridController[T] = gridController
 
+  def setCellSelectionMode(newCellSelectionMode: CellSelectionMode.Value): Unit = {
+    cellSelectionMode = newCellSelectionMode
+  }
+
+  def getCellSelectionMode: CellSelectionMode.Value = cellSelectionMode
+
+  // *************************** Private Methods ***************************
+
   private def generateGrid(): Unit = {
     cellGrid = gridController.generateGrid(fieldWidth, fieldHeight)
+  }
+
+  abstract object CellSelectionMode extends Enumeration {
+    val TOGGLE = Value(0)
+    val REPLACE = Value(1)
   }
 
 }
