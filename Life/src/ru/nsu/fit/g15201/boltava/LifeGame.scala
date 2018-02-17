@@ -7,6 +7,7 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 
+import ru.nsu.fit.g15201.boltava.model.GameController
 import ru.nsu.fit.g15201.boltava.model.canvas._
 import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
 import ru.nsu.fit.g15201.boltava.model.logic.Hexagon
@@ -14,9 +15,8 @@ import ru.nsu.fit.g15201.boltava.model.logic.Hexagon
 class LifeGame extends Application {
 
   private var drawable: IDrawable = _
-  private var gridController: IGridController[Hexagon] = _
-  private var cellGrid: Array[Array[Hexagon]] = _
   private var colorFiller: IColorFiller[Hexagon] = _
+  private var gameController: GameController[Hexagon] = _
 
   private var scene: Scene = _
 
@@ -28,8 +28,10 @@ class LifeGame extends Application {
     // create hexagons and mark them as alive or dead
     // draw hexagons
 
+    val gridWidth = 10
+    val gridHeight = 7
     initStage(primaryStage)
-    initHexagonGrid()
+    initHexagonGrid(gridWidth, gridHeight)
     drawHexagonGrid()
 
     setEventHandlers()
@@ -67,13 +69,12 @@ class LifeGame extends Application {
     primaryStage.show()
   }
 
-  private def initHexagonGrid() = {
-    gridController = new HexagonalGridController(50)
-    cellGrid = gridController.generateGrid(10, 7)
+  private def initHexagonGrid(width: Int, height: Int) = {
+    gameController = new GameController[Hexagon](width, height, new HexagonalGridController(50))
   }
 
   private def drawHexagonGrid(): Unit = {
-    cellGrid.foreach(_.foreach(hexagon => drawHex(drawable, hexagon)))
+    gameController.getCells.foreach(_.foreach(hexagon => drawHex(drawable, hexagon)))
   }
 
   private def setEventHandlers(): Unit = {
@@ -94,8 +95,10 @@ class LifeGame extends Application {
   }
 
   private def fillHexagon(point: DoublePoint): Unit = {
-    val hexCoords = gridController.getCellByPoint(point)
-    if (hexCoords.x < 0 || hexCoords.y < 0) return
+    val hexCoords = gameController.getGridController.getCellByPoint(point)
+    val cellGrid = gameController.getCells
+    if (hexCoords.x < 0 || hexCoords.y < 0 ||
+        hexCoords.x >= cellGrid.length || hexCoords.y >= cellGrid(0).length) return
     //      println(s"($x, $y) -> $hexCoords")
     colorFiller.fillCell(drawable, cellGrid(hexCoords.x)(hexCoords.y), Color.GRAY)
   }
