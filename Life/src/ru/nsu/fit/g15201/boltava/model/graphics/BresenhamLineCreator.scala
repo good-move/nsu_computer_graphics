@@ -1,5 +1,7 @@
 package ru.nsu.fit.g15201.boltava.model.graphics
 
+import ru.nsu.fit.g15201.boltava.model.canvas.Point
+
 import scala.collection.mutable.ArrayBuffer
 
 object BresenhamLineCreator extends LineCreator {

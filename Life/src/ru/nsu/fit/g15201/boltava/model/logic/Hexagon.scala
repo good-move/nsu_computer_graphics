@@ -1,6 +1,6 @@
 package ru.nsu.fit.g15201.boltava.model.logic
 
-import ru.nsu.fit.g15201.boltava.model.graphics.Point
+import ru.nsu.fit.g15201.boltava.model.canvas.Point
 
 class Hexagon(private val _center: Point, private val _vertices: Array[Point]) extends Cell {
 
