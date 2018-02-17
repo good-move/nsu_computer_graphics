@@ -2,9 +2,12 @@ package ru.nsu.fit.g15201.boltava.model.logic
 
 trait Cell {
 
+  def getState: State.State
+  def setState(state: State.State): Unit
+
   object State extends Enumeration {
-    val ALIVE = Value(0)
-    val DEAD = Value(1)
+    type State = Value
+    val ALIVE, DEAD = Value
   }
 
 }
