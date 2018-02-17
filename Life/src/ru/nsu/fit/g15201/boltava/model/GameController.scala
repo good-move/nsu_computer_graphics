@@ -29,7 +29,7 @@ class GameController[T <: Polygon](private val fieldWidth: Int = 10,
     cellGrid = gridController.generateGrid(fieldWidth, fieldHeight)
   }
 
-  abstract object CellSelectionMode extends Enumeration {
+  object CellSelectionMode extends Enumeration {
     val TOGGLE = Value(0)
     val REPLACE = Value(1)
   }
