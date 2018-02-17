@@ -7,6 +7,6 @@ import ru.nsu.fit.g15201.boltava.model.canvas.{Polygon, IDrawable}
 /**
   * Interface to implement a cell filling algorithm
   */
-trait IColorFiller[T <: Polygon] {
-  def fillCell(drawable: IDrawable, cell: T, color: Color)
+trait IColorFiller {
+  def fillCell(drawable: IDrawable, cell: Polygon, color: Color)
 }

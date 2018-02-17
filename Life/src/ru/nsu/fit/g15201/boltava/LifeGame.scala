@@ -15,7 +15,7 @@ import ru.nsu.fit.g15201.boltava.model.logic.Hexagon
 class LifeGame extends Application {
 
   private var drawable: IDrawable = _
-  private var colorFiller: IColorFiller[Hexagon] = _
+  private var colorFiller: IColorFiller = _
   private var gameController: GameController[Hexagon] = _
 
   private var scene: Scene = _
@@ -46,8 +46,10 @@ class LifeGame extends Application {
   }
 
   def drawHex(drawable: IDrawable, hex: Hexagon): Unit = {
-    for (i <- hex.vertices.indices) {
-      val linePoints = BresenhamLineCreator.getLinePoints(hex.vertices(i), hex.vertices((i + 1) % hex.vertices.length))
+    val vertices = hex.getVertices
+    val verticesCount = vertices.length
+    for (i <- vertices.indices) {
+      val linePoints = BresenhamLineCreator.getLinePoints(vertices(i), vertices((i + 1) % verticesCount))
       drawable.draw(linePoints)
     }
   }

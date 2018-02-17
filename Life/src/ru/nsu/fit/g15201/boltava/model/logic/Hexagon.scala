@@ -4,10 +4,9 @@ import ru.nsu.fit.g15201.boltava.model.canvas.{Polygon, Point}
 
 class Hexagon(private val _center: Point, private val _vertices: Array[Point]) extends Polygon {
 
-  def center: Point = _center
+  override def getCenter: Point = _center
 
-  def vertices: Array[Point] = _vertices
-
+  override def getVertices: Array[Point] = _vertices
 }
 
 
