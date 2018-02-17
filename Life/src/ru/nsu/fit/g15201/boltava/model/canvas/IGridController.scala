@@ -1,5 +1,7 @@
 package ru.nsu.fit.g15201.boltava.model.canvas
 
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point, Polygon}
+
 
 /**
   * This class is intended to control various grid systems.

@@ -9,6 +9,7 @@ import javafx.stage.Stage
 
 import ru.nsu.fit.g15201.boltava.model.GameController
 import ru.nsu.fit.g15201.boltava.model.canvas._
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Hexagon, Point}
 import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
 
 class LifeGame extends Application {

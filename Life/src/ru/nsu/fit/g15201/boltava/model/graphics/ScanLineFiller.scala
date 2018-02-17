@@ -2,7 +2,8 @@ package ru.nsu.fit.g15201.boltava.model.graphics
 
 import javafx.scene.paint.Color
 
-import ru.nsu.fit.g15201.boltava.model.canvas.{IDrawable, Point, Polygon}
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{Point, Polygon}
+import ru.nsu.fit.g15201.boltava.model.canvas.IDrawable
 
 import scala.collection.mutable.ListBuffer
 

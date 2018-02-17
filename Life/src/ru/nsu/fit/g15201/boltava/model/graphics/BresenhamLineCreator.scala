@@ -1,6 +1,6 @@
 package ru.nsu.fit.g15201.boltava.model.graphics
 
-import ru.nsu.fit.g15201.boltava.model.canvas.Point
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
 
 import scala.collection.mutable.ArrayBuffer
 

@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.model.canvas
+package ru.nsu.fit.g15201.boltava.model.canvas.geometry
 
 class Point(private var _x: Int, private var _y: Int) {
 

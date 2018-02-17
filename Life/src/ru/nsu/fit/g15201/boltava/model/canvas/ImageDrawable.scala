@@ -2,6 +2,8 @@ package ru.nsu.fit.g15201.boltava.model.canvas
 import javafx.scene.image.WritableImage
 import javafx.scene.paint.Color
 
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
+
 class ImageDrawable(private val writableImage: WritableImage) extends IDrawable {
 
   override def setColor(point: Point, color: Color): Unit = {

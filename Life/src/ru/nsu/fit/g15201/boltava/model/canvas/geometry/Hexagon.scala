@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.model.canvas
+package ru.nsu.fit.g15201.boltava.model.canvas.geometry
 
 class Hexagon(private val center: Point, private val vertices: Array[Point]) extends Polygon {
 

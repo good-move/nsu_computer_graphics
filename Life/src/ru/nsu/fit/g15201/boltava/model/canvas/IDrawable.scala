@@ -2,6 +2,8 @@ package ru.nsu.fit.g15201.boltava.model.canvas
 
 import javafx.scene.paint.Color
 
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
+
 trait IDrawable {
   def getHeight: Double
   def getWidth: Double
