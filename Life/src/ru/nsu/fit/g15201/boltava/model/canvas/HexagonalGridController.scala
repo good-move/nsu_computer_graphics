@@ -1,10 +1,11 @@
 package ru.nsu.fit.g15201.boltava.model.canvas
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Hexagon, Point}
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
+import ru.nsu.fit.g15201.boltava.model.logic.HexagonCell
 
 import scala.collection.mutable.ArrayBuffer
 
-class HexagonalGridController(private val hexSideSize: Int) extends IGridController[Hexagon] {
+class HexagonalGridController(private val hexSideSize: Int) extends IGridController[HexagonCell] {
 
   private val _size: Double = hexSideSize
   private val R: Double = _size
@@ -18,15 +19,15 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
 
   def getSideSize: Int = hexSideSize
 
-  override def generateGrid(width: Int, height: Int): Array[Array[Hexagon]] = {
-    val grid = new Array[Array[Hexagon]](height)
+  override def generateGrid(width: Int, height: Int): Array[Array[HexagonCell]] = {
+    val grid = new Array[Array[HexagonCell]](height)
 
     for (x <- 0 until height) {
-      grid(x) = new Array[Hexagon](width)
+      grid(x) = new Array[HexagonCell](width)
       for (y <- 0 until width) {
         val center = getCellCenter(x,y)
         val vertices = getVerticesForHexCenter(center)
-        grid(x)(y) = Hexagon((center.x.toInt, center.y.toInt), vertices)
+        grid(x)(y) = new HexagonCell((center.x.toInt, center.y.toInt), vertices)
       }
     }
 
@@ -59,10 +60,10 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     vertices.toArray
   }
 
-  def createHex(point: Point): Hexagon = {
+  def createHex(point: Point): HexagonCell = {
     val center = getCellCenter(point)
     val vertices = getVerticesForHex(point)
-    Hexagon(new Point(center.x, center.y), vertices)
+    new HexagonCell(new Point(center.x, center.y), vertices)
   }
 
   /**
