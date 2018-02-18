@@ -48,9 +48,13 @@ class GameController[T <: Cell with Polygon](private val fieldWidth: Int = 10,
     }
 
     if (cell.getState != oldState) {
-      cellStateObservers.foreach(o => o.onCellStateChange(cell))
+      notifyCellStateObservers(cell)
     }
 
+  }
+
+  private def notifyCellStateObservers(cell: Cell with Polygon): Unit = {
+    cellStateObservers.foreach(o => o.onCellStateChange(cell))
   }
 
   override def subscribe(cellStateObserver: ICellStateObserver): Unit = {
@@ -60,6 +64,17 @@ class GameController[T <: Cell with Polygon](private val fieldWidth: Int = 10,
   override def unsubscribe(cellStateObserver: ICellStateObserver): Unit = {
     cellStateObservers.remove(cellStateObserver)
   }
+
+  def resetAllCells(): Unit = {
+    cellGrid.foreach(_.foreach(cell => {
+      val oldState = cell.getState
+      cell.setState(cell.State.DEAD)
+      if (oldState != cell.getState) {
+        notifyCellStateObservers(cell)
+      }
+    }))
+  }
+
 }
 
 object CellSelectionMode extends Enumeration {
