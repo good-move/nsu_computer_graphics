@@ -23,6 +23,10 @@ class LifeGame extends Application with ICellStateObserver {
 
   private var scene: Scene = _
 
+  private val gridWidth = 10
+  private val gridHeight = 7
+  private val cellSideSize = 50
+
   override def start(primaryStage: Stage): Unit = {
     // TODO:
     // read config file
@@ -31,8 +35,6 @@ class LifeGame extends Application with ICellStateObserver {
     // create hexagons and mark them as alive or dead
     // draw hexagons
 
-    val gridWidth = 10
-    val gridHeight = 7
     initStage(primaryStage)
     initHexagonGrid(gridWidth, gridHeight)
     drawHexagonGrid()
@@ -75,7 +77,7 @@ class LifeGame extends Application with ICellStateObserver {
   }
 
   private def initHexagonGrid(width: Int, height: Int) = {
-    gameController = new GameController[HexagonCell](width, height, new HexagonalGridController(50))
+    gameController = new GameController[HexagonCell](width, height, new HexagonalGridController(cellSideSize))
     gameController.subscribe(this)
   }
 
