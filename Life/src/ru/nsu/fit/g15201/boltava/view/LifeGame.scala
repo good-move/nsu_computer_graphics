@@ -1,18 +1,18 @@
-package ru.nsu.fit.g15201.boltava
+package ru.nsu.fit.g15201.boltava.view
 
 import javafx.application.Application
-import javafx.scene.{Group, Scene}
 import javafx.scene.image.{ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
+import javafx.scene.{Group, Scene}
 import javafx.stage.Stage
 
 import ru.nsu.fit.g15201.boltava.model.canvas._
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point, Polygon}
 import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
-import ru.nsu.fit.g15201.boltava.model.logic.{CellSelectionMode, GameController, HexagonCell}
+import ru.nsu.fit.g15201.boltava.model.logic.{Cell, GameController, HexagonCell}
 
-class LifeGame extends Application {
+class LifeGame extends Application with ICellStateObserver {
 
   private var drawable: IDrawable = _
   private var colorFiller: IColorFiller = _
@@ -20,7 +20,6 @@ class LifeGame extends Application {
 
   private val aliveCellFillColor = Color.GRAY
   private val deadCellFillColor = Color.WHITE
-
 
   private var scene: Scene = _
 
@@ -77,6 +76,7 @@ class LifeGame extends Application {
 
   private def initHexagonGrid(width: Int, height: Int) = {
     gameController = new GameController[HexagonCell](width, height, new HexagonalGridController(50))
+    gameController.subscribe(this)
   }
 
   private def drawHexagonGrid(): Unit = {
@@ -108,16 +108,19 @@ class LifeGame extends Application {
 
     val hexagon = gameController.getCells(hexCoords.x)(hexCoords.y)
     gameController.onCellClicked(hexagon)
-    val color = hexagon.getState match {
-      case hexagon.State.ALIVE => aliveCellFillColor
-      case hexagon.State.DEAD => deadCellFillColor
-    }
-
-    fillHexagon(hexagon,color)
   }
 
-  private def fillHexagon(hexagonCell: HexagonCell, color: Color): Unit = {
+  private def fillCell(hexagonCell: Polygon, color: Color): Unit = {
     colorFiller.fillCell(drawable, hexagonCell, color)
+  }
+
+  override def onCellStateChange(cell: Cell with Polygon): Unit = {
+    val color = cell.getState match {
+      case cell.State.ALIVE => aliveCellFillColor
+      case cell.State.DEAD => deadCellFillColor
+    }
+
+    fillCell(cell, color)
   }
 
 }
