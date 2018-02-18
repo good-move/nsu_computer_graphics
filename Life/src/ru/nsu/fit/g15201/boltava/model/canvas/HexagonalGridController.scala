@@ -101,4 +101,35 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     }
   }
 
+  override def getCellNeighbors(point: Point): Array[Point] = {
+    val x = point.x
+    val y = point.y
+    val sign = if (x % 2 == 0) -1 else 1
+
+    Array[Point](
+      (x, y+1),
+      (x, y-1),
+      (x-1, y),
+      (x-1, y+sign),
+      (x+1, y),
+      (x+1, y+sign)
+    )
+  }
+
+  override def getCellDistantNeighbors(point: Point): Array[Point] = {
+    val x = point.x
+    val y = point.y
+    val isEven = if (point.x % 2 == 0) 1 else 0
+    val isOdd = if (point.x % 2 != 0) 1 else 0
+
+    Array[Point](
+      (x-2, y),
+      (x+2, y),
+      (x-1, y+1+isOdd),
+      (x-1, y-1-isEven),
+      (x+1, y+1+isOdd),
+      (x+1, y-1-isEven)
+    )
+  }
+
 }
