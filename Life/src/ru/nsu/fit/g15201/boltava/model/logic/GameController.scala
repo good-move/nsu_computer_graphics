@@ -2,13 +2,14 @@ package ru.nsu.fit.g15201.boltava.model
 
 import ru.nsu.fit.g15201.boltava.model.canvas.IGridController
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Polygon
+import ru.nsu.fit.g15201.boltava.model.logic.Cell
 
-class GameController[T <: Polygon](private val fieldWidth: Int = 10,
+class GameController[T <: Cell with Polygon](private val fieldWidth: Int = 10,
                                    private val fieldHeight: Int = 10,
                                    private val gridController: IGridController[T]) {
 
   private var cellGrid: Array[Array[T]] = _
-  private var cellSelectionMode = CellSelectionMode.REPLACE
+  private var cellSelectionMode = CellSelectionMode.TOGGLE
 
   { // constructor code
     generateGrid()
@@ -30,9 +31,9 @@ class GameController[T <: Polygon](private val fieldWidth: Int = 10,
     cellGrid = gridController.generateGrid(fieldWidth, fieldHeight)
   }
 
-  object CellSelectionMode extends Enumeration {
-    val TOGGLE = Value(0)
-    val REPLACE = Value(1)
-  }
+}
 
+object CellSelectionMode extends Enumeration {
+  type CellSelectionMode = Value
+  val TOGGLE, REPLACE = Value
 }

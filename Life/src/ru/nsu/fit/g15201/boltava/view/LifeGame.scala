@@ -7,16 +7,20 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 
-import ru.nsu.fit.g15201.boltava.model.GameController
 import ru.nsu.fit.g15201.boltava.model.canvas._
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Hexagon, Point}
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
 import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
+import ru.nsu.fit.g15201.boltava.model.logic.{CellSelectionMode, GameController, HexagonCell}
 
 class LifeGame extends Application {
 
   private var drawable: IDrawable = _
   private var colorFiller: IColorFiller = _
-  private var gameController: GameController[Hexagon] = _
+  private var gameController: GameController[HexagonCell] = _
+
+  private val aliveCellFillColor = Color.GRAY
+  private val deadCellFillColor = Color.WHITE
+
 
   private var scene: Scene = _
 
@@ -45,7 +49,7 @@ class LifeGame extends Application {
     }
   }
 
-  def drawHex(drawable: IDrawable, hex: Hexagon): Unit = {
+  def drawHex(drawable: IDrawable, hex: HexagonCell): Unit = {
     val vertices = hex.getVertices
     val verticesCount = vertices.length
     for (i <- vertices.indices) {
@@ -72,7 +76,7 @@ class LifeGame extends Application {
   }
 
   private def initHexagonGrid(width: Int, height: Int) = {
-    gameController = new GameController[Hexagon](width, height, new HexagonalGridController(50))
+    gameController = new GameController[HexagonCell](width, height, new HexagonalGridController(50))
   }
 
   private def drawHexagonGrid(): Unit = {
@@ -81,7 +85,7 @@ class LifeGame extends Application {
 
   private def setEventHandlers(): Unit = {
     scene.addEventHandler(MouseEvent.MOUSE_CLICKED, (event: MouseEvent) => {
-      fillHexagon((event.getSceneX, event.getSceneY))
+      onFieldDragOrClick((event.getSceneX, event.getSceneY))
       event.consume()
     })
 
@@ -91,18 +95,29 @@ class LifeGame extends Application {
     })
 
     scene.setOnMouseDragOver((event: MouseEvent) => {
-      fillHexagon((event.getSceneX, event.getSceneY))
+      onFieldDragOrClick((event.getSceneX, event.getSceneY))
     })
 
   }
 
-  private def fillHexagon(point: DoublePoint): Unit = {
+  private def onFieldDragOrClick(point: DoublePoint): Unit = {
     val hexCoords = gameController.getGridController.getCellByPoint(point)
     val cellGrid = gameController.getCells
     if (hexCoords.x < 0 || hexCoords.y < 0 ||
-        hexCoords.x >= cellGrid.length || hexCoords.y >= cellGrid(0).length) return
-    //      println(s"($x, $y) -> $hexCoords")
-    colorFiller.fillCell(drawable, cellGrid(hexCoords.x)(hexCoords.y), Color.GRAY)
+      hexCoords.x >= cellGrid.length || hexCoords.y >= cellGrid(0).length) return
+
+    val hexagon = gameController.getCells(hexCoords.x)(hexCoords.y)
+    gameController.onCellClicked(hexagon)
+    val color = hexagon.getState match {
+      case hexagon.State.ALIVE => aliveCellFillColor
+      case hexagon.State.DEAD => deadCellFillColor
+    }
+
+    fillHexagon(hexagon,color)
+  }
+
+  private def fillHexagon(hexagonCell: HexagonCell, color: Color): Unit = {
+    colorFiller.fillCell(drawable, hexagonCell, color)
   }
 
 }
