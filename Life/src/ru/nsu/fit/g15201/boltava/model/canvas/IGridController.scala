@@ -30,4 +30,8 @@ trait IGridController[CellType <: Polygon] {
     */
   def getCellByPoint(point: DoublePoint): Point
 
+  def getCellNeighbors(point: Point): Array[Point]
+
+  def getCellDistantNeighbors(point: Point): Array[Point]
+
 }
