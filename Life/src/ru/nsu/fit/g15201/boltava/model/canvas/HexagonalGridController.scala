@@ -1,11 +1,11 @@
 package ru.nsu.fit.g15201.boltava.model.canvas
 
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
-import ru.nsu.fit.g15201.boltava.model.logic.HexagonCell
+import ru.nsu.fit.g15201.boltava.model.logic.{Cell, HexagonCell}
 
 import scala.collection.mutable.ArrayBuffer
 
-class HexagonalGridController(private val hexSideSize: Int) extends IGridController[HexagonCell] {
+class HexagonalGridController(private val hexSideSize: Int) extends IGridController {
 
   private val _size: Double = hexSideSize
   private val R: Double = _size
@@ -19,7 +19,7 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
 
   def getSideSize: Int = hexSideSize
 
-  override def generateGrid(width: Int, height: Int): Array[Array[HexagonCell]] = {
+  override def generateGrid(width: Int, height: Int): Array[Array[Cell]] = {
     val grid = new Array[Array[HexagonCell]](height)
 
     for (x <- 0 until height) {
@@ -31,7 +31,7 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
       }
     }
 
-    grid
+    grid.asInstanceOf[Array[Array[Cell]]]
   }
 
   override def getCellCenter(point: Point): DoublePoint = {
@@ -45,7 +45,7 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
   }
 
   private def getVerticesForHexCenter(center: DoublePoint): Array[Point] = {
-    var vertices = ArrayBuffer[Point]()
+    val vertices = ArrayBuffer[Point]()
 
     var angle_deg: Double = OFFSET_ANGLE
     for (_ <- 0 to 6) {
@@ -85,7 +85,6 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     val xIn: Double = xBiased - W*xt.toDouble
 
     // figure out, what hexagon part we're in
-    var error = false
     val slope = R/r/2
     val lineValue = slope*Math.abs(xIn - W/2)
     if (yIn < lineValue) {

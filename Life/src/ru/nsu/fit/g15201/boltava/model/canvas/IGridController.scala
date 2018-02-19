@@ -1,6 +1,7 @@
 package ru.nsu.fit.g15201.boltava.model.canvas
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point, Polygon}
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
+import ru.nsu.fit.g15201.boltava.model.logic.Cell
 
 
 /**
@@ -8,11 +9,10 @@ import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point, Poly
   *
   * Creates arbitrary cell space with its own coordinate system
   *
-  * @tparam CellType
   */
-trait IGridController[CellType <: Polygon] {
+trait IGridController {
 
-  def generateGrid(width: Int, height: Int): Array[Array[CellType]]
+  def generateGrid(width: Int, height: Int): Array[Array[Cell]]
 
   /**
     * Get cartesian coordinates for cell with coordinates `point`,
