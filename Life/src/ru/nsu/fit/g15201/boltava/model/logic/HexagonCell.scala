@@ -1,9 +1,9 @@
 package ru.nsu.fit.g15201.boltava.model.logic
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{Point, Polygon}
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
 
 class HexagonCell(private val center: Point,
-                  private val vertices: Array[Point]) extends Cell with Polygon {
+                  private val vertices: Array[Point]) extends Cell {
 
   var state: State.Value = State.DEAD
 
