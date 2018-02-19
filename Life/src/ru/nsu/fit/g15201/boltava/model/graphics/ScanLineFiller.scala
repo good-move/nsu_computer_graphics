@@ -2,19 +2,20 @@ package ru.nsu.fit.g15201.boltava.model.graphics
 
 import javafx.scene.paint.Color
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{Point, Polygon}
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
 import ru.nsu.fit.g15201.boltava.model.canvas.IDrawable
+import ru.nsu.fit.g15201.boltava.model.logic.Cell
 
 import scala.collection.mutable.ListBuffer
 
 class ScanLineFiller extends IColorFiller {
 
-  override def fillCell(drawable: IDrawable, polygon: Polygon, newColor: Color): Unit = {
+  override def fillCell(drawable: IDrawable, polygon: Cell, newColor: Color): Unit = {
     val oldColor = drawable.getColor(polygon.getCenter.x, polygon.getCenter.y)
 
     if (oldColor.equals(newColor)) return
 
-    var stack = new ListBuffer[Point]()
+    val stack = new ListBuffer[Point]()
     stack.append(polygon.getCenter)
 
     while (stack.nonEmpty) {
