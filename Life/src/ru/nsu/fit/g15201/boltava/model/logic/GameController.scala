@@ -1,50 +1,90 @@
 package ru.nsu.fit.g15201.boltava.model.logic
 
+import java.util.concurrent.{ScheduledFuture, ScheduledThreadPoolExecutor, TimeUnit}
+
 import ru.nsu.fit.g15201.boltava.model.canvas.IGridController
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Polygon
 import ru.nsu.fit.g15201.boltava.view.ICellStateObserver
 
 import scala.collection.mutable
 
-class GameController[T <: Cell with Polygon](private val fieldWidth: Int = 10,
-                                   private val fieldHeight: Int = 10,
-                                   private val gridController: IGridController[T]) extends ICellClickListener with ICellStateProvider {
 
-  private var cellGrid: Array[Array[T]] = _
+
+class GameController(private val fieldWidth: Int = 10,
+                     private val fieldHeight: Int = 10,
+                     private val gridController: IGridController)
+                     extends ICellClickListener with ICellStateProvider with IFieldStateObserver {
+
+  private val executor = new ScheduledThreadPoolExecutor(1)
+  private val fieldUpdateInterval = 1000
+  private var updateTask: ScheduledFuture[_] = _
+
+  private var cellGrid: Array[Array[Cell]] = _
   private var cellSelectionMode = CellSelectionMode.TOGGLE
 
-  private var cellStateObservers = new mutable.HashSet[ICellStateObserver]()
+  private var fieldUpdater: ConwayFieldUpdater = _
+  private val cellStateObservers = new mutable.HashSet[ICellStateObserver]()
 
   { // constructor code
     generateGrid()
+    fieldUpdater = new ConwayFieldUpdater(cellGrid, gridController)
+    fieldUpdater.setStateObserver(this)
   }
 
-  def getCells: Array[Array[T]] = cellGrid
 
-  def getGridController: IGridController[T] = gridController
+
+  def getCells: Array[Array[Cell]] = cellGrid
+
+  def getGridController: IGridController = gridController
 
   def setCellSelectionMode(newCellSelectionMode: CellSelectionMode.Value): Unit = {
     cellSelectionMode = newCellSelectionMode
   }
 
+  def startGame(): Unit = {
+    println("Game Started!")
+    if (updateTask != null) {
+      updateTask.cancel({
+        val mayInterrupt = true; mayInterrupt
+      })
+    }
+    fieldUpdater.setInitialField(cellGrid)
+    updateTask = executor.scheduleAtFixedRate(fieldUpdater, 0, fieldUpdateInterval, TimeUnit.MILLISECONDS)
+  }
+
+  def nextStep(): Unit = {
+    fieldUpdater.run()
+  }
+
   def getCellSelectionMode: CellSelectionMode.Value = cellSelectionMode
+
+  def clearCellsField(): Unit = {
+    cellGrid.foreach(_.foreach(cell => {
+      val oldState = cell.getState
+      cell.setState(State.DEAD)
+      if (oldState != cell.getState) {
+        notifyCellStateObservers(cell)
+      }
+    }))
+  }
 
   // *************************** Private Methods ***************************
 
   private def generateGrid(): Unit = {
-    cellGrid = gridController.generateGrid(fieldWidth, fieldHeight)
+    cellGrid = gridController.generateGrid(fieldWidth, fieldHeight).asInstanceOf[Array[Array[Cell]]]
   }
 
-  override def onCellClicked(cell: Cell with Polygon): Unit = {
+  // *************************** ICellClickListener ***************************
+
+  override def onCellClicked(cell: Cell): Unit = {
     val oldState = cell.getState
     if (cellSelectionMode == CellSelectionMode.TOGGLE) {
-      if (cell.getState == cell.State.ALIVE) {
-        cell.setState(cell.State.DEAD)
+      if (cell.getState == State.ALIVE) {
+        cell.setState(State.DEAD)
       }  else {
-        cell.setState(cell.State.ALIVE)
+        cell.setState(State.ALIVE)
       }
     } else {
-      cell.setState(cell.State.ALIVE)
+      cell.setState(State.ALIVE)
     }
 
     if (cell.getState != oldState) {
@@ -53,9 +93,11 @@ class GameController[T <: Cell with Polygon](private val fieldWidth: Int = 10,
 
   }
 
-  private def notifyCellStateObservers(cell: Cell with Polygon): Unit = {
+  private def notifyCellStateObservers(cell: Cell): Unit = {
     cellStateObservers.foreach(o => o.onCellStateChange(cell))
   }
+
+  // *************************** ICellStateProvider ***************************
 
   override def subscribe(cellStateObserver: ICellStateObserver): Unit = {
     cellStateObservers.add(cellStateObserver)
@@ -65,14 +107,10 @@ class GameController[T <: Cell with Polygon](private val fieldWidth: Int = 10,
     cellStateObservers.remove(cellStateObserver)
   }
 
-  def resetAllCells(): Unit = {
-    cellGrid.foreach(_.foreach(cell => {
-      val oldState = cell.getState
-      cell.setState(cell.State.DEAD)
-      if (oldState != cell.getState) {
-        notifyCellStateObservers(cell)
-      }
-    }))
+  // *************************** IFieldStateObserver ***************************
+  override def onFieldUpdated(nextField: Array[Array[Cell]]): Unit = {
+    println("Updating field")
+    cellStateObservers.foreach(o => o.onCellsStateChange(nextField))
   }
 
 }
