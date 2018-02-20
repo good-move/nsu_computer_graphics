@@ -8,11 +8,10 @@ import ru.nsu.fit.g15201.boltava.view.ICellStateObserver
 import scala.collection.mutable
 
 
-
 class GameController(private val fieldWidth: Int = 10,
                      private val fieldHeight: Int = 10,
                      private val gridController: IGridController)
-                     extends ICellClickListener with ICellStateProvider with IFieldStateObserver {
+                     extends IGameLogicController with IFieldStateObserver {
 
   private val executor = new ScheduledThreadPoolExecutor(1)
   private val fieldUpdateInterval = 1000
@@ -31,16 +30,15 @@ class GameController(private val fieldWidth: Int = 10,
   }
 
 
+  override def getCells: Array[Array[Cell]] = cellGrid
 
-  def getCells: Array[Array[Cell]] = cellGrid
+  override def getGridController: IGridController = gridController
 
-  def getGridController: IGridController = gridController
-
-  def setCellSelectionMode(newCellSelectionMode: CellSelectionMode.Value): Unit = {
+  override def setCellSelectionMode(newCellSelectionMode: CellSelectionMode.Value): Unit = {
     cellSelectionMode = newCellSelectionMode
   }
 
-  def startGame(): Unit = {
+  override def start(): Unit = {
     println("Game Started!")
     if (updateTask != null) {
       updateTask.cancel({
@@ -51,13 +49,11 @@ class GameController(private val fieldWidth: Int = 10,
     updateTask = executor.scheduleAtFixedRate(fieldUpdater, 0, fieldUpdateInterval, TimeUnit.MILLISECONDS)
   }
 
-  def nextStep(): Unit = {
-    fieldUpdater.run()
+  override def pause(): Unit = {
+
   }
 
-  def getCellSelectionMode: CellSelectionMode.Value = cellSelectionMode
-
-  def clearCellsField(): Unit = {
+  override def reset(): Unit = {
     cellGrid.foreach(_.foreach(cell => {
       val oldState = cell.getState
       cell.setState(State.DEAD)
@@ -68,10 +64,16 @@ class GameController(private val fieldWidth: Int = 10,
     fieldUpdater.setInitialField(cellGrid)
   }
 
+  override def nextStep(): Unit = {
+    fieldUpdater.run()
+  }
+
+  override def getCellSelectionMode: CellSelectionMode.Value = cellSelectionMode
+
   // *************************** Private Methods ***************************
 
   private def generateGrid(): Unit = {
-    cellGrid = gridController.generateGrid(fieldWidth, fieldHeight).asInstanceOf[Array[Array[Cell]]]
+    cellGrid = gridController.generateGrid(fieldWidth, fieldHeight)
   }
 
   // *************************** ICellClickListener ***************************
