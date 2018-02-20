@@ -19,7 +19,7 @@ class GameController(private val fieldWidth: Int = 10,
   private var updateTask: ScheduledFuture[_] = _
 
   private var cellGrid: Array[Array[Cell]] = _
-  private var cellSelectionMode = CellSelectionMode.TOGGLE
+  private var cellSelectionMode = CellSelectionMode.REPLACE
 
   private var fieldUpdater: ConwayFieldUpdater = _
   private val cellStateObservers = new mutable.HashSet[ICellStateObserver]()
@@ -65,6 +65,7 @@ class GameController(private val fieldWidth: Int = 10,
         notifyCellStateObservers(cell)
       }
     }))
+    fieldUpdater.setInitialField(cellGrid)
   }
 
   // *************************** Private Methods ***************************
