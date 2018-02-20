@@ -131,4 +131,10 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     )
   }
 
+  override def getCartesianFieldSize(width: Int, height: Int): (Double, Double) = {
+    val w = 2*r * width
+    val h = 2*R * height
+    (w, h)
+  }
+
 }
