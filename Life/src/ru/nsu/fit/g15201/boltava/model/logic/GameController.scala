@@ -63,7 +63,7 @@ class GameController(private val gridController: IGridController) extends IGameL
   }
 
   override def pause(): Unit = {
-
+    stopUpdater()
   }
 
   override def reset(): Unit = {
