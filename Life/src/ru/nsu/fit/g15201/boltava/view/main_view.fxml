@@ -69,7 +69,6 @@
     <HBox fx:id="gameFieldWrapper"
           GridPane.rowIndex="2"
           GridPane.columnIndex="0"
-          onMouseClicked="#onGameFieldClicked"
           style="-fx-background:white"
     >
         <ImageView fx:id="gameFieldImageView"/>
