@@ -13,52 +13,83 @@ import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
 import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
 import ru.nsu.fit.g15201.boltava.model.logic.{Cell, GameController, State}
 
-class Controller extends ICellStateObserver {
+class MainViewController extends ICellStateObserver {
 
   private var drawable: IDrawable = _
   private var colorFiller: IColorFiller = _
   private var gameController: GameController = _
 
-  private val aliveCellFillColor = Color.GRAY
-  private val deadCellFillColor = Color.WHITE
+  private val ALIVE_CELL_COLOR = Color.GRAY
+  private val DEAD_CELL_COLOR = Color.WHITE
 
-  private val gridWidth = 8
-  private val gridHeight = 8
-  private val cellSideSize = 40
+  private val GRID_WIDTH = 8
+  private val GRID_HEIGHT = 8
+  private val CELL_SIDE_SIZE = 40
 
   @FXML private var toolbar: ToolBar = _
   @FXML private var gameFieldImageView: ImageView = _
   @FXML private var gameFieldWrapper: HBox = _
 
-  var initialized = false
-
+  @FXML
   private def initialize(): Unit = {
-    if (initialized) return
-
-    initHexagonGrid(gridWidth, gridHeight)
+    initializeGrid(GRID_WIDTH, GRID_HEIGHT)
 
     val image = new WritableImage(1000, 1000)
-    for (x <- 0 until image.getWidth.toInt; y <- 0 until image.getHeight.toInt) image.getPixelWriter.setColor(x, y, Color.WHITE)
     gameFieldImageView.setImage(image)
     drawable = new ImageDrawable(image)
+    fillWhiteBackground(drawable)
 
     setEventHandlers()
 
     colorFiller = new ScanLineFiller()
-
-    initialized = true
   }
 
-  private def initHexagonGrid(width: Int, height: Int) = {
-    val gridController: IGridController = new HexagonalGridController(cellSideSize)
+  private def fillWhiteBackground(drawable: IDrawable): Unit = {
+    for (x <- 0 until drawable.getWidth.toInt; y <- 0 until drawable.getHeight.toInt) {
+      drawable.setColor((x, y), Color.WHITE)
+    }
+  }
+
+  private def initializeGrid(width: Int, height: Int) = {
+    val gridController: IGridController = new HexagonalGridController(CELL_SIDE_SIZE)
     gameController = new GameController(width, height, gridController)
     gameController.subscribe(this)
   }
 
-  private def drawLine(drawable: IDrawable, points: Array[Point]): Unit = {
-    for (p <- points) {
-      drawable.setColor(p, Color.BLACK)
-    }
+  @FXML
+  protected def onPlay(event: MouseEvent): Unit = {
+    println("onPlay")
+    // if model not selected, alert <Model must be chosen>
+    // else: draw grid and start game
+
+    //    gameController.startGame()
+    drawCellGrid()
+  }
+
+  @FXML
+  protected def onPause(event: MouseEvent): Unit = {
+    // if game started, pause game
+    println("onPause")
+  }
+
+  @FXML
+  protected def onClearField(event: MouseEvent): Unit = {
+    // stop game and clear field
+    println("onClearField")
+    onPause(event)
+    gameController.clearCellsField()
+  }
+
+  @FXML
+  protected def onNextStep(event: MouseEvent): Unit = {
+    // pause game and make next step
+    println("onNextStep")
+    gameController.nextStep()
+  }
+
+  @FXML
+  protected def onGameFieldClicked(event: MouseEvent): Unit = {
+    println("hello")
   }
 
   private def drawHex(drawable: IDrawable, hex: Cell): Unit = {
@@ -109,8 +140,8 @@ class Controller extends ICellStateObserver {
 
   override def onCellStateChange(cell: Cell): Unit = {
     val color = cell.getState match {
-      case State.ALIVE => aliveCellFillColor
-      case State.DEAD => deadCellFillColor
+      case State.ALIVE => ALIVE_CELL_COLOR
+      case State.DEAD => DEAD_CELL_COLOR
     }
 
     fillCell(cell, color)
@@ -120,37 +151,6 @@ class Controller extends ICellStateObserver {
     Platform.runLater(() => {
       cell.foreach(_.foreach(onCellStateChange))
     })
-  }
-
-  @FXML
-  protected def onPlay(event: MouseEvent): Unit = {
-    initialize()
-    println("onPlay")
-//    gameController.startGame()
-    drawCellGrid()
-  }
-
-  @FXML
-  protected def onPause(event: MouseEvent): Unit = {
-    println("onPause")
-  }
-
-  @FXML
-  protected def onClearField(event: MouseEvent): Unit = {
-    println("onClearField")
-    onPause(event)
-    gameController.clearCellsField()
-  }
-
-  @FXML
-  protected def onNextStep(event: MouseEvent): Unit = {
-    println("onNextStep")
-    gameController.nextStep()
-  }
-
-  @FXML
-  protected def onGameFieldClicked(event: MouseEvent): Unit = {
-    println("hello")
   }
 
 }
