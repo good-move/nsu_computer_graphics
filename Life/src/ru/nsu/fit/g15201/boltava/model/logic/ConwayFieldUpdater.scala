@@ -14,7 +14,7 @@ import ru.nsu.fit.g15201.boltava.model.logic.State.State
 class ConwayFieldUpdater(private val gridController: IGridController) extends Runnable {
 
   private var mainField: Array[Array[Cell]] = _
-  private val helperField: Array[Array[State]] = null
+  private var helperField: Array[Array[State]] = _
   private var fieldStateObserver: IFieldStateObserver = _
 
   private var sourceHelper = false
@@ -26,8 +26,12 @@ class ConwayFieldUpdater(private val gridController: IGridController) extends Ru
   private var _birthLowerBorderScore: Double = 2.3
   private var _birthUpperBorderScore: Double = 2.9
 
+
+  private var c = 1
   def run(): Unit = {
     makeStep()
+    c += 1
+    println(c)
   }
 
   def makeStep(): Unit = {
@@ -75,12 +79,13 @@ class ConwayFieldUpdater(private val gridController: IGridController) extends Ru
       mainField(i)(j).setState(helperField(i)(j))
     }
 
+    println("step done")
   }
 
   def setMainField(field: Array[Array[Cell]]): Unit = {
     // TODO: make synchronized
     mainField = field
-    createHelperArray()
+    helperField = createHelperArray()
     sourceHelper = false
   }
 
