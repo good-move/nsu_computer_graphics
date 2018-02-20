@@ -1,0 +1,36 @@
+package ru.nsu.fit.g15201.boltava.model.logic
+
+class GridParameters {
+
+  private[this] var _width: Int = 0
+  private[this] var _height: Int = 0
+  private[this] var _borderWidth: Int = 1
+  private[this] var _cellSideSize: Int = 20
+
+  def cellSideSize: Int = _cellSideSize
+
+  def cellSideSize_=(value: Int): Unit = {
+    _cellSideSize = value
+  }
+
+  def width: Int = _width
+
+  def width_=(value: Int): Unit = {
+    _width = value
+  }
+
+
+  def height: Int = _height
+
+  def height_=(value: Int): Unit = {
+    _height = value
+  }
+
+
+  def borderWidth: Int = _borderWidth
+
+  def borderWidth_=(value: Int): Unit = {
+    _borderWidth = value
+  }
+
+}
