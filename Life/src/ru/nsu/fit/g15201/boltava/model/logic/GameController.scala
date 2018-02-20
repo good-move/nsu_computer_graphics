@@ -7,28 +7,38 @@ import ru.nsu.fit.g15201.boltava.view.ICellStateObserver
 
 import scala.collection.mutable
 
-
-class GameController(private val fieldWidth: Int = 10,
-                     private val fieldHeight: Int = 10,
-                     private val gridController: IGridController)
-                     extends IGameLogicController with IFieldStateObserver {
+/**
+  * Controls logic of the whole game.
+  *
+  * @param gridController
+  */
+class GameController(private val gridController: IGridController) extends IGameLogicController with IFieldStateObserver {
 
   private val executor = new ScheduledThreadPoolExecutor(1)
   private val fieldUpdateInterval = 1000
   private var updateTask: ScheduledFuture[_] = _
 
+  private var gridParameters: GridParameters = _
   private var cellGrid: Array[Array[Cell]] = _
   private var cellSelectionMode = CellSelectionMode.REPLACE
 
   private var fieldUpdater: ConwayFieldUpdater = _
   private val cellStateObservers = new mutable.HashSet[ICellStateObserver]()
 
+  private var gameState = GameState.UNINITIALIZED
+
   { // constructor code
-    generateGrid()
-    fieldUpdater = new ConwayFieldUpdater(cellGrid, gridController)
+    fieldUpdater = new ConwayFieldUpdater(gridController)
     fieldUpdater.setStateObserver(this)
   }
 
+  override def setGridParams(gridParameters: GridParameters): Unit = {
+    if (gameState == GameState.UNINITIALIZED) {
+      gameState = GameState.INITIALIZED
+    }
+    this.gridParameters = gridParameters
+    generateGrid()
+  }
 
   override def getCells: Array[Array[Cell]] = cellGrid
 
@@ -39,14 +49,17 @@ class GameController(private val fieldWidth: Int = 10,
   }
 
   override def start(): Unit = {
-    println("Game Started!")
-    if (updateTask != null) {
-      updateTask.cancel({
-        val mayInterrupt = true; mayInterrupt
-      })
+    if (!this.isGameModelSet) {
+      throw new RuntimeException("Game Field is not initialized")
     }
-    fieldUpdater.setInitialField(cellGrid)
+
+    println("Game Started!")
+    stopUpdater()
+
+    fieldUpdater.setMainField(cellGrid)
     updateTask = executor.scheduleAtFixedRate(fieldUpdater, 0, fieldUpdateInterval, TimeUnit.MILLISECONDS)
+
+    gameState = GameState.STARTED
   }
 
   override def pause(): Unit = {
@@ -54,6 +67,8 @@ class GameController(private val fieldWidth: Int = 10,
   }
 
   override def reset(): Unit = {
+    stopUpdater()
+
     cellGrid.foreach(_.foreach(cell => {
       val oldState = cell.getState
       cell.setState(State.DEAD)
@@ -61,11 +76,17 @@ class GameController(private val fieldWidth: Int = 10,
         notifyCellStateObservers(cell)
       }
     }))
-    fieldUpdater.setInitialField(cellGrid)
+    fieldUpdater.setMainField(cellGrid)
+
+    gameState = GameState.RESET
   }
 
   override def nextStep(): Unit = {
-    fieldUpdater.run()
+    if (!this.isGameModelSet) {
+      throw new RuntimeException("Game Field is not initialized")
+    }
+
+    fieldUpdater.makeStep()
   }
 
   override def getCellSelectionMode: CellSelectionMode.Value = cellSelectionMode
@@ -73,7 +94,14 @@ class GameController(private val fieldWidth: Int = 10,
   // *************************** Private Methods ***************************
 
   private def generateGrid(): Unit = {
-    cellGrid = gridController.generateGrid(fieldWidth, fieldHeight)
+    println("Generated Grid")
+    cellGrid = gridController.generateGrid(gridParameters.width, gridParameters.height)
+  }
+
+  private def stopUpdater(): Unit = {
+    if (updateTask != null) {
+      updateTask.cancel(true)
+    }
   }
 
   // *************************** ICellClickListener ***************************
@@ -111,14 +139,23 @@ class GameController(private val fieldWidth: Int = 10,
   }
 
   // *************************** IFieldStateObserver ***************************
+
   override def onFieldUpdated(nextField: Array[Array[Cell]]): Unit = {
     println("Updating field")
     cellStateObservers.foreach(o => o.onCellsStateChange(nextField))
   }
 
-}
 
-object CellSelectionMode extends Enumeration {
-  type CellSelectionMode = Value
-  val TOGGLE, REPLACE = Value
+
+  override def isGameStarted: Boolean = gameState == GameState.STARTED
+
+  override def isGameFinished: Boolean = gameState == GameState.FINISHED
+
+  override def isGameModelSet: Boolean = gameState != GameState.UNINITIALIZED
+
+  private object GameState extends Enumeration {
+    type GameState = Value
+    val UNINITIALIZED, INITIALIZED, STARTED, PAUSED, RESET, FINISHED = Value
+  }
+
 }
