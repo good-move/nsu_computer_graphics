@@ -9,15 +9,16 @@ import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 
 import ru.nsu.fit.g15201.boltava.model.canvas.{HexagonalGridController, IDrawable, IGridController, ImageDrawable}
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.DoublePoint
 import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
-import ru.nsu.fit.g15201.boltava.model.logic.{Cell, GameController, State}
+import ru.nsu.fit.g15201.boltava.model.logic.{Cell, GameController, IGameLogicController, State}
 
 class MainViewController extends ICellStateObserver {
 
   private var drawable: IDrawable = _
   private var colorFiller: IColorFiller = _
-  private var gameController: GameController = _
+  private var gridController: IGridController = _
+  private var gameController: IGameLogicController = _
 
   private val ALIVE_CELL_COLOR = Color.GRAY
   private val DEAD_CELL_COLOR = Color.WHITE
@@ -29,6 +30,9 @@ class MainViewController extends ICellStateObserver {
   @FXML private var toolbar: ToolBar = _
   @FXML private var gameFieldImageView: ImageView = _
   @FXML private var gameFieldWrapper: HBox = _
+
+  // ************************* Controller initialization *************************
+
 
   @FXML
   private def initialize(): Unit = {
@@ -44,17 +48,23 @@ class MainViewController extends ICellStateObserver {
     colorFiller = new ScanLineFiller()
   }
 
-  private def fillWhiteBackground(drawable: IDrawable): Unit = {
-    for (x <- 0 until drawable.getWidth.toInt; y <- 0 until drawable.getHeight.toInt) {
-      drawable.setColor((x, y), Color.WHITE)
-    }
+  private def setEventHandlers(): Unit = {
+    gameFieldWrapper.setOnMouseClicked((event: MouseEvent) => {
+      onFieldDragOrClick((event.getX, event.getY))
+    })
+
+    gameFieldWrapper.setOnDragDetected((event: MouseEvent) => {
+      gameFieldImageView.startFullDrag()
+      event.consume()
+    })
+
+    gameFieldWrapper.setOnMouseDragOver((event: MouseEvent) => {
+      onFieldDragOrClick((event.getX, event.getY))
+    })
+
   }
 
-  private def initializeGrid(width: Int, height: Int) = {
-    val gridController: IGridController = new HexagonalGridController(CELL_SIDE_SIZE)
-    gameController = new GameController(width, height, gridController)
-    gameController.subscribe(this)
-  }
+  // ************************* FXML events *************************
 
   @FXML
   protected def onPlay(event: MouseEvent): Unit = {
@@ -73,11 +83,11 @@ class MainViewController extends ICellStateObserver {
   }
 
   @FXML
-  protected def onClearField(event: MouseEvent): Unit = {
+  protected def onReset(event: MouseEvent): Unit = {
     // stop game and clear field
     println("onClearField")
     onPause(event)
-    gameController.clearCellsField()
+    gameController.reset()
   }
 
   @FXML
@@ -107,24 +117,8 @@ class MainViewController extends ICellStateObserver {
     })
   }
 
-  private def setEventHandlers(): Unit = {
-    gameFieldWrapper.setOnMouseClicked((event: MouseEvent) => {
-      onFieldDragOrClick((event.getX, event.getY))
-    })
-
-    gameFieldWrapper.addEventHandler(MouseEvent.DRAG_DETECTED, (event: MouseEvent) => {
-      gameFieldImageView.startFullDrag()
-      event.consume()
-    })
-
-    gameFieldWrapper.setOnMouseDragOver((event: MouseEvent) => {
-      onFieldDragOrClick((event.getX, event.getY))
-    })
-
-  }
-
   private def onFieldDragOrClick(point: DoublePoint): Unit = {
-    val hexCoords = gameController.getGridController.getCellByPoint(point)
+    val hexCoords = gridController.getCellByPoint(point)
     val cellGrid = gameController.getCells
     println(s"$point -> $hexCoords")
     if (hexCoords.x < 0 || hexCoords.y < 0 ||
@@ -137,6 +131,20 @@ class MainViewController extends ICellStateObserver {
   private def fillCell(cell: Cell, color: Color): Unit = {
         colorFiller.fillCell(drawable, cell, color)
   }
+
+  private def fillWhiteBackground(drawable: IDrawable): Unit = {
+    for (x <- 0 until drawable.getWidth.toInt; y <- 0 until drawable.getHeight.toInt) {
+      drawable.setColor((x, y), Color.WHITE)
+    }
+  }
+
+  private def initializeGrid(width: Int, height: Int) = {
+    gridController = new HexagonalGridController(CELL_SIDE_SIZE)
+    gameController = new GameController(width, height, gridController)
+    gameController.subscribe(this)
+  }
+
+  // ************************* ICellStateObserver *************************
 
   override def onCellStateChange(cell: Cell): Unit = {
     val color = cell.getState match {

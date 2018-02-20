@@ -37,7 +37,7 @@
                 <Button
                         fx:id="clearFieldBtn"
                         text="Clear"
-                        onMouseClicked="#onClearField"
+                        onMouseClicked="#onReset"
                 >
                     <tooltip><Tooltip text="Clear the field"/></tooltip>
                 </Button>
