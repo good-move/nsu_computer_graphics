@@ -5,10 +5,16 @@ import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
 import ru.nsu.fit.g15201.boltava.model.logic.State.State
 
 
-class ConwayFieldUpdater(private var initialField: Array[Array[Cell]],
-                         private val gridController: IGridController) extends Runnable {
+/**
+  * Implements Conway Game Of Life state switching, given array
+  * of cells and grid controller to fetch information about cells' neighbors
+  *
+  * @param gridController
+  */
+class ConwayFieldUpdater(private val gridController: IGridController) extends Runnable {
 
-  private val helperField = createHelperArray()
+  private var mainField: Array[Array[Cell]] = _
+  private val helperField: Array[Array[State]] = null
   private var fieldStateObserver: IFieldStateObserver = _
 
   private var sourceHelper = false
@@ -20,62 +26,66 @@ class ConwayFieldUpdater(private var initialField: Array[Array[Cell]],
   private var _birthLowerBorderScore: Double = 2.3
   private var _birthUpperBorderScore: Double = 2.9
 
-  override def run(): Unit = {
-    nextStep()
-    fieldStateObserver.onFieldUpdated(initialField)
+  def run(): Unit = {
+    makeStep()
   }
 
-  def nextStep(): Unit = {
+  def makeStep(): Unit = {
+    _nextStep()
+    fieldStateObserver.onFieldUpdated(mainField)
+  }
+
+  private def _nextStep(): Unit = {
+    if (mainField == null) {
+      throw new RuntimeException("Field is not initialized for field updater")
+    }
+
     println("Next step")
 
-    for (i <- initialField.indices) {
-      for (j <- initialField(i).indices) {
-        // TODO: optimize neighbors counting performance?
+    for (i <- mainField.indices; j <- mainField(i).indices) {
+      // TODO: optimize neighbors counting performance?
 
+      val closeNeighborsCount = gridController.getCellNeighbors((i, j))
+        .filter(neighborsFilter).count(p => countAliveFilter(p, mainField))
+      val distantNeighborsCount = gridController.getCellDistantNeighbors((i, j))
+        .filter(neighborsFilter).count(p => countAliveFilter(p, mainField))
 
-        val closeNeighborsCount = gridController.getCellNeighbors((i, j))
-          .filter(neighborsFilter).count(p => countAliveFilter(p, initialField))
-        val distantNeighborsCount = gridController.getCellDistantNeighbors((i, j))
-          .filter(neighborsFilter).count(p => countAliveFilter(p, initialField))
+      val impact = closeNeighborsCount * closeNeighborsImpactScore +
+        distantNeighborsCount * distantNeighborsImpactScore
 
-        val impact = closeNeighborsCount * closeNeighborsImpactScore +
-          distantNeighborsCount * distantNeighborsImpactScore
-
-        val cell = initialField(i)(j)
-        if (cell.getState == State.DEAD) {
-          val canBeBorn = birthLowerBorderScore <= impact && impact <= birthUpperBorderScore
-          if (canBeBorn) {
-            helperField(i)(j) = State.ALIVE
-          } else {
-            helperField(i)(j) = State.DEAD
-          }
-        } else if (cell.getState == State.ALIVE) {
-          val isStillAlive = lifeLowerBorderScore <= impact && impact <= lifeUpperBorderScore
-          if (!isStillAlive) {
-            helperField(i)(j) = State.DEAD
-          } else {
-            helperField(i)(j) = State.ALIVE
-          }
+      val cell = mainField(i)(j)
+      if (cell.getState == State.DEAD) {
+        val canBeBorn = birthLowerBorderScore <= impact && impact <= birthUpperBorderScore
+        if (canBeBorn) {
+          helperField(i)(j) = State.ALIVE
+        } else {
+          helperField(i)(j) = State.DEAD
+        }
+      } else if (cell.getState == State.ALIVE) {
+        val isStillAlive = lifeLowerBorderScore <= impact && impact <= lifeUpperBorderScore
+        if (!isStillAlive) {
+          helperField(i)(j) = State.DEAD
+        } else {
+          helperField(i)(j) = State.ALIVE
         }
       }
     }
 
-    for (i <- helperField.indices) {
-      for (j <- helperField(i).indices) {
-        initialField(i)(j).setState(helperField(i)(j))
-      }
+    for (i <- helperField.indices; j <- helperField(i).indices) {
+      mainField(i)(j).setState(helperField(i)(j))
     }
 
   }
 
-  def setInitialField(field: Array[Array[Cell]]): Unit = {
+  def setMainField(field: Array[Array[Cell]]): Unit = {
     // TODO: make synchronized
-    initialField = field
+    mainField = field
+    createHelperArray()
     sourceHelper = false
   }
 
   private def neighborsFilter(p: Point): Boolean = {
-    p.x >= 0 && p.y >= 0 && p.x < initialField.length && p.y < initialField(0).length
+    p.x >= 0 && p.y >= 0 && p.x < mainField.length && p.y < mainField(0).length
   }
 
   private def countAliveFilter(p: Point, field: Array[Array[Cell]]): Boolean = {
@@ -93,9 +103,9 @@ class ConwayFieldUpdater(private var initialField: Array[Array[Cell]],
   }
 
   private def createHelperArray(): Array[Array[State]] = {
-    val result = new Array[Array[State]](initialField.length)
+    val result = new Array[Array[State]](mainField.length)
     for (i <- result.indices) {
-      result(i) = new Array[State](initialField(i).length)
+      result(i) = new Array[State](mainField(i).length)
     }
     result
   }
