@@ -34,4 +34,6 @@ trait IGridController {
 
   def getCellDistantNeighbors(point: Point): Array[Point]
 
+  def getCartesianFieldSize(width: Int, height: Int): (Double, Double)
+
 }
