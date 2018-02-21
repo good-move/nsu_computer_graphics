@@ -31,25 +31,22 @@ object ConfigReader {
 
       gridParameters
     } catch {
-      case e: Exception => throw new RuntimeException("Failed to read grid configuration file", e)
+      case e: Exception => throw new RuntimeException("Failed to read grid configuration file. Check out config file structure description.", e)
     } finally {
       bufferedSource.close
     }
   }
 
   private def readDimensions(reader: BufferedReader): (Int, Int) = {
-    try {
-      val line = reader.readLine()
-      val dimensions = line.split(" ").map(s => s.toInt)
-      val (width, height) = (dimensions(0), dimensions(1))
-      (width, height)
-    } catch {
-      case e: Exception => throw new RuntimeException("Failed to read grid dimensions", e)
-    }
+    val line = reader.readLine()
+    val dimensions = line.split(" ").map(s => s.toInt)
+    val (width, height) = (dimensions(0), dimensions(1))
+    (width, height)
   }
 
   private def readAliveCells(reader: BufferedReader): Array[(Int, Int)] = {
     val aliveCellsCount = reader.readLine().toInt
+    if (aliveCellsCount <= 0) throw new RuntimeException("Number of alive cells must be a positive integer.")
     val aliveCells = new Array[(Int, Int)](aliveCellsCount)
     for (i <- aliveCells.indices) {
       val coords = reader.readLine().split(" ").map(s => s.toInt)
