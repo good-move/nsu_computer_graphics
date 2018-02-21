@@ -7,7 +7,7 @@ import javafx.scene.image.{ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout._
 import javafx.scene.paint.Color
-import javafx.stage.Window
+import javafx.stage.{FileChooser, Window}
 
 import ru.nsu.fit.g15201.boltava.model.canvas.{HexagonalGridController, IDrawable, IGridController, ImageDrawable}
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.DoublePoint
@@ -42,7 +42,7 @@ class MainViewController extends ICellStateObserver {
 
   @FXML
   private def initialize(): Unit = {
-    createNewGrid(DEFAULT_CONFIG_PATH)
+//    createNewGrid(DEFAULT_CONFIG_PATH)
     setEventHandlers()
     colorFiller = new ScanLineFiller()
     VBox.setVgrow(scrollPane, Priority.ALWAYS)
@@ -148,6 +148,16 @@ class MainViewController extends ICellStateObserver {
     // pause game and make next step
     println("onNextStep")
     gameController.nextStep()
+  }
+
+  @FXML
+  protected def onOpenModel(event: MouseEvent): Unit = {
+    val fileChooser:FileChooser = new FileChooser()
+    fileChooser.setTitle("Open Resource File")
+    val file = fileChooser.showOpenDialog(toolbar.getScene.getWindow)
+    if (file != null) {
+      createNewGrid(file.getAbsolutePath)
+    }
   }
 
   private def drawCell(drawable: IDrawable, cell: Cell): Unit = {

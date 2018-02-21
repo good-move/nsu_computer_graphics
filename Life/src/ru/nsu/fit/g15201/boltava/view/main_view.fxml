@@ -25,13 +25,13 @@
         <!-- Uncomment this to remove padding inside Toolbar -->
         <!--<padding><Insets /></padding>-->
         <HBox>
-            <Button
-                    fx:id="clearFieldBtn"
-                    text="Clear"
-                    onMouseClicked="#onReset"
+            <Button fx:id="openGameModelBtn"
+                    text="Open"
+                    onMouseClicked="#onOpenModel"
             >
-                <tooltip><Tooltip text="Clear the field"/></tooltip>
+                <tooltip><Tooltip text="Open game field model"/></tooltip>
             </Button>
+            <Separator orientation="VERTICAL" />
             <Button
                     fx:id="playBtn"
                     text="Play"
@@ -52,6 +52,13 @@
                     onMouseClicked="#onNextStep"
             >
                 <tooltip><Tooltip text="Make one step in the game"/></tooltip>
+            </Button>
+            <Button
+                    fx:id="clearFieldBtn"
+                    text="Reset"
+                    onMouseClicked="#onReset"
+            >
+                <tooltip><Tooltip text="Clear the field"/></tooltip>
             </Button>
         </HBox>
     </ToolBar>
