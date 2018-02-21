@@ -2,7 +2,6 @@ package ru.nsu.fit.g15201.boltava.view
 
 import javafx.application.Platform
 import javafx.fxml.FXML
-import javafx.scene.control.ScrollPane.ScrollBarPolicy
 import javafx.scene.control.{ScrollPane, ToolBar}
 import javafx.scene.image.{ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
@@ -49,17 +48,17 @@ class MainViewController extends ICellStateObserver {
   }
 
   private def setEventHandlers(): Unit = {
-    scrollPane.setOnMouseClicked((event: MouseEvent) => {
+    gameFieldImageView.setOnMouseClicked((event: MouseEvent) => {
       onFieldDragOrClick((event.getX, event.getY))
     })
 
-    scrollPane.setOnDragDetected((event: MouseEvent) => {
+    gameFieldImageView.setOnDragDetected((event: MouseEvent) => {
       gameFieldImageView.startFullDrag()
       event.consume()
     })
 
-    scrollPane.setOnMouseDragOver((event: MouseEvent) => {
-      onFieldDragOrClick((event.getX, event.getY))
+    gameFieldImageView.setOnMouseDragOver((event: MouseEvent) => {
+      onFieldDragOrClick((event.getX + scrollPane.getHvalue, event.getY + scrollPane.getVvalue))
     })
 
     VBox.setVgrow(scrollPane, Priority.ALWAYS)
@@ -140,7 +139,6 @@ class MainViewController extends ICellStateObserver {
     Platform.runLater(() => {
       gameController.getCells.foreach(_.foreach(cell => drawCell(drawable, cell)))
     })
-
   }
 
   private def onFieldDragOrClick(point: DoublePoint): Unit = {
