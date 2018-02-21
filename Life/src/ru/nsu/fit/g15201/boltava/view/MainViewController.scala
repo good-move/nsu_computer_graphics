@@ -16,7 +16,7 @@ import ru.nsu.fit.g15201.boltava.model.logic._
 
 class MainViewController extends ICellStateObserver {
 
-  private val CONFIG_PATH = "./config.txt"
+  private val DEFAULT_CONFIG_PATH = "./config.txt"
 
   private var drawable: IDrawable = _
   private var colorFiller: IColorFiller = _
@@ -36,22 +36,23 @@ class MainViewController extends ICellStateObserver {
   @FXML private var scrollPane: ScrollPane = _
 
   private var window: Window = _
-  private var writableImage: WritableImage = _
+  private var gridImage: WritableImage = _
 
   // ************************* Controller initialization *************************
 
   @FXML
   private def initialize(): Unit = {
-    initializeGrid(GRID_WIDTH, GRID_HEIGHT)
-
+    createNewGrid(DEFAULT_CONFIG_PATH)
     setEventHandlers()
-
     colorFiller = new ScanLineFiller()
+    VBox.setVgrow(scrollPane, Priority.ALWAYS)
   }
 
   private def setEventHandlers(): Unit = {
     gameFieldImageView.setOnMouseClicked((event: MouseEvent) => {
+//      println("hello")
       onFieldDragOrClick((event.getX, event.getY))
+      event.consume()
     })
 
     gameFieldImageView.setOnDragDetected((event: MouseEvent) => {
@@ -60,10 +61,37 @@ class MainViewController extends ICellStateObserver {
     })
 
     gameFieldImageView.setOnMouseDragOver((event: MouseEvent) => {
-      onFieldDragOrClick((event.getX + scrollPane.getHvalue, event.getY + scrollPane.getVvalue))
+      onFieldDragOrClick((event.getX, event.getY))
+      event.consume()
     })
 
-    VBox.setVgrow(scrollPane, Priority.ALWAYS)
+  }
+
+  private def createNewGrid(configPath: String) = {
+    try {
+      val gridParameters = ConfigReader.parseConfig(configPath)
+      if (gameController != null) {
+        gameController.unsubscribe(this)
+      }
+      gridController = new HexagonalGridController(gridParameters.cellSideSize)
+      gameController = new GameController(gridController)
+      gameController.setGridParams(gridParameters)
+      gameController.subscribe(this)
+      drawCellGrid()
+      fillAliveCells(gridParameters.aliveCells)
+    } catch {
+      case e: Exception =>
+        println(e.getMessage)
+        AlertHelper.showError(window, "Failed to read configuration file", e.getMessage)
+    }
+  }
+
+  private def fillAliveCells(aliveCells: Array[(Int, Int)]): Unit = {
+    Platform.runLater(() => {
+      aliveCells
+        .map(coords => gameController.getCells(coords._1)(coords._2))
+        .foreach(cell => gameController.onCellClicked(cell))
+    })
   }
 
   // ************************* FXML events *************************
@@ -97,7 +125,6 @@ class MainViewController extends ICellStateObserver {
       return
     }
 
-    drawCellGrid()
     gameController.start()
   }
 
@@ -134,9 +161,9 @@ class MainViewController extends ICellStateObserver {
 
   private def drawCellGrid(): Unit = {
     val (width, height) = gridController.getCartesianFieldSize(GRID_WIDTH, GRID_HEIGHT)
-    writableImage= new WritableImage(width.ceil.toInt, height.ceil.toInt)
-    gameFieldImageView.setImage(writableImage)
-    drawable = new ImageDrawable(writableImage)
+    gridImage = new WritableImage(width.ceil.toInt, height.ceil.toInt)
+    gameFieldImageView.setImage(gridImage)
+    drawable = new ImageDrawable(gridImage)
 
     Platform.runLater(() => {
       gameController.getCells.foreach(_.foreach(cell => drawCell(drawable, cell)))
@@ -146,7 +173,7 @@ class MainViewController extends ICellStateObserver {
   private def onFieldDragOrClick(point: DoublePoint): Unit = {
     val cellCoords = gridController.getCellByPoint(point)
     val cellGrid = gameController.getCells
-//    println(s"$point -> $cellCoords")
+    println(s"$point -> $cellCoords")
     if (cellCoords.x < 0 || cellCoords.y < 0 ||
       cellCoords.x >= cellGrid.length || cellCoords.y >= cellGrid(0).length) return
 
@@ -156,21 +183,6 @@ class MainViewController extends ICellStateObserver {
 
   private def fillCell(cell: Cell, color: Color): Unit = {
     colorFiller.fillCell(drawable, cell, color)
-  }
-
-  private def initializeGrid(width: Int, height: Int) = {
-    try {
-      val gridParameters = ConfigReader.parseConfig(CONFIG_PATH)
-      gridController = new HexagonalGridController(CELL_SIDE_SIZE)
-      gameController = new GameController(gridController)
-      gameController.setGridParams(gridParameters)
-      gameController.subscribe(this)
-    } catch {
-      case e: Exception =>
-        println(e.getMessage)
-        window = toolbar.getScene.getWindow
-        AlertHelper.showError(window, "Failed to read configuration file", e.getMessage)
-    }
   }
 
   // ************************* ICellStateObserver *************************
