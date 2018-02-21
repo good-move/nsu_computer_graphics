@@ -16,6 +16,8 @@ import ru.nsu.fit.g15201.boltava.model.logic._
 
 class MainViewController extends ICellStateObserver {
 
+  private val CONFIG_PATH = "./config.txt"
+
   private var drawable: IDrawable = _
   private var colorFiller: IColorFiller = _
   private var gridController: IGridController = _
@@ -163,14 +165,18 @@ class MainViewController extends ICellStateObserver {
   }
 
   private def initializeGrid(width: Int, height: Int) = {
-    gridController = new HexagonalGridController(CELL_SIDE_SIZE)
-    val gridParameters = new GridParameters()
-    gridParameters.cellSideSize = CELL_SIDE_SIZE
-    gridParameters.width = width
-    gridParameters.height = height
-    gameController = new GameController(gridController=gridController)
-    gameController.setGridParams(gridParameters)
-    gameController.subscribe(this)
+    try {
+      val gridParameters = ConfigReader.parseConfig(CONFIG_PATH)
+      gridController = new HexagonalGridController(CELL_SIDE_SIZE)
+      gameController = new GameController(gridController)
+      gameController.setGridParams(gridParameters)
+      gameController.subscribe(this)
+    } catch {
+      case e: Exception =>
+        println(e.getMessage)
+        window = toolbar.getScene.getWindow
+        AlertHelper.showError(window, "Failed to read configuration file", e.getMessage)
+    }
   }
 
   // ************************* ICellStateObserver *************************
