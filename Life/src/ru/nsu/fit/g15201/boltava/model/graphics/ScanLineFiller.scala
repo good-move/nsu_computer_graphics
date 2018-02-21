@@ -25,21 +25,21 @@ class ScanLineFiller extends IColorFiller {
         y -= 1
       }
       y += 1
-      var spanLeft = false
-      var spanRight = false
+      var filledLeft = false
+      var filledRight = false
       while (y < drawable.getHeight && drawable.getColor(p.x, y) == oldColor) {
         drawable.setColor((p.x, y), newColor)
-        if (!spanLeft && p.x-1 >= 0 && drawable.getColor(p.x-1, y) == oldColor) {
+        if (!filledLeft && p.x-1 >= 0 && drawable.getColor(p.x-1, y) == oldColor) {
           stack.append((p.x - 1, y))
-          spanLeft = false
-        } else if (spanLeft && p.x-1 >= 0 && drawable.getColor(p.x-1, y) != oldColor) {
-          spanLeft = false
+          filledLeft = true
+        } else if (filledLeft && p.x-1 >= 0 && drawable.getColor(p.x-1, y) != oldColor) {
+          filledLeft = false
         }
-        if (!spanRight && p.x < drawable.getWidth-1 && drawable.getColor(p.x+1, y) == oldColor) {
+        if (!filledRight && p.x < drawable.getWidth-1 && drawable.getColor(p.x+1, y) == oldColor) {
           stack.append((p.x + 1, y))
-          spanRight = false
-        } else if (spanRight && p.x+1 < drawable.getWidth && drawable.getColor(p.x+1, y) != oldColor) {
-          spanRight = false
+          filledRight = true
+        } else if (filledRight && p.x+1 < drawable.getWidth && drawable.getColor(p.x+1, y) != oldColor) {
+          filledRight = false
         }
         y+=1
       }
