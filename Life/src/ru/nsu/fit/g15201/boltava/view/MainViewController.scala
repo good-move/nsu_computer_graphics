@@ -158,12 +158,6 @@ class MainViewController extends ICellStateObserver {
     colorFiller.fillCell(drawable, cell, color)
   }
 
-  private def fillWhiteBackground(drawable: IDrawable): Unit = {
-    for (x <- 0 until drawable.getWidth.toInt; y <- 0 until drawable.getHeight.toInt) {
-      drawable.setColor((x, y), Color.WHITE)
-    }
-  }
-
   private def initializeGrid(width: Int, height: Int) = {
     try {
       val gridParameters = ConfigReader.parseConfig(CONFIG_PATH)
