@@ -26,7 +26,7 @@ class MainViewController extends ICellStateObserver {
 
   private val GRID_WIDTH =20
   private val GRID_HEIGHT = 20
-  private val CELL_SIDE_SIZE = 20
+  private val CELL_SIDE_SIZE = 30
 
   @FXML private var toolbar: ToolBar = _
   @FXML private var gameFieldImageView: ImageView = _
@@ -101,6 +101,7 @@ class MainViewController extends ICellStateObserver {
   protected def onPause(event: MouseEvent): Unit = {
     // if game started, pause game
     println("onPause")
+    gameController.pause()
   }
 
   @FXML
@@ -167,7 +168,7 @@ class MainViewController extends ICellStateObserver {
     gridParameters.width = width
     gridParameters.height = height
     gameController = new GameController(gridController=gridController)
-//    gameController.setGridParams(gridParameters)
+    gameController.setGridParams(gridParameters)
     gameController.subscribe(this)
   }
 
