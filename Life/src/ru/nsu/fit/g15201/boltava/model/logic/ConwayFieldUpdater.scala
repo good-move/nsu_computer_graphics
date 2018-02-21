@@ -27,11 +27,8 @@ class ConwayFieldUpdater(private val gridController: IGridController) extends Ru
   private var _birthUpperBorderScore: Double = 2.9
 
 
-  private var c = 1
   def run(): Unit = {
     makeStep()
-    c += 1
-    println(c)
   }
 
   def makeStep(): Unit = {
