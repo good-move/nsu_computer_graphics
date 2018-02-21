@@ -26,9 +26,9 @@ class MainViewController extends ICellStateObserver {
   private val ALIVE_CELL_COLOR = Color.GRAY
   private val DEAD_CELL_COLOR = Color.WHITE
 
-  private val GRID_WIDTH = 40
-  private val GRID_HEIGHT = 40
-  private val CELL_SIDE_SIZE = 15
+  private val MAX_GRID_SIDE_SIZE = 500
+  private val MAX_BORDER_WIDTH = 15
+  private val MAX_CELL_SIDE_SIZE = 50
 
   @FXML private var root: VBox = _
   @FXML private var toolbar: ToolBar = _
@@ -70,6 +70,7 @@ class MainViewController extends ICellStateObserver {
   private def createNewGrid(configPath: String) = {
     try {
       val gridParameters = ConfigReader.parseConfig(configPath)
+      validateGridParameters(gridParameters)
       if (gameController != null) {
         gameController.unsubscribe(this)
       }
@@ -77,13 +78,39 @@ class MainViewController extends ICellStateObserver {
       gameController = new GameController(gridController)
       gameController.setGridParams(gridParameters)
       gameController.subscribe(this)
-      drawCellGrid()
+      drawCellGrid(gridParameters.width, gridParameters.height)
       fillAliveCells(gridParameters.aliveCells)
     } catch {
       case e: Exception =>
         println(e.getMessage)
         AlertHelper.showError(window, "Failed to read configuration file", e.getMessage)
     }
+  }
+
+  private def validateGridParameters(gridParameters: GridParameters) = {
+    if (gridParameters.width <= 0 || gridParameters.width > MAX_GRID_SIDE_SIZE ||
+        gridParameters.height <= 0 || gridParameters.height > MAX_GRID_SIDE_SIZE) {
+      throw new RuntimeException(
+        s"Invalid grid dimensions. Grid width and height " +
+          s"must be positive integers between 1 and $MAX_GRID_SIDE_SIZE.")
+    }
+
+    if (gridParameters.borderWidth <= 0 || gridParameters.borderWidth > MAX_BORDER_WIDTH) {
+      throw new RuntimeException(s"Border width must be a positive integer not greater than $MAX_BORDER_WIDTH.")
+    }
+
+    if (gridParameters.cellSideSize <= 0 || gridParameters.cellSideSize > MAX_CELL_SIDE_SIZE) {
+      throw new RuntimeException(s"Cell side size must be a positive integer not grater than $MAX_CELL_SIDE_SIZE.")
+    }
+
+    gridParameters.aliveCells.foreach(cell => {
+      if (cell._1 < 0 || cell._1 >= gridParameters.width ||
+          cell._2 < 0 || cell._2 >= gridParameters.height) {
+        throw new RuntimeException(s"Cell coordinates out of bounds: $cell " +
+          s"(width: ${gridParameters.width}, height: ${gridParameters.height}).")
+      }
+    })
+
   }
 
   private def fillAliveCells(aliveCells: Array[(Int, Int)]): Unit = {
@@ -169,8 +196,8 @@ class MainViewController extends ICellStateObserver {
     }
   }
 
-  private def drawCellGrid(): Unit = {
-    val (width, height) = gridController.getCartesianFieldSize(GRID_WIDTH, GRID_HEIGHT)
+  private def drawCellGrid(w: Int, h: Int): Unit = {
+    val (width, height) = gridController.getCartesianFieldSize(w, h)
     gridImage = new WritableImage(width.ceil.toInt, height.ceil.toInt)
     gameFieldImageView.setImage(gridImage)
     drawable = new ImageDrawable(gridImage)
