@@ -21,7 +21,7 @@ class MainViewController extends ICellStateObserver {
   private var drawable: IDrawable = _
   private var colorFiller: IColorFiller = _
   private var gridController: IGridController = _
-  private var gameController: IGameLogicController = _
+  private val gameController: IGameLogicController = new GameController
 
   private val ALIVE_CELL_COLOR = Color.GRAY
   private val DEAD_CELL_COLOR = Color.WHITE
@@ -71,11 +71,8 @@ class MainViewController extends ICellStateObserver {
     try {
       val gridParameters = ConfigReader.parseConfig(configPath)
       validateGridParameters(gridParameters)
-      if (gameController != null) {
-        gameController.unsubscribe(this)
-      }
+      gameController.unsubscribe(this)
       gridController = new HexagonalGridController(gridParameters.cellSideSize)
-      gameController = new GameController(gridController)
       gameController.setGridParams(gridParameters)
       gameController.subscribe(this)
       drawCellGrid(gridParameters.width, gridParameters.height)
@@ -123,18 +120,14 @@ class MainViewController extends ICellStateObserver {
 
   // ************************* FXML events *************************
 
-  @FXML
-  protected def onPlay(event: MouseEvent): Unit = {
-    println("onPlay")
-    window = toolbar.getScene.getWindow
-
+  private def showAlertOnError(): Boolean = {
     if (!gameController.isGameModelSet) {
       AlertHelper.showError(
         window,
         "Game model not chosen",
         "Open a game model or create a new one by pressing corresponding toolbar buttons."
       )
-      return
+      return true
     }
 
     if (gameController.isGameFinished) {
@@ -143,6 +136,19 @@ class MainViewController extends ICellStateObserver {
         "Game has finished",
         "Choose alive cells to watch life happen."
       )
+      return true
+    }
+
+    false
+  }
+
+  @FXML
+  protected def onPlay(event: MouseEvent): Unit = {
+    println("onPlay")
+    window = toolbar.getScene.getWindow
+
+    val alertShown = showAlertOnError()
+    if (alertShown) {
       return
     }
 
@@ -157,6 +163,11 @@ class MainViewController extends ICellStateObserver {
 
   @FXML
   protected def onPause(event: MouseEvent): Unit = {
+    val alertShown = showAlertOnError()
+    if (alertShown) {
+      return
+    }
+
     // if game started, pause game
     println("onPause")
     gameController.pause()
@@ -164,6 +175,11 @@ class MainViewController extends ICellStateObserver {
 
   @FXML
   protected def onReset(event: MouseEvent): Unit = {
+    val alertShown = showAlertOnError()
+    if (alertShown) {
+      return
+    }
+
     // stop game and clear field
     println("onClearField")
     onPause(event)
@@ -172,6 +188,11 @@ class MainViewController extends ICellStateObserver {
 
   @FXML
   protected def onNextStep(event: MouseEvent): Unit = {
+    val alertShown = showAlertOnError()
+    if (alertShown) {
+      return
+    }
+
     // pause game and make next step
     println("onNextStep")
     gameController.nextStep()
