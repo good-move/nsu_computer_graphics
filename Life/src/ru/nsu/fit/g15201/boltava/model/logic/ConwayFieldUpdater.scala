@@ -9,15 +9,13 @@ import ru.nsu.fit.g15201.boltava.model.logic.State.State
   * Implements Conway Game Of Life state switching, given array
   * of cells and grid controller to fetch information about cells' neighbors
   *
-  * @param gridController
   */
-class ConwayFieldUpdater(private val gridController: IGridController) extends Runnable {
+class ConwayFieldUpdater extends Runnable {
 
+  private var gridController: IGridController = _
   private var mainField: Array[Array[Cell]] = _
   private var helperField: Array[Array[State]] = _
   private var fieldStateObserver: IFieldStateObserver = _
-
-  private var sourceHelper = false
 
   private var _closeNeighborsImpactScore: Double = 1.0
   private var _distantNeighborsImpactScore: Double = .3
@@ -83,7 +81,6 @@ class ConwayFieldUpdater(private val gridController: IGridController) extends Ru
     // TODO: make synchronized
     mainField = field
     helperField = createHelperArray()
-    sourceHelper = false
   }
 
   private def neighborsFilter(p: Point): Boolean = {
@@ -102,6 +99,10 @@ class ConwayFieldUpdater(private val gridController: IGridController) extends Ru
   def removeStateObserver(): Unit = {
     // TODO: make synchronized
     this.fieldStateObserver = null
+  }
+
+  def setGridController(gridController: IGridController): Unit = {
+    this.gridController = gridController
   }
 
   private def createHelperArray(): Array[Array[State]] = {

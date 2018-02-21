@@ -10,15 +10,16 @@ import scala.collection.mutable
 /**
   * Controls logic of the whole game.
   *
-  * @param gridController
   */
-class GameController(private val gridController: IGridController) extends IGameLogicController with IFieldStateObserver {
+class GameController extends IGameLogicController with IFieldStateObserver {
 
   private val executor = new ScheduledThreadPoolExecutor(1)
   private val fieldUpdateInterval = 1000
   private var updateTask: ScheduledFuture[_] = _
 
+  private var gridController: IGridController = _
   private var gridParameters: GridParameters = _
+
   private var cellGrid: Array[Array[Cell]] = _
   private var cellSelectionMode = CellSelectionMode.REPLACE
 
@@ -28,7 +29,7 @@ class GameController(private val gridController: IGridController) extends IGameL
   private var gameState = GameState.UNINITIALIZED
 
   { // constructor code
-    fieldUpdater = new ConwayFieldUpdater(gridController)
+    fieldUpdater = new ConwayFieldUpdater
     fieldUpdater.setStateObserver(this)
   }
 
@@ -44,6 +45,11 @@ class GameController(private val gridController: IGridController) extends IGameL
   override def getCells: Array[Array[Cell]] = cellGrid
 
   override def getGridController: IGridController = gridController
+
+  override def setGridController(gridController: IGridController): Unit = {
+    this.gridController = gridController
+    fieldUpdater.setGridController(gridController)
+  }
 
   override def setCellSelectionMode(newCellSelectionMode: CellSelectionMode.Value): Unit = {
     cellSelectionMode = newCellSelectionMode

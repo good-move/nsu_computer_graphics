@@ -20,6 +20,7 @@ trait IGameLogicController extends ICellStateProvider with ICellClickListener {
   def isGameFinished: Boolean
 
   // TODO: move these out
+  def setGridController(gridController: IGridController)
   def getGridController: IGridController
   def getCells: Array[Array[Cell]]
 
