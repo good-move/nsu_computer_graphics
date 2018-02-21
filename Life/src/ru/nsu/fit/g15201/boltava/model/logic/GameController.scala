@@ -38,6 +38,7 @@ class GameController(private val gridController: IGridController) extends IGameL
     }
     this.gridParameters = gridParameters
     generateGrid()
+    fieldUpdater.setMainField(cellGrid)
   }
 
   override def getCells: Array[Array[Cell]] = cellGrid
@@ -53,12 +54,8 @@ class GameController(private val gridController: IGridController) extends IGameL
       throw new RuntimeException("Game Field is not initialized")
     }
 
-    println("Game Started!")
     stopUpdater()
-
-    fieldUpdater.setMainField(cellGrid)
     updateTask = executor.scheduleAtFixedRate(fieldUpdater, 0, fieldUpdateInterval, TimeUnit.MILLISECONDS)
-
     gameState = GameState.STARTED
   }
 
@@ -94,7 +91,6 @@ class GameController(private val gridController: IGridController) extends IGameL
   // *************************** Private Methods ***************************
 
   private def generateGrid(): Unit = {
-    println("Generated Grid")
     cellGrid = gridController.generateGrid(gridParameters.width, gridParameters.height)
   }
 
@@ -141,11 +137,8 @@ class GameController(private val gridController: IGridController) extends IGameL
   // *************************** IFieldStateObserver ***************************
 
   override def onFieldUpdated(nextField: Array[Array[Cell]]): Unit = {
-    println("Updating field")
     cellStateObservers.foreach(o => o.onCellsStateChange(nextField))
   }
-
-
 
   override def isGameStarted: Boolean = gameState == GameState.STARTED
 
