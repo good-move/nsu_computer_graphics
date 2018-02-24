@@ -52,8 +52,8 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
       angle_deg += ROTATION_ANGLE
       val angle_rad = angle_deg/180.0  * Math.PI
       vertices.append((
-        Math.round(center.x + _size * Math.cos(angle_rad)).toInt,
-        Math.round(center.y + _size * Math.sin(angle_rad)).toInt
+        (center.x + _size * Math.cos(angle_rad)).ceil.toInt,
+        (center.y + _size * Math.sin(angle_rad)).ceil.toInt
       ))
     }
 

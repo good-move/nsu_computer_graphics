@@ -13,7 +13,7 @@ import javafx.stage.{FileChooser, Window}
 import ru.nsu.fit.g15201.boltava.model.canvas._
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
 import ru.nsu.fit.g15201.boltava.model.graphics._
-import ru.nsu.fit.g15201.boltava.model.logic._
+import ru.nsu.fit.g15201.boltava.model.logic.{ConfigManager, _}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -53,7 +53,6 @@ class MainViewController extends ICellStateObserver {
 
   private def setEventHandlers(): Unit = {
     gameFieldImageView.setOnMouseClicked((event: MouseEvent) => {
-//      println("hello")
       onFieldDragOrClick((event.getX, event.getY))
       event.consume()
     })
