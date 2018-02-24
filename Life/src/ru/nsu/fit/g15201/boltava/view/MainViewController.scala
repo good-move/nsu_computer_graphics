@@ -1,5 +1,6 @@
 package ru.nsu.fit.g15201.boltava.view
 
+import java.io.File
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.control.{ScrollPane, ToolBar}
@@ -7,6 +8,7 @@ import javafx.scene.image.{ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout._
 import javafx.scene.paint.Color
+import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.{FileChooser, Window}
 
 import ru.nsu.fit.g15201.boltava.model.canvas._
@@ -205,6 +207,7 @@ class MainViewController extends ICellStateObserver {
   protected def onOpenModel(event: MouseEvent): Unit = {
     val fileChooser:FileChooser = new FileChooser()
     fileChooser.setTitle("Open Game Model File")
+    fileChooser.getExtensionFilters.add(new ExtensionFilter(s"${ConfigManager.MODEL_FILE_DESCRIPTION}", s"*.${ConfigManager.MODEL_FILE_EXTENSION}"))
     val file = fileChooser.showOpenDialog(toolbar.getScene.getWindow)
     if (file != null) {
       createNewGrid(file.getAbsolutePath)
@@ -215,10 +218,10 @@ class MainViewController extends ICellStateObserver {
   protected def onSaveModel(event: MouseEvent): Unit = {
     val fileChooser:FileChooser = new FileChooser()
     fileChooser.setTitle("Select Model File")
-    val file = fileChooser.showSaveDialog(toolbar.getScene.getWindow)
 
+    fileChooser.getExtensionFilters.add(new ExtensionFilter(s"${ConfigManager.MODEL_FILE_DESCRIPTION}", s"*.${ConfigManager.MODEL_FILE_EXTENSION}"))
+    val file = fileChooser.showSaveDialog(toolbar.getScene.getWindow)
     if (file != null) {
-      println("FILE NOT NULL")
       if (gameController.isGameStarted) {
         gameController.pause()
       }

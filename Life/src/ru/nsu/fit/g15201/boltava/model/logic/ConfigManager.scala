@@ -13,7 +13,13 @@ import scala.io.Source
   */
 object ConfigManager {
 
+  val MODEL_FILE_EXTENSION = "life"
+  val MODEL_FILE_DESCRIPTION = "LIFE model file"
+
   def openGameModel(configPath: String): GridParameters = {
+    if (!configPath.endsWith(".life")) {
+      throw new RuntimeException(s"Configuration file extension must be .$MODEL_FILE_EXTENSION.")
+    }
 
     if (!Files.exists(Paths.get(configPath))) {
       throw new RuntimeException(s"File $configPath doesn't exist")
@@ -59,8 +65,11 @@ object ConfigManager {
   }
 
   def saveGameModel(configFile: File, gridParameters: GridParameters, aliveCells: Array[Point]): Unit = {
-    // TODO: add comments to each section
-    val writer = new BufferedWriter(new FileWriter(configFile))
+    var file = configFile
+    if(!file.getName.endsWith(s".$MODEL_FILE_EXTENSION")) {
+      file = new File(s"${file.getAbsolutePath}.$MODEL_FILE_EXTENSION")
+    }
+    val writer = new BufferedWriter(new FileWriter(file))
 
     // write grid dimensions
     writer.write(s"${gridParameters.width} ${gridParameters.height}")
@@ -79,7 +88,7 @@ object ConfigManager {
     writer.write(" // Number of alive cells\n")
 
     for (point <- aliveCells) {
-      writer.write(s"${point.x} ${point.y}")
+      writer.write(s"${point.x} ${point.y}\n")
     }
 
     writer.flush()
@@ -92,7 +101,7 @@ object utils {
   val COMMENT_SIGN = "//"
 
   implicit class StringExtension(val s: String) {
-    def filterComments: String = s.split(COMMENT_SIGN)(0)
+    def filterComments: String = s.split(COMMENT_SIGN)(0).trim
   }
 
 }
