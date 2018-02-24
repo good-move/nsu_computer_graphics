@@ -31,6 +31,12 @@
             >
                 <tooltip><Tooltip text="Open game field model"/></tooltip>
             </Button>
+            <Button fx:id="saveGameModelBtn"
+                    text="Save"
+                    onMouseClicked="#onSaveModel"
+            >
+                <tooltip><Tooltip text="Open game field model"/></tooltip>
+            </Button>
             <Separator orientation="VERTICAL" />
             <Button
                     fx:id="playBtn"
