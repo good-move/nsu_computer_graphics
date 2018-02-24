@@ -1,6 +1,5 @@
 package ru.nsu.fit.g15201.boltava.view
 
-import java.io.File
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.control.{ScrollPane, ToolBar}
@@ -13,7 +12,7 @@ import javafx.stage.{FileChooser, Window}
 
 import ru.nsu.fit.g15201.boltava.model.canvas._
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
-import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
+import ru.nsu.fit.g15201.boltava.model.graphics._
 import ru.nsu.fit.g15201.boltava.model.logic._
 
 import scala.collection.mutable.ArrayBuffer
@@ -24,9 +23,11 @@ class MainViewController extends ICellStateObserver {
   private var colorFiller: IColorFiller = _
   private var gridController: IGridController = _
   private val gameController: IGameLogicController = new GameController
+  private val drawer: IDrawer = new BresenhamDrawer()
 
   private val ALIVE_CELL_COLOR = Color.GRAY
   private val DEAD_CELL_COLOR = Color.WHITE
+  private val CELL_BORDER_COLOR = Color.BLACK
 
   private val MAX_GRID_SIDE_SIZE = 500
   private val MAX_BORDER_WIDTH = 15
@@ -78,7 +79,7 @@ class MainViewController extends ICellStateObserver {
       gameController.setGridController(gridController)
       gameController.setGridParams(gridParameters)
       gameController.subscribe(this)
-      drawCellGrid(gridParameters.width, gridParameters.height)
+      drawGrid(gridParameters.width, gridParameters.height)
       fillAliveCells(gridParameters.aliveCells)
     } catch {
       case e: Exception =>
@@ -205,9 +206,7 @@ class MainViewController extends ICellStateObserver {
 
   @FXML
   protected def onOpenModel(event: MouseEvent): Unit = {
-    val fileChooser:FileChooser = new FileChooser()
-    fileChooser.setTitle("Open Game Model File")
-    fileChooser.getExtensionFilters.add(new ExtensionFilter(s"${ConfigManager.MODEL_FILE_DESCRIPTION}", s"*.${ConfigManager.MODEL_FILE_EXTENSION}"))
+    val fileChooser = createProperFileChooser("Open Game Model File")
     val file = fileChooser.showOpenDialog(toolbar.getScene.getWindow)
     if (file != null) {
       createNewGrid(file.getAbsolutePath)
@@ -216,11 +215,9 @@ class MainViewController extends ICellStateObserver {
 
   @FXML
   protected def onSaveModel(event: MouseEvent): Unit = {
-    val fileChooser:FileChooser = new FileChooser()
-    fileChooser.setTitle("Select Model File")
-
-    fileChooser.getExtensionFilters.add(new ExtensionFilter(s"${ConfigManager.MODEL_FILE_DESCRIPTION}", s"*.${ConfigManager.MODEL_FILE_EXTENSION}"))
+    val fileChooser = createProperFileChooser("Select Model File")
     val file = fileChooser.showSaveDialog(toolbar.getScene.getWindow)
+
     if (file != null) {
       if (gameController.isGameStarted) {
         gameController.pause()
@@ -238,23 +235,21 @@ class MainViewController extends ICellStateObserver {
     }
   }
 
-  private def drawCell(drawable: IDrawable, cell: Cell): Unit = {
-    val vertices = cell.getVertices
-    val verticesCount = vertices.length
-    for (i <- vertices.indices) {
-      val linePoints = BresenhamLineCreator.getLinePoints(vertices(i), vertices((i + 1) % verticesCount))
-      drawable.draw(linePoints)
-    }
+  private def createProperFileChooser(title: String): FileChooser = {
+    val fileChooser:FileChooser = new FileChooser()
+    fileChooser.setTitle(title)
+    fileChooser.getExtensionFilters.add(new ExtensionFilter(s"${ConfigManager.MODEL_FILE_DESCRIPTION}", s"*.${ConfigManager.MODEL_FILE_EXTENSION}"))
+    fileChooser
   }
 
-  private def drawCellGrid(w: Int, h: Int): Unit = {
+  private def drawGrid(w: Int, h: Int): Unit = {
     val (width, height) = gridController.getCartesianFieldSize(w, h)
     gridImage = new WritableImage(width.ceil.toInt, height.ceil.toInt)
     gameFieldImageView.setImage(gridImage)
     drawable = new ImageDrawable(gridImage)
 
     Platform.runLater(() => {
-      gameController.getCells.foreach(_.foreach(cell => drawCell(drawable, cell)))
+      drawer.drawGrid(drawable, gameController.getCells, CELL_BORDER_COLOR)
     })
   }
 
