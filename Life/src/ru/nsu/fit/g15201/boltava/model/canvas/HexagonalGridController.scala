@@ -27,7 +27,7 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
       for (y <- 0 until width) {
         val center = getCellCenter(x,y)
         val vertices = getVerticesForHexCenter(center)
-        grid(x)(y) = new HexagonCell((center.x.toInt, center.y.toInt), vertices)
+        grid(x)(y) = new HexagonCell((center.x.toInt, center.y.toInt), vertices, x, y)
       }
     }
 
@@ -58,12 +58,6 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     }
 
     vertices.toArray
-  }
-
-  def createHex(point: Point): HexagonCell = {
-    val center = getCellCenter(point)
-    val vertices = getVerticesForHex(point)
-    new HexagonCell(new Point(center.x, center.y), vertices)
   }
 
   /**
