@@ -7,6 +7,9 @@ trait Cell {
   def getCenter: Point
   def getVertices: Array[Point]
 
+  def getX: Int
+  def getY: Int
+
   def getState: State.State
   def setState(state: State.State): Unit
 
