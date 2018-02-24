@@ -89,7 +89,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   }
 
   override def start(): Unit = {
-    if (!this.isGameModelSet) {
+    if (!this.isGameInitialized) {
       throw new RuntimeException("Game Field is not initialized")
     }
 
@@ -97,9 +97,10 @@ class GameController extends IGameLogicController with IFieldStateObserver {
       throw new RuntimeException("Game ")
     }
 
-    stopUpdater()
-    updateTask = executor.scheduleAtFixedRate(fieldUpdater, 0, fieldUpdateInterval, TimeUnit.MILLISECONDS)
-    gameState = GameState.RUNNING
+    if (!isGameRunning) {
+      updateTask = executor.scheduleAtFixedRate(fieldUpdater, 0, fieldUpdateInterval, TimeUnit.MILLISECONDS)
+      gameState = GameState.RUNNING
+    }
   }
 
   override def pause(): Unit = {
@@ -108,6 +109,8 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   }
 
   override def reset(): Unit = {
+    if (isGameReset) return
+
     gameState = GameState.RESET
     stopUpdater()
 
@@ -122,7 +125,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   }
 
   override def nextStep(): Unit = {
-    if (!this.isGameModelSet) {
+    if (!isGameInitialized) {
       throw new RuntimeException("Game Field is not initialized")
     }
 
@@ -169,8 +172,6 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private def notifyCellStateObservers(cell: Cell): Unit = {
     cellStateObservers.foreach(o => o.onCellStateChange(cell))
   }
-
-  private def isGameModelSet: Boolean = gameState != GameState.UNINITIALIZED
 
   // *************************** ICellStateProvider ***************************
 

@@ -40,11 +40,6 @@ class MainViewController extends ICellStateObserver {
   // ************************* Controller initialization *************************
 
   @FXML
-  def mmm(event: MouseEvent): Unit = {
-    println("hello")
-  }
-
-  @FXML
   private def initialize(): Unit = {
     gameController.subscribe(this)
     setEventHandlers()
@@ -53,18 +48,17 @@ class MainViewController extends ICellStateObserver {
   private def setEventHandlers(): Unit = {
     gameFieldImageView.setPickOnBounds(true)
     gameFieldImageView.setOnMouseClicked((event: MouseEvent) => {
-      println("yes")
       onFieldDragOrClick((event.getX, event.getY))
       event.consume()
     })
 
     gameFieldImageView.setOnDragDetected((event: MouseEvent) => {
-//      gameFieldImageView.startFullDrag()
+      gameFieldImageView.startFullDrag()
       event.consume()
     })
 
     gameFieldImageView.setOnMouseDragOver((event: MouseEvent) => {
-//      onFieldDragOrClick((event.getX, event.getY))
+      onFieldDragOrClick((event.getX, event.getY))
       event.consume()
     })
 
@@ -128,7 +122,7 @@ class MainViewController extends ICellStateObserver {
       return
     }
 
-//    gameController.start()
+    gameController.start()
   }
 
   @FXML
@@ -219,7 +213,6 @@ class MainViewController extends ICellStateObserver {
 
   private def onFieldDragOrClick(point: DoublePoint): Unit = {
     val cellCoords = gridController.getCellByPoint(point)
-    println(point)
     val cellGrid = gameController.getCells
     if (cellCoords.x < 0 || cellCoords.y < 0 ||
       cellCoords.x >= cellGrid.length || cellCoords.y >= cellGrid(0).length) return
