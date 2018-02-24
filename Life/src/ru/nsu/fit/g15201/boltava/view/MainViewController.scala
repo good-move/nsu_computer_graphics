@@ -20,7 +20,7 @@ import scala.collection.mutable.ArrayBuffer
 class MainViewController extends ICellStateObserver {
 
   private var drawable: IDrawable = _
-  private var colorFiller: IColorFiller = new ScanLineFiller()
+  private val colorFiller: IColorFiller = new ScanLineFiller()
   private var gridController: IGridController = _
   private val gameController: IGameLogicController = new GameController()
   private val drawer: IDrawer = new BresenhamDrawer()
@@ -92,7 +92,7 @@ class MainViewController extends ICellStateObserver {
   // ************************* FXML events *************************
 
   private def showAlertOnError(): Boolean = {
-    if (!gameController.isGameModelSet) {
+    if (!gameController.isGameInitialized) {
       AlertHelper.showError(
         window,
         "Game model not chosen",
@@ -101,10 +101,10 @@ class MainViewController extends ICellStateObserver {
       return true
     }
 
-    if (gameController.isGameFinished) {
+    if (gameController.isGameFinished || gameController.isGameReset) {
       AlertHelper.showWarning(
         window,
-        "Game has finished",
+        "Game is over",
         "Choose alive cells to watch life happen."
       )
       return true
@@ -124,7 +124,7 @@ class MainViewController extends ICellStateObserver {
     }
 
     // continue game in case it's already started
-    if (gameController.isGameStarted) {
+    if (gameController.isGameRunning) {
       gameController.start()
       return
     }
@@ -184,7 +184,7 @@ class MainViewController extends ICellStateObserver {
     val file = fileChooser.showSaveDialog(toolbar.getScene.getWindow)
 
     if (file != null) {
-      if (gameController.isGameStarted) {
+      if (gameController.isGameRunning) {
         gameController.pause()
       }
       val aliveCells = new ArrayBuffer[Point]()
@@ -194,7 +194,7 @@ class MainViewController extends ICellStateObserver {
         }
       }))
       ConfigManager.saveGameModel(file, gameController.getGridParams, aliveCells.toArray)
-      if (gameController.isGameStarted) {
+      if (gameController.isGamePaused) {
         gameController.start()
       }
     }
@@ -221,7 +221,6 @@ class MainViewController extends ICellStateObserver {
   private def onFieldDragOrClick(point: DoublePoint): Unit = {
     val cellCoords = gridController.getCellByPoint(point)
     val cellGrid = gameController.getCells
-    println(s"$point -> $cellCoords")
     if (cellCoords.x < 0 || cellCoords.y < 0 ||
       cellCoords.x >= cellGrid.length || cellCoords.y >= cellGrid(0).length) return
 

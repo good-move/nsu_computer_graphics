@@ -93,16 +93,22 @@ class GameController extends IGameLogicController with IFieldStateObserver {
       throw new RuntimeException("Game Field is not initialized")
     }
 
+    if (this.isGameReset || this.isGameFinished) {
+      throw new RuntimeException("Game ")
+    }
+
     stopUpdater()
     updateTask = executor.scheduleAtFixedRate(fieldUpdater, 0, fieldUpdateInterval, TimeUnit.MILLISECONDS)
-    gameState = GameState.STARTED
+    gameState = GameState.RUNNING
   }
 
   override def pause(): Unit = {
+    gameState = GameState.PAUSED
     stopUpdater()
   }
 
   override def reset(): Unit = {
+    gameState = GameState.RESET
     stopUpdater()
 
     cellGrid.foreach(_.foreach(cell => {
@@ -113,8 +119,6 @@ class GameController extends IGameLogicController with IFieldStateObserver {
       }
     }))
     fieldUpdater.setMainField(cellGrid)
-
-    gameState = GameState.RESET
   }
 
   override def nextStep(): Unit = {
@@ -154,6 +158,9 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     }
 
     if (cell.getState != oldState) {
+      if (isGameReset && cell.getState == State.ALIVE) {
+        gameState = GameState.INITIALIZED
+      }
       notifyCellStateObservers(cell)
     }
 
@@ -162,6 +169,8 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private def notifyCellStateObservers(cell: Cell): Unit = {
     cellStateObservers.foreach(o => o.onCellStateChange(cell))
   }
+
+  private def isGameModelSet: Boolean = gameState != GameState.UNINITIALIZED
 
   // *************************** ICellStateProvider ***************************
 
@@ -179,15 +188,13 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     cellStateObservers.foreach(o => o.onCellsStateChange(nextField))
   }
 
-  override def isGameStarted: Boolean = gameState == GameState.STARTED
+  override def isGameInitialized: Boolean = gameState != GameState.UNINITIALIZED
+
+  override def isGameRunning: Boolean = gameState == GameState.RUNNING
+
+  override def isGamePaused: Boolean = gameState == GameState.PAUSED
+
+  override def isGameReset: Boolean = gameState == GameState.RESET
 
   override def isGameFinished: Boolean = gameState == GameState.FINISHED
-
-  override def isGameModelSet: Boolean = gameState != GameState.UNINITIALIZED
-
-  private object GameState extends Enumeration {
-    type GameState = Value
-    val UNINITIALIZED, INITIALIZED, STARTED, PAUSED, RESET, FINISHED = Value
-  }
-
 }
