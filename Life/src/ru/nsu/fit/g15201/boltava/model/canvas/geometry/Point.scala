@@ -17,6 +17,21 @@ class Point(private var _x: Int, private var _y: Int) {
   }
 
   override def toString: String = s"(${_x}, ${_y})"
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Point]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Point =>
+      (that canEqual this) &&
+        _x == that._x &&
+        _y == that._y
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(_x, _y)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
 }
 
 object Point {
@@ -37,6 +52,21 @@ class DoublePoint(private var _x: Double, private var _y: Double) {
   }
 
   override def toString: String = s"(${_x}, ${_y})"
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[DoublePoint]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: DoublePoint =>
+      (that canEqual this) &&
+        _x == that._x &&
+        _y == that._y
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(_x, _y)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
 }
 
 object DoublePoint {

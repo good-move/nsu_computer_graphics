@@ -39,6 +39,8 @@ class MainViewController extends ICellStateObserver {
   private var window: Window = _
   private var gridImage: WritableImage = _
 
+  private var lastDraggedOverCell: Point = (-1, -1)
+
   // ************************* Controller initialization *************************
 
   @FXML
@@ -50,7 +52,7 @@ class MainViewController extends ICellStateObserver {
   private def setEventHandlers(): Unit = {
     gameFieldImageView.setPickOnBounds(true)
     gameFieldImageView.setOnMouseClicked((event: MouseEvent) => {
-      onFieldDragOrClick((event.getX, event.getY))
+      onFieldClick((event.getX, event.getY))
       event.consume()
     })
 
@@ -60,7 +62,7 @@ class MainViewController extends ICellStateObserver {
     })
 
     gameFieldImageView.setOnMouseDragOver((event: MouseEvent) => {
-      onFieldDragOrClick((event.getX, event.getY))
+      onFieldDragOver((event.getX, event.getY))
       event.consume()
     })
 
@@ -235,7 +237,7 @@ class MainViewController extends ICellStateObserver {
     })
   }
 
-  private def onFieldDragOrClick(point: DoublePoint): Unit = {
+  private def onFieldClick(point: DoublePoint): Unit = {
     val cellCoords = gridController.getCellByPoint(point)
     val cellGrid = gameController.getCells
     if (cellCoords.x < 0 || cellCoords.y < 0 ||
@@ -243,6 +245,16 @@ class MainViewController extends ICellStateObserver {
 
     val cell = gameController.getCells(cellCoords.x)(cellCoords.y)
     gameController.onCellClicked(cell)
+  }
+
+  private def onFieldDragOver(point: DoublePoint): Unit = {
+    val cellCoords = gridController.getCellByPoint(point)
+    if (cellCoords.equals(lastDraggedOverCell)) {
+      return
+    }
+
+    lastDraggedOverCell = cellCoords
+    onFieldClick(point)
   }
 
   private def fillCell(cell: Cell, color: Color): Unit = {
@@ -268,8 +280,6 @@ class MainViewController extends ICellStateObserver {
 
 }
 
-// todo: toggle button
-// todo: fix drag+toggle bug
 // todo: add menu
 // todo: replace button with icons
 // todo: add ability to change grid parameters while playing
