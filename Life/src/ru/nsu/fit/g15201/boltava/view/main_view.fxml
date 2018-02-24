@@ -12,6 +12,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ToggleButton?>
+
 <VBox fx:controller="ru.nsu.fit.g15201.boltava.view.MainViewController"
       fx:id="root"
       xmlns:fx="http://javafx.com/fxml"
@@ -26,14 +27,14 @@
         <!-- Uncomment this to remove padding inside Toolbar -->
         <HBox>
             <Button fx:id="openGameModelBtn"
-                    text="Open"
                     onMouseClicked="#onOpenModel"
+                    styleClass="toolbar-btn, open-model-btn"
             >
                 <tooltip><Tooltip text="Open game field model"/></tooltip>
             </Button>
             <Button fx:id="saveGameModelBtn"
-                    text="Save"
                     onMouseClicked="#onSaveModel"
+                    styleClass="toolbar-btn, save-model-btn"
             >
                 <tooltip><Tooltip text="Save game field model"/></tooltip>
             </Button>
@@ -42,29 +43,29 @@
 
             <Button
                     fx:id="playBtn"
-                    text="Play"
                     onMouseClicked="#onPlay"
+                    styleClass="toolbar-btn, play-btn"
             >
                 <tooltip><Tooltip text="Start the game"/></tooltip>
             </Button>
             <Button
                     fx:id="pauseBtn"
-                    text="Pause"
                     onMouseClicked="#onPause"
+                    styleClass="toolbar-btn, pause-btn"
             >
                 <tooltip><Tooltip text="Pause the game"/></tooltip>
             </Button>
             <Button
                     fx:id="nextStepBtn"
-                    text="Next Step"
                     onMouseClicked="#onNextStep"
+                    styleClass="toolbar-btn, step-btn"
             >
                 <tooltip><Tooltip text="Make one step in the game"/></tooltip>
             </Button>
             <Button
                     fx:id="clearFieldBtn"
-                    text="Reset"
                     onMouseClicked="#onReset"
+                    styleClass="toolbar-btn, reset-btn"
             >
                 <tooltip><Tooltip text="Clear the field"/></tooltip>
             </Button>
@@ -73,19 +74,45 @@
 
             <ToggleButton
                     fx:id="setToggleModeBtn"
-                    text="Toggle"
                     onMouseClicked="#onSetToggle"
+                    styleClass="toolbar-btn, set-toggle-btn"
             >
                 <tooltip><Tooltip text="Set 'toggle' mode"/></tooltip>
             </ToggleButton>
 
             <ToggleButton
                     fx:id="setReplaceModeBtn"
-                    text="Replace"
                     onMouseClicked="#onSetReplace"
+                    styleClass="toolbar-btn, set-replace-btn"
             >
                 <tooltip><Tooltip text="Set 'replace' mode"/></tooltip>
             </ToggleButton>
+
+            <Separator orientation="VERTICAL" />
+
+            <Button
+                    fx:id="settingsBtn"
+                    onMouseClicked="#onReset"
+                    styleClass="toolbar-btn, settings-btn"
+            >
+                <tooltip><Tooltip text="Settings"/></tooltip>
+            </Button>
+
+            <Button
+                    fx:id="aboutBtn"
+                    onMouseClicked="#onReset"
+                    styleClass="toolbar-btn, about-btn"
+            >
+                <tooltip><Tooltip text="About"/></tooltip>
+            </Button>
+
+            <Button
+                    fx:id="helpBtn"
+                    onMouseClicked="#onReset"
+                    styleClass="toolbar-btn, help-btn"
+            >
+                <tooltip><Tooltip text="Help"/></tooltip>
+            </Button>
 
         </HBox>
     </ToolBar>

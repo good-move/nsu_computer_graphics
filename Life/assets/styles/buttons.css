@@ -1,0 +1,67 @@
+.toolbar-btn {
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 28 28;
+    -fx-background-position: center center;
+    -fx-border-style: none;
+    -fx-background-color: transparent;
+}
+
+.toolbar-btn:pressed {
+    -fx-border-color: #dfdfdf;
+    -fx-background-color: #555;
+}
+
+.toolbar-btn:hover {
+     -fx-border-style: solid;
+     -fx-border-color: #dfdfdf;
+}
+
+.open-model-btn {
+    -fx-background-image: url("/icons/png/open.png")
+}
+
+.save-model-btn {
+    -fx-background-image: url("/icons/png/save.png");
+}
+
+.play-btn {
+    -fx-background-image: url("/icons/png/set1/play.png");
+}
+
+.pause-btn {
+    -fx-background-image: url("/icons/png/set2/pause.png");
+}
+
+.step-btn {
+    -fx-background-image: url("/icons/png/set2/step.png");
+}
+
+.reset-btn {
+    -fx-background-image: url("/icons/png/set3/clear2.png");
+}
+
+.set-replace-btn {
+    -fx-background-image: url("/icons/png/replace.png");
+}
+
+.set-toggle-btn {
+    -fx-background-image: url("/icons/png/toggle.png");
+}
+
+.help-btn {
+    -fx-background-image: url("/icons/png/help.png");
+}
+
+.about-btn {
+    -fx-background-image: url("/icons/png/profile.png");
+}
+
+.settings-btn {
+    -fx-background-image: url("/icons/png/settings.png");
+}
+
+.active-button {
+    -fx-background-color: red
+}

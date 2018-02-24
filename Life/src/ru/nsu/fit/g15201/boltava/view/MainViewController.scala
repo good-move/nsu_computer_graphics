@@ -2,8 +2,8 @@ package ru.nsu.fit.g15201.boltava.view
 
 import javafx.application.Platform
 import javafx.fxml.FXML
-import javafx.scene.control.{Button, ScrollPane, ToggleButton, ToolBar}
-import javafx.scene.image.{ImageView, WritableImage}
+import javafx.scene.control.{ScrollPane, ToggleButton, ToolBar}
+import javafx.scene.image.{Image, ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout._
 import javafx.scene.paint.Color
@@ -16,6 +16,7 @@ import ru.nsu.fit.g15201.boltava.model.graphics._
 import ru.nsu.fit.g15201.boltava.model.logic.{ConfigManager, _}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.reflect.io.Path
 
 class MainViewController extends ICellStateObserver {
 
@@ -283,3 +284,4 @@ class MainViewController extends ICellStateObserver {
 // todo: add menu
 // todo: replace button with icons
 // todo: add ability to change grid parameters while playing
+// todo: add About modal window
