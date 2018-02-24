@@ -7,7 +7,7 @@ class HexagonCell(private val center: Point,
                   private val x: Int, private val y: Int
                  ) extends Cell {
 
-  var state: State.Value = State.DEAD
+  var state: State.State = State.DEAD
 
   override def getState: State.State = state
 

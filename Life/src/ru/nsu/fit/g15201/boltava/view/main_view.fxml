@@ -23,7 +23,6 @@
              GridPane.columnIndex="0"
     >
         <!-- Uncomment this to remove padding inside Toolbar -->
-        <!--<padding><Insets /></padding>-->
         <HBox>
             <Button fx:id="openGameModelBtn"
                     text="Open"
@@ -69,11 +68,11 @@
         </HBox>
     </ToolBar>
 
-    <Separator minWidth="400" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-
     <ScrollPane fx:id="scrollPane"
-                style="-fx-background:white; "
+                style="-fx-background:white;"
+                VBox.vgrow="ALWAYS"
+
     >
-        <ImageView fx:id="gameFieldImageView"/>
+        <ImageView fx:id="gameFieldImageView"  />
     </ScrollPane>
 </VBox>

@@ -40,24 +40,31 @@ class MainViewController extends ICellStateObserver {
   // ************************* Controller initialization *************************
 
   @FXML
+  def mmm(event: MouseEvent): Unit = {
+    println("hello")
+  }
+
+  @FXML
   private def initialize(): Unit = {
+    gameController.subscribe(this)
     setEventHandlers()
-    VBox.setVgrow(scrollPane, Priority.ALWAYS)
   }
 
   private def setEventHandlers(): Unit = {
+    gameFieldImageView.setPickOnBounds(true)
     gameFieldImageView.setOnMouseClicked((event: MouseEvent) => {
+      println("yes")
       onFieldDragOrClick((event.getX, event.getY))
       event.consume()
     })
 
     gameFieldImageView.setOnDragDetected((event: MouseEvent) => {
-      gameFieldImageView.startFullDrag()
+//      gameFieldImageView.startFullDrag()
       event.consume()
     })
 
     gameFieldImageView.setOnMouseDragOver((event: MouseEvent) => {
-      onFieldDragOrClick((event.getX, event.getY))
+//      onFieldDragOrClick((event.getX, event.getY))
       event.consume()
     })
 
@@ -66,11 +73,9 @@ class MainViewController extends ICellStateObserver {
   private def createNewGrid(configPath: String) = {
     try {
       val gridParameters = ConfigManager.openGameModel(configPath)
-      gameController.unsubscribe(this)
       gridController = new HexagonalGridController(gridParameters.cellSideSize)
       gameController.setGridController(gridController)
       gameController.setGridParams(gridParameters)
-      gameController.subscribe(this)
       drawGrid(gridParameters.width, gridParameters.height)
       fillAliveCells(gridParameters.aliveCells)
     } catch {
@@ -123,13 +128,7 @@ class MainViewController extends ICellStateObserver {
       return
     }
 
-    // continue game in case it's already started
-    if (gameController.isGameRunning) {
-      gameController.start()
-      return
-    }
-
-    gameController.start()
+//    gameController.start()
   }
 
   @FXML
@@ -220,6 +219,7 @@ class MainViewController extends ICellStateObserver {
 
   private def onFieldDragOrClick(point: DoublePoint): Unit = {
     val cellCoords = gridController.getCellByPoint(point)
+    println(point)
     val cellGrid = gameController.getCells
     if (cellCoords.x < 0 || cellCoords.y < 0 ||
       cellCoords.x >= cellGrid.length || cellCoords.y >= cellGrid(0).length) return
