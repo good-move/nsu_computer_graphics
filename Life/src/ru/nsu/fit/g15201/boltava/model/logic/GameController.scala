@@ -28,12 +28,17 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   private var gameState = GameState.UNINITIALIZED
 
+  private val MAX_GRID_SIDE_SIZE = 500
+  private val MAX_BORDER_WIDTH = 15
+  private val MAX_CELL_SIDE_SIZE = 50
+
   { // constructor code
     fieldUpdater = new ConwayFieldUpdater
     fieldUpdater.setStateObserver(this)
   }
 
   override def setGridParams(gridParameters: GridParameters): Unit = {
+    validateGridParameters(gridParameters)
     if (gameState == GameState.UNINITIALIZED) {
       gameState = GameState.INITIALIZED
     }
@@ -44,6 +49,31 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   override def getGridParams: GridParameters = this.gridParameters
 
+  private def validateGridParameters(gridParameters: GridParameters) = {
+    if (gridParameters.width <= 0 || gridParameters.width > MAX_GRID_SIDE_SIZE ||
+      gridParameters.height <= 0 || gridParameters.height > MAX_GRID_SIDE_SIZE) {
+      throw new RuntimeException(
+        s"Invalid grid dimensions. Grid width and height " +
+          s"must be positive integers between 1 and $MAX_GRID_SIDE_SIZE.")
+    }
+
+    if (gridParameters.borderWidth <= 0 || gridParameters.borderWidth > MAX_BORDER_WIDTH) {
+      throw new RuntimeException(s"Border width must be a positive integer not greater than $MAX_BORDER_WIDTH.")
+    }
+
+    if (gridParameters.cellSideSize <= 0 || gridParameters.cellSideSize > MAX_CELL_SIDE_SIZE) {
+      throw new RuntimeException(s"Cell side size must be a positive integer not grater than $MAX_CELL_SIDE_SIZE.")
+    }
+
+    gridParameters.aliveCells.foreach(cell => {
+      if (cell._1 < 0 || cell._1 >= gridParameters.width ||
+        cell._2 < 0 || cell._2 >= gridParameters.height) {
+        throw new RuntimeException(s"Cell coordinates out of bounds: $cell " +
+          s"(width: ${gridParameters.width}, height: ${gridParameters.height}).")
+      }
+    })
+
+  }
 
   override def getCells: Array[Array[Cell]] = cellGrid
 
