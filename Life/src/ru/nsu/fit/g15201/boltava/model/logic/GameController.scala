@@ -21,7 +21,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private var gridParameters: GridParameters = _
 
   private var cellGrid: Array[Array[Cell]] = _
-  private var cellSelectionMode = CellSelectionMode.REPLACE
+  private var cellSelectionMode = CellSelectionMode.TOGGLE
 
   private var fieldUpdater: ConwayFieldUpdater = _
   private val cellStateObservers = new mutable.HashSet[ICellStateObserver]()
@@ -41,6 +41,9 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     generateGrid()
     fieldUpdater.setMainField(cellGrid)
   }
+
+  override def getGridParams: GridParameters = this.gridParameters
+
 
   override def getCells: Array[Array[Cell]] = cellGrid
 
