@@ -9,14 +9,14 @@ import javafx.scene.layout._
 import javafx.scene.paint.Color
 import javafx.stage.{FileChooser, Window}
 
-import ru.nsu.fit.g15201.boltava.model.canvas.{HexagonalGridController, IDrawable, IGridController, ImageDrawable}
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.DoublePoint
+import ru.nsu.fit.g15201.boltava.model.canvas._
+import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
 import ru.nsu.fit.g15201.boltava.model.graphics.{BresenhamLineCreator, IColorFiller, ScanLineFiller}
 import ru.nsu.fit.g15201.boltava.model.logic._
 
-class MainViewController extends ICellStateObserver {
+import scala.collection.mutable.ArrayBuffer
 
-  private val DEFAULT_CONFIG_PATH = "./config.txt"
+class MainViewController extends ICellStateObserver {
 
   private var drawable: IDrawable = _
   private var colorFiller: IColorFiller = _
@@ -69,10 +69,11 @@ class MainViewController extends ICellStateObserver {
 
   private def createNewGrid(configPath: String) = {
     try {
-      val gridParameters = ConfigReader.parseConfig(configPath)
+      val gridParameters = ConfigManager.openGameModel(configPath)
       validateGridParameters(gridParameters)
       gameController.unsubscribe(this)
       gridController = new HexagonalGridController(gridParameters.cellSideSize)
+      gameController.setGridController(gridController)
       gameController.setGridParams(gridParameters)
       gameController.subscribe(this)
       drawCellGrid(gridParameters.width, gridParameters.height)
@@ -80,10 +81,12 @@ class MainViewController extends ICellStateObserver {
     } catch {
       case e: Exception =>
         println(e.getMessage)
+        e.printStackTrace()
         AlertHelper.showError(window, "Failed to read configuration file", e.getMessage)
     }
   }
 
+  // TODO: move to game controller
   private def validateGridParameters(gridParameters: GridParameters) = {
     if (gridParameters.width <= 0 || gridParameters.width > MAX_GRID_SIDE_SIZE ||
         gridParameters.height <= 0 || gridParameters.height > MAX_GRID_SIDE_SIZE) {
@@ -201,10 +204,34 @@ class MainViewController extends ICellStateObserver {
   @FXML
   protected def onOpenModel(event: MouseEvent): Unit = {
     val fileChooser:FileChooser = new FileChooser()
-    fileChooser.setTitle("Open Resource File")
+    fileChooser.setTitle("Open Game Model File")
     val file = fileChooser.showOpenDialog(toolbar.getScene.getWindow)
     if (file != null) {
       createNewGrid(file.getAbsolutePath)
+    }
+  }
+
+  @FXML
+  protected def onSaveModel(event: MouseEvent): Unit = {
+    val fileChooser:FileChooser = new FileChooser()
+    fileChooser.setTitle("Select Model File")
+    val file = fileChooser.showSaveDialog(toolbar.getScene.getWindow)
+
+    if (file != null) {
+      println("FILE NOT NULL")
+      if (gameController.isGameStarted) {
+        gameController.pause()
+      }
+      val aliveCells = new ArrayBuffer[Point]()
+      gameController.getCells.foreach(_.foreach(cell => {
+        if (cell.getState == State.ALIVE) {
+          aliveCells.append((cell.getX, cell.getY))
+        }
+      }))
+      ConfigManager.saveGameModel(file, gameController.getGridParams, aliveCells.toArray)
+      if (gameController.isGameStarted) {
+        gameController.start()
+      }
     }
   }
 
