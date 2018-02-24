@@ -2,7 +2,7 @@ package ru.nsu.fit.g15201.boltava.view
 
 import javafx.application.Platform
 import javafx.fxml.FXML
-import javafx.scene.control.{ScrollPane, ToolBar}
+import javafx.scene.control.{Button, ScrollPane, ToggleButton, ToolBar}
 import javafx.scene.image.{ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout._
@@ -33,6 +33,8 @@ class MainViewController extends ICellStateObserver {
   @FXML private var toolbar: ToolBar = _
   @FXML private var gameFieldImageView: ImageView = _
   @FXML private var scrollPane: ScrollPane = _
+  @FXML private var setToggleModeBtn: ToggleButton = _
+  @FXML private var setReplaceModeBtn: ToggleButton = _
 
   private var window: Window = _
   private var gridImage: WritableImage = _
@@ -200,6 +202,28 @@ class MainViewController extends ICellStateObserver {
     fileChooser
   }
 
+  @FXML
+  def onSetReplace(event: MouseEvent): Unit = {
+    if (!gameController.isGameInitialized) {
+      showAlertOnError()
+      setReplaceModeBtn.setSelected(false)
+      return
+    }
+    gameController.setCellSelectionMode(CellSelectionMode.REPLACE)
+    setToggleModeBtn.setSelected(false)
+  }
+
+  @FXML
+  def onSetToggle(event: MouseEvent): Unit = {
+    if (!gameController.isGameInitialized) {
+      showAlertOnError()
+      setToggleModeBtn.setSelected(false)
+      return
+    }
+    gameController.setCellSelectionMode(CellSelectionMode.TOGGLE)
+    setReplaceModeBtn.setSelected(false)
+  }
+
   private def drawGrid(w: Int, h: Int): Unit = {
     val (width, height) = gridController.getCartesianFieldSize(w, h)
     gridImage = new WritableImage(width.ceil.toInt, height.ceil.toInt)
@@ -243,3 +267,9 @@ class MainViewController extends ICellStateObserver {
   }
 
 }
+
+// todo: toggle button
+// todo: fix drag+toggle bug
+// todo: add menu
+// todo: replace button with icons
+// todo: add ability to change grid parameters while playing

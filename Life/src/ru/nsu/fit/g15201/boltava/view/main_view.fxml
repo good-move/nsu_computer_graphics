@@ -11,6 +11,7 @@
 
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ToggleButton?>
 <VBox fx:controller="ru.nsu.fit.g15201.boltava.view.MainViewController"
       fx:id="root"
       xmlns:fx="http://javafx.com/fxml"
@@ -34,9 +35,11 @@
                     text="Save"
                     onMouseClicked="#onSaveModel"
             >
-                <tooltip><Tooltip text="Open game field model"/></tooltip>
+                <tooltip><Tooltip text="Save game field model"/></tooltip>
             </Button>
+
             <Separator orientation="VERTICAL" />
+
             <Button
                     fx:id="playBtn"
                     text="Play"
@@ -65,6 +68,25 @@
             >
                 <tooltip><Tooltip text="Clear the field"/></tooltip>
             </Button>
+
+            <Separator orientation="VERTICAL" />
+
+            <ToggleButton
+                    fx:id="setToggleModeBtn"
+                    text="Toggle"
+                    onMouseClicked="#onSetToggle"
+            >
+                <tooltip><Tooltip text="Set 'toggle' mode"/></tooltip>
+            </ToggleButton>
+
+            <ToggleButton
+                    fx:id="setReplaceModeBtn"
+                    text="Replace"
+                    onMouseClicked="#onSetReplace"
+            >
+                <tooltip><Tooltip text="Set 'replace' mode"/></tooltip>
+            </ToggleButton>
+
         </HBox>
     </ToolBar>
 
