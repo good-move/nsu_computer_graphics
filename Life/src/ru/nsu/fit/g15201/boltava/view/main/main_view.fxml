@@ -100,7 +100,7 @@
 
             <Button
                     fx:id="aboutBtn"
-                    onMouseClicked="#onReset"
+                    onMouseClicked="#onAbout"
                     styleClass="toolbar-btn, about-btn"
             >
                 <tooltip><Tooltip text="About"/></tooltip>
@@ -108,7 +108,7 @@
 
             <Button
                     fx:id="helpBtn"
-                    onMouseClicked="#onReset"
+                    onMouseClicked="#onHelp"
                     styleClass="toolbar-btn, help-btn"
             >
                 <tooltip><Tooltip text="Help"/></tooltip>

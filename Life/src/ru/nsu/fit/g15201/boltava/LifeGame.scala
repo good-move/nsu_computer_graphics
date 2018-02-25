@@ -20,7 +20,7 @@ class LifeGame extends Application {
   private val windowTitle = "Conway Game Of Life"
 
   override def start(primaryStage: Stage): Unit = {
-    val root: Parent = FXMLLoader.load(getClass.getResource("./view/main_view.fxml"))
+    val root: Parent = FXMLLoader.load(getClass.getResource("./view/main/main_view.fxml"))
     primaryStage.setTitle(windowTitle)
     val scene = new Scene(root, 800, 500, Color.WHITE)
     scene.getStylesheets.add(getClass.getResource("/styles/buttons.css").toExternalForm)

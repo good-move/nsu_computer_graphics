@@ -55,11 +55,11 @@
 }
 
 .about-btn {
-    -fx-background-image: url("/icons/png/profile.png");
+    -fx-background-image: url("/icons/png/about.png");
 }
 
 .settings-btn {
-    -fx-background-image: url("/icons/png/settings.png");
+    -fx-background-image: url("/icons/png/setting.png");
 }
 
 .active-button {

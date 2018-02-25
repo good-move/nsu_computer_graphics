@@ -1,8 +1,9 @@
 package ru.nsu.fit.g15201.boltava.view
 
 import javafx.application.Platform
-import javafx.fxml.FXML
-import javafx.scene.control.{ScrollPane, ToggleButton, ToolBar}
+import javafx.fxml.{FXML, FXMLLoader}
+import javafx.scene.{Node, Parent}
+import javafx.scene.control.{Cell => _, _}
 import javafx.scene.image.{Image, ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout._
@@ -227,6 +228,20 @@ class MainViewController extends ICellStateObserver {
     setReplaceModeBtn.setSelected(false)
   }
 
+  @FXML
+  def onAbout(event: MouseEvent): Unit = {
+    val owner = event.getSource.asInstanceOf[Node].getScene.getWindow
+    val aboutDialog = new AboutDialog(owner)
+    aboutDialog.show()
+  }
+
+  @FXML
+  def onHelp(event: MouseEvent): Unit = {
+    val owner = event.getSource.asInstanceOf[Node].getScene.getWindow
+    val helpDialog = new HelpDialog(owner)
+    helpDialog.show()
+  }
+
   private def drawGrid(w: Int, h: Int): Unit = {
     val (width, height) = gridController.getCartesianFieldSize(w, h)
     gridImage = new WritableImage(width.ceil.toInt, height.ceil.toInt)
@@ -282,6 +297,6 @@ class MainViewController extends ICellStateObserver {
 }
 
 // todo: add menu
-// todo: replace button with icons
 // todo: add ability to change grid parameters while playing
 // todo: add About modal window
+// todo: implement onExit method
