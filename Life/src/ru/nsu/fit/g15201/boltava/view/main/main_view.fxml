@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ToggleButton?>
 
-<VBox fx:controller="ru.nsu.fit.g15201.boltava.view.MainViewController"
+<VBox fx:controller="ru.nsu.fit.g15201.boltava.view.main.MainViewController"
       fx:id="root"
       xmlns:fx="http://javafx.com/fxml"
       minWidth="300"
@@ -92,7 +92,7 @@
 
             <Button
                     fx:id="settingsBtn"
-                    onMouseClicked="#onReset"
+                    onMouseClicked="#onOpenSettings"
                     styleClass="toolbar-btn, settings-btn"
             >
                 <tooltip><Tooltip text="Settings"/></tooltip>

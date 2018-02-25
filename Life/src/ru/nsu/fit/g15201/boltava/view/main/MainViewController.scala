@@ -18,9 +18,9 @@ import ru.nsu.fit.g15201.boltava.model.logic.{ConfigManager, _}
 import ru.nsu.fit.g15201.boltava.view.{AlertHelper, ICellStateObserver}
 import ru.nsu.fit.g15201.boltava.view.about.AboutDialog
 import ru.nsu.fit.g15201.boltava.view.help.HelpDialog
+import ru.nsu.fit.g15201.boltava.view.settings.SettingsPane
 
 import scala.collection.mutable.ArrayBuffer
-import scala.reflect.io.Path
 
 class MainViewController extends ICellStateObserver {
 
@@ -243,6 +243,13 @@ class MainViewController extends ICellStateObserver {
     val owner = event.getSource.asInstanceOf[Node].getScene.getWindow
     val helpDialog = new HelpDialog(owner)
     helpDialog.show()
+  }
+
+  @FXML
+  def onOpenSettings(event: MouseEvent): Unit = {
+    val owner = event.getSource.asInstanceOf[Node].getScene.getWindow
+    val settingsPan = new SettingsPane(owner)
+    settingsPan.show()
   }
 
   private def drawGrid(w: Int, h: Int): Unit = {

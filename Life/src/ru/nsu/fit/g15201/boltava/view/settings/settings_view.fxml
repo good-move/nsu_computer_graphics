@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.geometry.Insets?>
+<VBox
+        xmlns:fx="http://javafx.com/fxml"
+        fx:id="root"
+        fx:controller="ru.nsu.fit.g15201.boltava.view.about.AboutDialogController"
+        minWidth="600"
+>
+    <padding><Insets top="10" right="10" bottom="10" left="10" /></padding>
+    <TabPane>
+        <Tab fx:id="gridSettingsTab" closable="false" text="Grid" >
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints minWidth="300" maxWidth="350" />
+                    <ColumnConstraints minWidth="300" maxWidth="350" />
+                </columnConstraints>
+                <Label styleClass="grid-dimensions-title"
+                       text="Grid Dimensions"
+                       GridPane.rowIndex="0"
+                       GridPane.columnIndex="0"
+                       GridPane.columnSpan="2"
+                />
+                <HBox GridPane.rowIndex="1" GridPane.columnIndex="0">
+                    <Label text="Width" minWidth="60"/>
+                    <TextField fx:id="gridWidthField" />
+                </HBox>
+                <HBox GridPane.rowIndex="1" GridPane.columnIndex="1">
+                    <Label text="Height" minWidth="60" />
+                    <TextField fx:id="gridHeightField" />
+                </HBox>
+
+                <!--<Separator/>-->
+
+                <HBox GridPane.rowIndex="2" GridPane.columnIndex="0">
+                    <Label text="Cell border size" minWidth="90" />
+                    <TextField fx:id="cellBorderSizeTextField" />
+                </HBox>
+                <Slider fx:id="cellBorderSizeSlider" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+
+                <HBox GridPane.rowIndex="2" GridPane.columnIndex="1">
+                    <Label text="Cell border width" minWidth="90" />
+                    <TextField fx:id="cellBorderWidthTextField" />
+                </HBox>
+                <Slider fx:id="cellBorderWidthSlider" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+            </GridPane>
+        </Tab>
+
+        <Tab fx:id="gameSettingsTab" closable="false" text="Game" >
+            <VBox >
+                <padding><Insets top="10" right="10" bottom="10" left="10" /></padding>
+                <HBox >
+                    <Label text="MinBirth" minWidth="100"/>
+                    <TextField fx:id="minBirthTextField" />
+                </HBox>
+
+                <HBox >
+                    <Label text="MaxBirth" minWidth="100" />
+                    <TextField fx:id="maxBirthTextField" />
+                </HBox>
+
+                <HBox >
+                    <Label text="MinAlive" minWidth="100" />
+                    <TextField fx:id="minAliveTextField" />
+                </HBox>
+
+                <HBox >
+                    <Label text="MaxAlive" minWidth="100" />
+                    <TextField fx:id="maxAliveTextField" />
+                </HBox>
+            </VBox>
+        </Tab>
+    </TabPane>
+
+    <Separator/>
+
+    <HBox style="border:1px;">
+        <Button text="Cancel" alignment="BASELINE_RIGHT" />
+        <Button text="Apply" alignment="BASELINE_RIGHT"/>
+    </HBox>
+
+</VBox>
