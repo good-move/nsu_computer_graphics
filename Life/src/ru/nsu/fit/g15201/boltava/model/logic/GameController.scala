@@ -18,7 +18,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private var updateTask: ScheduledFuture[_] = _
 
   private var gridController: IGridController = _
-  private var gridParameters: GridParameters = _
+  private var gridParameters: GridSettings = _
 
   private var cellGrid: Array[Array[Cell]] = _
   private var cellSelectionMode = CellSelectionMode.TOGGLE
@@ -37,7 +37,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     fieldUpdater.setStateObserver(this)
   }
 
-  override def setGridParams(gridParameters: GridParameters): Unit = {
+  override def setGridParams(gridParameters: GridSettings): Unit = {
     validateGridParameters(gridParameters)
     if (gameState == GameState.UNINITIALIZED) {
       gameState = GameState.INITIALIZED
@@ -47,9 +47,9 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     fieldUpdater.setMainField(cellGrid)
   }
 
-  override def getGridParams: GridParameters = this.gridParameters
+  override def getGridParams: GridSettings = this.gridParameters
 
-  private def validateGridParameters(gridParameters: GridParameters) = {
+  private def validateGridParameters(gridParameters: GridSettings) = {
     if (gridParameters.width <= 0 || gridParameters.width > MAX_GRID_SIDE_SIZE ||
       gridParameters.height <= 0 || gridParameters.height > MAX_GRID_SIDE_SIZE) {
       throw new RuntimeException(

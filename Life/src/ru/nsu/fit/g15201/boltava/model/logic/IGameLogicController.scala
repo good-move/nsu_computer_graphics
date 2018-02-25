@@ -11,8 +11,8 @@ trait IGameLogicController extends ICellStateProvider with ICellClickListener {
   def pause(): Unit
   def reset(): Unit
 
-  def setGridParams(gridParameters: GridParameters): Unit
-  def getGridParams: GridParameters
+  def setGridParams(gridParameters: GridSettings): Unit
+  def getGridParams: GridSettings
 
   def setCellSelectionMode(cellSelectionMode: CellSelectionMode)
   def getCellSelectionMode: CellSelectionMode

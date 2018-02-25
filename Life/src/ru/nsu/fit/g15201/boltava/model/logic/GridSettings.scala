@@ -1,6 +1,6 @@
 package ru.nsu.fit.g15201.boltava.model.logic
 
-class GridParameters {
+class GridSettings {
 
   private[this] var _width: Int = 0
   private[this] var _height: Int = 0
