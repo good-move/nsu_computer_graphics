@@ -32,7 +32,6 @@ class SettingsPaneController extends IGridParametersProvider {
   @FXML var applyButton: Button = _
   @FXML var okButton: Button = _
 
-
   private var currentGridSettings: GridSettings = _
   private var boundsSettings: BoundsSettings = _
 
@@ -41,16 +40,12 @@ class SettingsPaneController extends IGridParametersProvider {
     initSliders()
   }
 
-  def setCurrentSettings(gridSettings: GridSettings): Unit = {
+  def setCurrentSettings(boundsSettings: BoundsSettings, gridSettings: GridSettings): Unit = {
+    this.boundsSettings = boundsSettings
     currentGridSettings = GridSettings(gridSettings)
+    applyBounds()
     applySettings()
   }
-
-  def setBoundsSettings(boundsSettings: BoundsSettings): Unit = {
-    this.boundsSettings = boundsSettings
-    applyBounds()
-  }
-
   override def setChangeListener(gridParametersChangeListener: IGridParametersChangeListener): Unit = {
     settingsChangeListener = gridParametersChangeListener
   }
@@ -81,7 +76,7 @@ class SettingsPaneController extends IGridParametersProvider {
   private def initSliders(): Unit = {
     cellBorderWidthSlider.valueProperty().addListener(new ChangeListener[Number] {
       override def changed(observable: ObservableValue[_ <: Number], oldValue: Number, nextValue: Number): Unit = {
-        val nextIntValue = nextValue.asInstanceOf[Int]
+        val nextIntValue = nextValue.asInstanceOf[Double]
         if (boundsSettings.minCellBorderWidth < nextIntValue &&
             nextIntValue < boundsSettings.maxCellBorderWidth) {
           cellBorderWidthTF.setText(nextIntValue.toString)
@@ -102,7 +97,7 @@ class SettingsPaneController extends IGridParametersProvider {
 
     cellBorderSizeSlider.valueProperty().addListener(new ChangeListener[Number] {
       override def changed(observable: ObservableValue[_ <: Number], oldValue: Number, nextValue: Number): Unit = {
-        val nextIntValue = nextValue.asInstanceOf[Int]
+        val nextIntValue = nextValue.asInstanceOf[Double]
         if (boundsSettings.minCellBorderWidth < nextIntValue &&
           nextIntValue < boundsSettings.maxCellBorderWidth) {
           cellBorderSizeTF.setText(nextIntValue.toString)
