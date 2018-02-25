@@ -1,95 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.layout.HBox?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.geometry.Insets?>
-<VBox
-        xmlns:fx="http://javafx.com/fxml"
-        fx:id="root"
-        fx:controller="ru.nsu.fit.g15201.boltava.view.about.AboutDialogController"
-        minWidth="600"
->
-    <padding><Insets top="10" right="10" bottom="10" left="10" /></padding>
+<VBox fx:id="root" minWidth="600" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112" fx:controller="ru.nsu.fit.g15201.boltava.view.settings.SettingsPaneController">
+    <padding><Insets bottom="10" left="10" right="10" top="10" /></padding>
     <TabPane>
-        <Tab fx:id="gridSettingsTab" closable="false" text="Grid" >
+        <Tab fx:id="gridSettingsTab" closable="false" text="Grid">
             <GridPane>
                 <columnConstraints>
-                    <ColumnConstraints minWidth="300" maxWidth="350" />
-                    <ColumnConstraints minWidth="300" maxWidth="350" />
+                    <ColumnConstraints maxWidth="350" minWidth="300" />
+                    <ColumnConstraints maxWidth="350" minWidth="300" />
                 </columnConstraints>
-                <Label styleClass="grid-dimensions-title"
-                       text="Grid Dimensions"
-                       GridPane.rowIndex="0"
-                       GridPane.columnIndex="0"
-                       GridPane.columnSpan="2"
-                />
-                <HBox GridPane.rowIndex="1" GridPane.columnIndex="0">
-                    <Label text="Width" minWidth="60"/>
-                    <TextField fx:id="gridWidthField" />
+                <Label styleClass="grid-dimensions-title" text="Grid Dimensions" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0" />
+                <HBox GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <Label minWidth="60" text="Width" />
+                    <TextField fx:id="gridWidthTF" />
                 </HBox>
-                <HBox GridPane.rowIndex="1" GridPane.columnIndex="1">
-                    <Label text="Height" minWidth="60" />
-                    <TextField fx:id="gridHeightField" />
+                <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <Label minWidth="60" text="Height" />
+                    <TextField fx:id="gridHeightTF" />
                 </HBox>
 
                 <!--<Separator/>-->
 
-                <HBox GridPane.rowIndex="2" GridPane.columnIndex="0">
-                    <Label text="Cell border size" minWidth="90" />
-                    <TextField fx:id="cellBorderSizeTextField" />
+                <HBox GridPane.columnIndex="0" GridPane.rowIndex="2">
+                    <Label minWidth="90" text="Cell border size" />
+                    <TextField fx:id="cellBorderSizeTF" />
                 </HBox>
-                <Slider fx:id="cellBorderSizeSlider" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <Slider fx:id="cellBorderSizeSlider" GridPane.columnIndex="0" GridPane.rowIndex="3" />
 
-                <HBox GridPane.rowIndex="2" GridPane.columnIndex="1">
-                    <Label text="Cell border width" minWidth="90" />
-                    <TextField fx:id="cellBorderWidthTextField" />
+                <HBox GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <Label minWidth="90" text="Cell border width" />
+                    <TextField fx:id="cellBorderWidthTF" />
                 </HBox>
-                <Slider fx:id="cellBorderWidthSlider" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                <Slider fx:id="cellBorderWidthSlider" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
 
             </GridPane>
         </Tab>
 
-        <Tab fx:id="gameSettingsTab" closable="false" text="Game" >
-            <VBox >
-                <padding><Insets top="10" right="10" bottom="10" left="10" /></padding>
-                <HBox >
-                    <Label text="MinBirth" minWidth="100"/>
-                    <TextField fx:id="minBirthTextField" />
+        <Tab fx:id="gameSettingsTab" closable="false" text="Game">
+            <VBox>
+                <padding><Insets bottom="10" left="10" right="10" top="10" /></padding>
+                <HBox>
+                    <Label minWidth="100" text="MinBirth" />
+                    <TextField fx:id="minBirthTF" />
                 </HBox>
 
-                <HBox >
-                    <Label text="MaxBirth" minWidth="100" />
-                    <TextField fx:id="maxBirthTextField" />
+                <HBox>
+                    <Label minWidth="100" text="MaxBirth" />
+                    <TextField fx:id="maxBirthTF" />
                 </HBox>
 
-                <HBox >
-                    <Label text="MinAlive" minWidth="100" />
-                    <TextField fx:id="minAliveTextField" />
+                <HBox>
+                    <Label minWidth="100" text="MinAlive" />
+                    <TextField fx:id="minAliveTF" />
                 </HBox>
 
-                <HBox >
-                    <Label text="MaxAlive" minWidth="100" />
-                    <TextField fx:id="maxAliveTextField" />
+                <HBox>
+                    <Label minWidth="100" text="MaxAlive" />
+                    <TextField fx:id="maxAliveTF" />
                 </HBox>
             </VBox>
         </Tab>
     </TabPane>
 
-    <Separator/>
+    <Separator />
 
     <HBox style="border:1px;">
-        <Button text="Cancel" alignment="BASELINE_RIGHT" />
-        <Button text="Apply" alignment="BASELINE_RIGHT"/>
+        <Button fx:id="cancelButton" alignment="BASELINE_RIGHT" text="Cancel" />
+        <Button fx:id="applyButton" alignment="BASELINE_RIGHT" text="Apply" />
+        <Button fx:id="okButton" alignment="BASELINE_RIGHT" text="OK" />
     </HBox>
 
 </VBox>

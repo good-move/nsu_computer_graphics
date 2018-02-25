@@ -10,7 +10,7 @@ import ru.nsu.fit.g15201.boltava.view.CustomModalDialog
 import scala.reflect.io.Path
 
 class HelpDialog(owner: Window = null)
-      extends CustomModalDialog[HelpDialogController](
+      extends CustomModalDialog[HelpDialogController, Unit](
         HelpDialog.title, HelpDialog.cssPath, HelpDialog.contentPath
       ) {
 

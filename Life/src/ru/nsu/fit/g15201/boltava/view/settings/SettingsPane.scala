@@ -7,7 +7,7 @@ import ru.nsu.fit.g15201.boltava.view.CustomModalDialog
 import scala.reflect.io.Path
 
 class SettingsPane(owner: Window = null)
-      extends CustomModalDialog[SettingsPaneController](
+      extends CustomModalDialog[SettingsPaneController, Unit](
         "Settings", SettingsPane.cssPath, SettingsPane.contentPath
       ) {
   {

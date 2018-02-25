@@ -41,3 +41,17 @@ class GridSettings {
   }
 
 }
+
+object GridSettings {
+
+  def apply(other: GridSettings): GridSettings = {
+    val gridSettings = new GridSettings
+    gridSettings.cellSideSize = other.cellSideSize
+    gridSettings.borderWidth = other.borderWidth
+    gridSettings.aliveCells = other.aliveCells
+    gridSettings.width = other.width
+    gridSettings.height = other.height
+    gridSettings
+  }
+
+}

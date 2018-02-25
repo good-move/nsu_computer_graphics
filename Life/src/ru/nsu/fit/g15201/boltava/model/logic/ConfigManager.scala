@@ -16,7 +16,7 @@ object ConfigManager {
   val MODEL_FILE_EXTENSION = "life"
   val MODEL_FILE_DESCRIPTION = "LIFE model file"
 
-  def openGameModel(configPath: String): GridParameters = {
+  def openGameModel(configPath: String): GridSettings = {
     if (!configPath.endsWith(".life")) {
       throw new RuntimeException(s"Configuration file extension must be .$MODEL_FILE_EXTENSION.")
     }
@@ -29,7 +29,7 @@ object ConfigManager {
     val reader = bufferedSource.bufferedReader()
 
     try {
-      val gridParameters = new GridParameters()
+      val gridParameters = new GridSettings()
       val (width, height) = readDimensions(reader)
       gridParameters.height = height
       gridParameters.width = width
@@ -64,7 +64,7 @@ object ConfigManager {
     aliveCells
   }
 
-  def saveGameModel(configFile: File, gridParameters: GridParameters, aliveCells: Array[Point]): Unit = {
+  def saveGameModel(configFile: File, gridParameters: GridSettings, aliveCells: Array[Point]): Unit = {
     var file = configFile
     if(!file.getName.endsWith(s".$MODEL_FILE_EXTENSION")) {
       file = new File(s"${file.getAbsolutePath}.$MODEL_FILE_EXTENSION")

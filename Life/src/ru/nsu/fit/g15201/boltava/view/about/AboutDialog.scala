@@ -7,7 +7,7 @@ import ru.nsu.fit.g15201.boltava.view.CustomModalDialog
 import scala.reflect.io.Path
 
 class AboutDialog(owner: Window = null)
-      extends CustomModalDialog[AboutDialogController](
+      extends CustomModalDialog[AboutDialogController, Unit](
         "About", AboutDialog.cssPath, AboutDialog.contentPath
       ) {
   {
