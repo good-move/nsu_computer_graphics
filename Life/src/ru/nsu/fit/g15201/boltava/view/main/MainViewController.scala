@@ -1,9 +1,9 @@
-package ru.nsu.fit.g15201.boltava.view
+package ru.nsu.fit.g15201.boltava.view.main
 
 import javafx.application.Platform
 import javafx.fxml.{FXML, FXMLLoader}
+import javafx.scene.control.{ScrollPane, ToggleButton, ToolBar}
 import javafx.scene.{Node, Parent}
-import javafx.scene.control.{Cell => _, _}
 import javafx.scene.image.{Image, ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout._
@@ -15,6 +15,7 @@ import ru.nsu.fit.g15201.boltava.model.canvas._
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
 import ru.nsu.fit.g15201.boltava.model.graphics._
 import ru.nsu.fit.g15201.boltava.model.logic.{ConfigManager, _}
+import ru.nsu.fit.g15201.boltava.view.{AlertHelper, ICellStateObserver}
 import ru.nsu.fit.g15201.boltava.view.about.AboutDialog
 import ru.nsu.fit.g15201.boltava.view.help.HelpDialog
 
@@ -300,5 +301,4 @@ class MainViewController extends ICellStateObserver {
 
 // todo: add menu
 // todo: add ability to change grid parameters while playing
-// todo: add About modal window
 // todo: implement onExit method

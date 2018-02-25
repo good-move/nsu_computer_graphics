@@ -17,7 +17,7 @@
     <Label text="Conway Game Of Life" />
     <Label text="Creator: Alexey Boltava (g.15201)" />
     <Label text="v1.0.0" alignment="BASELINE_CENTER"/>
-    <Text text="&#x2422; 2018"/>
+    <Text text="&#x00a9; 2018"/>
 
     <Label />
     <Button text="Close" onMouseClicked="#onClose" fx:id="closeButton" />
