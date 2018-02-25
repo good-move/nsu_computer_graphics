@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.scene.control.Button?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:id="root"
+      fx:controller="ru.nsu.fit.g15201.boltava.view.about.AboutDialogController"
+>
+
+    <padding><Insets top="10" right="10" bottom="10" left="10" /></padding>
+    <Label text="About"/>
+    <Label />
+
+    <Label text="Conway Game Of Life" />
+    <Label text="Creator: Alexey Boltava (g.15201)" />
+    <Label text="v1.0.0" alignment="BASELINE_CENTER"/>
+    <Text text="&#x2422; 2018"/>
+
+    <Label />
+    <Button text="Close" onMouseClicked="#onClose" fx:id="closeButton" />
+
+</VBox>
