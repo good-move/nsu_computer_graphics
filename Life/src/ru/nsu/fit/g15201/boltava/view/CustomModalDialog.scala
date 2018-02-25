@@ -2,8 +2,8 @@ package ru.nsu.fit.g15201.boltava.view
 
 import java.net.URL
 import javafx.fxml.FXMLLoader
-import javafx.scene.control.Dialog
-import javafx.scene.{Parent, Scene}
+import javafx.scene.control.{ButtonType, Dialog}
+import javafx.scene.{Node, Parent, Scene}
 import javafx.stage.{Modality, Stage, Window}
 
 abstract class CustomModalDialog[T, R] (
@@ -26,6 +26,11 @@ abstract class CustomModalDialog[T, R] (
     setTitle("About")
     initOwner(owner)
     initModality(Modality.APPLICATION_MODAL)
+
+    getDialogPane.getButtonTypes.add(ButtonType.CLOSE)
+    val closeButton = getDialogPane.lookupButton(ButtonType.CLOSE)
+    closeButton.managedProperty.bind(closeButton.visibleProperty())
+    closeButton.setVisible(false)
   }
 
   def getController: T = {
