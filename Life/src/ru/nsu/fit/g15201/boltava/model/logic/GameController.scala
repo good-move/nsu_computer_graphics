@@ -18,7 +18,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private var updateTask: ScheduledFuture[_] = _
 
   private var gridController: IGridController = _
-  private var gridParameters: GridSettings = _
+  private var gridParameters: GridSettings = new GridSettings
 
   private var cellGrid: Array[Array[Cell]] = _
   private var cellSelectionMode = CellSelectionMode.TOGGLE

@@ -247,10 +247,6 @@ class MainViewController extends ICellStateObserver {
 
   @FXML
   def onOpenSettings(event: MouseEvent): Unit = {
-    if (!gameController.isGameInitialized) {
-      showAlertOnError()
-      return
-    }
     val owner = event.getSource.asInstanceOf[Node].getScene.getWindow
     val settingsPane = new SettingsPane(owner)
     settingsPane.getController.setCurrentSettings(gameController.getSettingBounds, gameController.getGridParams)

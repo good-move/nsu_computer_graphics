@@ -4,8 +4,8 @@ class GridSettings {
 
   private[this] var _width: Int = 0
   private[this] var _height: Int = 0
-  private[this] var _borderWidth: Int = 1
-  private[this] var _cellSideSize: Int = 20
+  private[this] var _borderWidth: Int = 0
+  private[this] var _cellSideSize: Int = 0
   private[this] var _aliveCells: Array[(Int, Int)] = _
 
   def aliveCells: Array[(Int, Int)] = _aliveCells
