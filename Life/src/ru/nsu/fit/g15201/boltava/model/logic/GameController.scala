@@ -32,9 +32,15 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private val MAX_BORDER_WIDTH = 15
   private val MAX_CELL_SIDE_SIZE = 50
 
+  private val boundsSettings = new BoundsSettings
+
   { // constructor code
     fieldUpdater = new ConwayFieldUpdater
     fieldUpdater.setStateObserver(this)
+    boundsSettings.minCellBorderSize = 10
+    boundsSettings.maxCellBorderSize = MAX_CELL_SIDE_SIZE
+    boundsSettings.minCellBorderWidth = 1
+    boundsSettings.maxCellBorderWidth = MAX_BORDER_WIDTH
   }
 
   override def setGridParams(gridParameters: GridSettings): Unit = {
@@ -198,4 +204,6 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   override def isGameReset: Boolean = gameState == GameState.RESET
 
   override def isGameFinished: Boolean = gameState == GameState.FINISHED
+
+  override def getSettingBounds: BoundsSettings = boundsSettings
 }
