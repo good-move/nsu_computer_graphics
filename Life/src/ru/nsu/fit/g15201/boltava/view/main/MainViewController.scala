@@ -15,6 +15,7 @@ import ru.nsu.fit.g15201.boltava.model.canvas._
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
 import ru.nsu.fit.g15201.boltava.model.graphics._
 import ru.nsu.fit.g15201.boltava.model.logic.{ConfigManager, _}
+import ru.nsu.fit.g15201.boltava.view.about.AboutDialog
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.io.Path

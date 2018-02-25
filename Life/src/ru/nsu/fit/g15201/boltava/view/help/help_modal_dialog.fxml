@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<VBox   xmlns:fx="http://javafx.com/fxml"
+        styleClass="root"
+        fx:controller="ru.nsu.fit.g15201.boltava.view.help.HelpDialogController">
+    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+
+    <Label wrapText="true" text="Game Rules" styleClass="h2"/>
+    <Label wrapText="true"
+           text="The game is a life simulator, representing generations of cells. Each cell on the grid has a state (alive or dead), which is affected by its neighbors."
+    />
+    <Label wrapText="true"
+           text="You can select alive and dead cells, watch generations change and interfere the process to impact the evolution."
+    />
+    <Label />
+    <Label wrapText="true" text="Configuration file explanation:" styleClass="h2"/>
+    <Label wrapText="true" text="1) must be a text file with .life extension"/>
+    <Label wrapText="true" text="2) must contain lines of the following structure:"/>
+    <Label wrapText="true" text="        &#x2022; n m - grid dimensions" styleClass="li"/>
+    <Label wrapText="true" text="        &#x2022; w - border width in pixels" styleClass="li"/>
+    <Label wrapText="true" text="        &#x2022; k - cell side size in pixels " styleClass="li"/>
+    <Label wrapText="true" text="        &#x2022; t - number of alive cells" styleClass="li"/>
+    <Label wrapText="true" text="        &#x2022; x y - t rows of coordinates, which represent alive cells on the grid" styleClass="li" />
+    <Button text="close" fx:id="closeButton" onMouseClicked="#onClose"/>
+</VBox>
