@@ -248,9 +248,7 @@ class MainViewController extends ICellStateObserver {
   @FXML
   def onOpenSettings(event: MouseEvent): Unit = {
     val owner = event.getSource.asInstanceOf[Node].getScene.getWindow
-    println("opening settings")
     SettingsPaneActivity.launch(owner, gameController)
-    println("opened settings")
   }
 
   private def drawGrid(w: Int, h: Int): Unit = {

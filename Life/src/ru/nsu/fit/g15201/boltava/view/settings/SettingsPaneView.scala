@@ -32,7 +32,7 @@ class SettingsPaneView extends IView {
   @FXML var okButton: Button = _
 
   private var currentGameSettings = new GameSettings
-  private var boundsSettings: BoundsSettings = new BoundsSettings
+  private var boundsSettings = new BoundsSettings
 
   private var presenter: IPresenter = _
 
@@ -60,9 +60,17 @@ class SettingsPaneView extends IView {
   private def applyBounds(): Unit = {
     cellBorderSizeSlider.setMin(boundsSettings.minBorderSize)
     cellBorderSizeSlider.setMax(boundsSettings.maxBorderSize)
+    setSliderProps(cellBorderSizeSlider)
 
     cellBorderWidthSlider.setMin(boundsSettings.minBorderWidth)
     cellBorderWidthSlider.setMax(boundsSettings.maxBorderWidth)
+    setSliderProps(cellBorderWidthSlider)
+  }
+
+  private def setSliderProps(slider: Slider): Unit = {
+    slider.setShowTickMarks(true)
+    slider.setShowTickLabels(true)
+    slider.setMajorTickUnit(5)
   }
 
   private def applySettings(): Unit = {
@@ -79,10 +87,11 @@ class SettingsPaneView extends IView {
   private def initSlidersListeners(): Unit = {
     cellBorderWidthSlider.valueProperty().addListener(new ChangeListener[Number] {
       override def changed(observable: ObservableValue[_ <: Number], oldValue: Number, nextWidth: Number): Unit = {
-        val width = nextWidth.asInstanceOf[Double]
+        val width = nextWidth.asInstanceOf[Double].toInt
+        cellBorderWidthSlider.setValue(width)
         if (width.isWithinBounds(boundsSettings.minBorderWidth, boundsSettings.maxBorderWidth)) {
           cellBorderWidthTF.setText(width.toString)
-          currentGameSettings.borderWidth = width.toInt
+          currentGameSettings.borderWidth = width
         }
       }
     })
@@ -96,11 +105,10 @@ class SettingsPaneView extends IView {
 
     cellBorderSizeSlider.valueProperty().addListener(new ChangeListener[Number] {
       override def changed(observable: ObservableValue[_ <: Number], oldValue: Number, nextSize: Number): Unit = {
-        val nextDoubleValue = nextSize.asInstanceOf[Double]
-        if (boundsSettings.minBorderWidth < nextDoubleValue &&
-          nextDoubleValue < boundsSettings.maxBorderWidth) {
-          cellBorderSizeTF.setText(nextDoubleValue.toString)
-          currentGameSettings.borderSize = nextDoubleValue.toInt
+        val borderSize = nextSize.asInstanceOf[Double].toInt
+        if (borderSize.isWithinBounds(boundsSettings.minBorderSize, boundsSettings.maxBorderSize)) {
+          cellBorderSizeTF.setText(borderSize.toString)
+          currentGameSettings.borderSize = borderSize
         }
       }
     })
@@ -108,7 +116,7 @@ class SettingsPaneView extends IView {
     cellBorderSizeTF.onTextChanged(borderSize => {
       if (isValidInt(borderSize, boundsSettings.minBorderSize, boundsSettings.maxBorderSize)) {
         cellBorderSizeSlider.setValue(borderSize.toDouble)
-        currentGameSettings.borderSize = borderSize.toInt
+        currentGameSettings.borderSize = borderSize.toDouble.toInt
       }
     })
 
@@ -121,21 +129,18 @@ class SettingsPaneView extends IView {
       trimmedString.toDouble.isWithinBounds(lowerBound, upperBound)
   }
 
-
   private def initTextFieldsListeners(): Unit = {
-    println("TF")
-    println("is null: " + (gridWidthTF == null))
     gridWidthTF.onTextChanged(gridWidth => {
       if (isValidInt(gridWidth, 1, boundsSettings.maxGridSize)) {
         cellBorderSizeSlider.setValue(gridWidth.toInt)
-        currentGameSettings.width = gridWidth.toInt
+        currentGameSettings.width = gridWidth.toDouble.toInt
       }
     })
 
     gridHeightTF.onTextChanged(gridHeight => {
       if (isValidInt(gridHeight, 1, boundsSettings.maxGridSize)) {
         cellBorderSizeSlider.setValue(gridHeight.toInt)
-        currentGameSettings.height = gridHeight.toInt
+        currentGameSettings.height = gridHeight.toDouble.toInt
       }
     })
 
@@ -189,7 +194,7 @@ object utils {
 
   implicit class StringExtension(val s: String) {
     def isNonNegativeInteger: Boolean = {
-      s.forall(c => c.isDigit)
+      s.length > 0 && s.forall(c => c.isDigit)
     }
   }
 
