@@ -12,7 +12,7 @@ trait IGameLogicController extends ICellStateProvider with ICellClickListener {
   def reset(): Unit
 
   def setGridParams(gridParameters: GameSettings): Unit
-  def getGridParams: GameSettings
+  def getGameSettings: GameSettings
 
   def getBoundsSettings: BoundsSettings
 

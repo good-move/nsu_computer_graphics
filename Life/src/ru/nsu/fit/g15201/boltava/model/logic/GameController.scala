@@ -18,44 +18,44 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private var updateTask: ScheduledFuture[_] = _
 
   private var gridController: IGridController = _
-  private var gridParameters: GridSettings = new GridSettings
+  private var gameSettings = new GameSettings
+  private val boundsSettings = new BoundsSettings
 
   private var cellGrid: Array[Array[Cell]] = _
   private var cellSelectionMode = CellSelectionMode.TOGGLE
 
   private var fieldUpdater: ConwayFieldUpdater = _
   private val cellStateObservers = new mutable.HashSet[ICellStateObserver]()
-
   private var gameState = GameState.UNINITIALIZED
 
   private val MAX_GRID_SIDE_SIZE = 500
   private val MAX_BORDER_WIDTH = 15
   private val MAX_CELL_SIDE_SIZE = 50
 
-  private val boundsSettings = new BoundsSettings
 
   { // constructor code
     fieldUpdater = new ConwayFieldUpdater
     fieldUpdater.setStateObserver(this)
-    boundsSettings.minCellBorderSize = 10
-    boundsSettings.maxCellBorderSize = MAX_CELL_SIDE_SIZE
-    boundsSettings.minCellBorderWidth = 1
-    boundsSettings.maxCellBorderWidth = MAX_BORDER_WIDTH
+    boundsSettings.minBorderSize = 10
+    boundsSettings.maxBorderSize = MAX_CELL_SIDE_SIZE
+    boundsSettings.minBorderWidth = 1
+    boundsSettings.maxBorderWidth = MAX_BORDER_WIDTH
+    boundsSettings.maxGridSize - MAX_GRID_SIDE_SIZE
   }
 
-  override def setGridParams(gridParameters: GridSettings): Unit = {
+  override def setGridParams(gridParameters: GameSettings): Unit = {
     validateGridParameters(gridParameters)
     if (gameState == GameState.UNINITIALIZED) {
       gameState = GameState.INITIALIZED
     }
-    this.gridParameters = gridParameters
+    this.gameSettings = gridParameters
     generateGrid()
     fieldUpdater.setMainField(cellGrid)
   }
 
-  override def getGridParams: GridSettings = this.gridParameters
+  override def getGameSettings: GameSettings = this.gameSettings
 
-  private def validateGridParameters(gridParameters: GridSettings) = {
+  private def validateGridParameters(gridParameters: GameSettings) = {
     if (gridParameters.width <= 0 || gridParameters.width > MAX_GRID_SIDE_SIZE ||
       gridParameters.height <= 0 || gridParameters.height > MAX_GRID_SIDE_SIZE) {
       throw new RuntimeException(
@@ -67,7 +67,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
       throw new RuntimeException(s"Border width must be a positive integer not greater than $MAX_BORDER_WIDTH.")
     }
 
-    if (gridParameters.cellSideSize <= 0 || gridParameters.cellSideSize > MAX_CELL_SIDE_SIZE) {
+    if (gridParameters.borderSize <= 0 || gridParameters.borderSize > MAX_CELL_SIDE_SIZE) {
       throw new RuntimeException(s"Cell side size must be a positive integer not grater than $MAX_CELL_SIDE_SIZE.")
     }
 
@@ -143,7 +143,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   // *************************** Private Methods ***************************
 
   private def generateGrid(): Unit = {
-    cellGrid = gridController.generateGrid(gridParameters.width, gridParameters.height)
+    cellGrid = gridController.generateGrid(gameSettings.width, gameSettings.height)
   }
 
   private def stopUpdater(): Unit = {
@@ -205,5 +205,5 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   override def isGameFinished: Boolean = gameState == GameState.FINISHED
 
-  override def getSettingBounds: BoundsSettings = boundsSettings
+  override def getBoundsSettings: BoundsSettings = boundsSettings
 }
