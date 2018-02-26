@@ -14,10 +14,10 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="root" minWidth="600" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112" fx:controller="ru.nsu.fit.g15201.boltava.view.settings.SettingsPaneController">
+<VBox minWidth="600" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112" fx:controller="ru.nsu.fit.g15201.boltava.view.settings.SettingsPaneView">
     <padding><Insets bottom="10" left="10" right="10" top="10" /></padding>
     <TabPane>
-        <Tab fx:id="gridSettingsTab" closable="false" text="Grid">
+        <Tab closable="false" text="Grid">
             <GridPane>
                 <columnConstraints>
                     <ColumnConstraints maxWidth="350" minWidth="300" />
@@ -56,7 +56,7 @@
             </GridPane>
         </Tab>
 
-        <Tab fx:id="gameSettingsTab" closable="false" text="Game">
+        <Tab closable="false" text="Game">
             <VBox>
                 <padding><Insets bottom="10" left="10" right="10" top="10" /></padding>
                 <HBox>
