@@ -1,7 +1,6 @@
 package ru.nsu.fit.g15201.boltava.view.settings
 
 import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.beans.{InvalidationListener, Observable}
 import javafx.fxml.FXML
 import javafx.scene.control.{Button, Slider, TextField}
 

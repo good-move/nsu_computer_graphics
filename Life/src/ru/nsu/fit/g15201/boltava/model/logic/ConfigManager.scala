@@ -16,7 +16,7 @@ object ConfigManager {
   val MODEL_FILE_EXTENSION = "life"
   val MODEL_FILE_DESCRIPTION = "LIFE model file"
 
-  def openGameModel(configPath: String): GridSettings = {
+  def openGameModel(configPath: String): GameSettings = {
     if (!configPath.endsWith(".life")) {
       throw new RuntimeException(s"Configuration file extension must be .$MODEL_FILE_EXTENSION.")
     }
@@ -29,12 +29,12 @@ object ConfigManager {
     val reader = bufferedSource.bufferedReader()
 
     try {
-      val gridParameters = new GridSettings()
+      val gridParameters = new GameSettings()
       val (width, height) = readDimensions(reader)
       gridParameters.height = height
       gridParameters.width = width
       gridParameters.borderWidth = reader.readLine().filterComments.toInt
-      gridParameters.cellSideSize = reader.readLine().filterComments.toInt
+      gridParameters.borderSize = reader.readLine().filterComments.toInt
       gridParameters.aliveCells = readAliveCells(reader)
 
       gridParameters
@@ -64,7 +64,7 @@ object ConfigManager {
     aliveCells
   }
 
-  def saveGameModel(configFile: File, gridParameters: GridSettings, aliveCells: Array[Point]): Unit = {
+  def saveGameModel(configFile: File, gridParameters: GameSettings, aliveCells: Array[Point]): Unit = {
     var file = configFile
     if(!file.getName.endsWith(s".$MODEL_FILE_EXTENSION")) {
       file = new File(s"${file.getAbsolutePath}.$MODEL_FILE_EXTENSION")
@@ -80,7 +80,7 @@ object ConfigManager {
     writer.write(" // Border width in pixels\n")
 
     // write cell side size
-    writer.write(s"${gridParameters.cellSideSize}")
+    writer.write(s"${gridParameters.borderSize}")
     writer.write(" // Cell side size in pixels\n")
 
     // write alive cells coordinates
