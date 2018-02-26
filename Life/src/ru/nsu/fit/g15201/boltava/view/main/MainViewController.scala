@@ -1,10 +1,10 @@
 package ru.nsu.fit.g15201.boltava.view.main
 
 import javafx.application.Platform
-import javafx.fxml.{FXML, FXMLLoader}
+import javafx.fxml.FXML
+import javafx.scene.Node
 import javafx.scene.control.{ScrollPane, ToggleButton, ToolBar}
-import javafx.scene.{Node, Parent}
-import javafx.scene.image.{Image, ImageView, WritableImage}
+import javafx.scene.image.{ImageView, WritableImage}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout._
 import javafx.scene.paint.Color
@@ -15,10 +15,10 @@ import ru.nsu.fit.g15201.boltava.model.canvas._
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
 import ru.nsu.fit.g15201.boltava.model.graphics._
 import ru.nsu.fit.g15201.boltava.model.logic.{ConfigManager, _}
-import ru.nsu.fit.g15201.boltava.view.{AlertHelper, ICellStateObserver}
 import ru.nsu.fit.g15201.boltava.view.about.AboutDialog
 import ru.nsu.fit.g15201.boltava.view.help.HelpDialog
-import ru.nsu.fit.g15201.boltava.view.settings.SettingsPane
+import ru.nsu.fit.g15201.boltava.view.settings.SettingsPaneActivity
+import ru.nsu.fit.g15201.boltava.view.{AlertHelper, ICellStateObserver}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -49,7 +49,7 @@ class MainViewController extends ICellStateObserver {
   // ************************* Controller initialization *************************
 
   @FXML
-  private def initialize(): Unit = {
+  def initialize(): Unit = {
     gameController.subscribe(this)
     setEventHandlers()
   }
@@ -76,7 +76,7 @@ class MainViewController extends ICellStateObserver {
   private def createNewGrid(configPath: String) = {
     try {
       val gridParameters = ConfigManager.openGameModel(configPath)
-      gridController = new HexagonalGridController(gridParameters.cellSideSize)
+      gridController = new HexagonalGridController(gridParameters.borderSize)
       gameController.setGridController(gridController)
       gameController.setGridParams(gridParameters)
       drawGrid(gridParameters.width, gridParameters.height)
@@ -195,7 +195,7 @@ class MainViewController extends ICellStateObserver {
           aliveCells.append((cell.getX, cell.getY))
         }
       }))
-      ConfigManager.saveGameModel(file, gameController.getGridParams, aliveCells.toArray)
+      ConfigManager.saveGameModel(file, gameController.getGameSettings, aliveCells.toArray)
       if (gameController.isGamePaused) {
         gameController.start()
       }
@@ -203,7 +203,7 @@ class MainViewController extends ICellStateObserver {
   }
 
   private def createProperFileChooser(title: String): FileChooser = {
-    val fileChooser:FileChooser = new FileChooser()
+    val fileChooser: FileChooser = new FileChooser()
     fileChooser.setTitle(title)
     fileChooser.getExtensionFilters.add(new ExtensionFilter(s"${ConfigManager.MODEL_FILE_DESCRIPTION}", s"*.${ConfigManager.MODEL_FILE_EXTENSION}"))
     fileChooser
@@ -248,9 +248,9 @@ class MainViewController extends ICellStateObserver {
   @FXML
   def onOpenSettings(event: MouseEvent): Unit = {
     val owner = event.getSource.asInstanceOf[Node].getScene.getWindow
-    val settingsPane = new SettingsPane(owner)
-    settingsPane.getController.setCurrentSettings(gameController.getSettingBounds, gameController.getGridParams)
-    settingsPane.show()
+    println("opening settings")
+    SettingsPaneActivity.launch(owner, gameController)
+    println("opened settings")
   }
 
   private def drawGrid(w: Int, h: Int): Unit = {
