@@ -19,14 +19,19 @@ abstract class CustomModalDialog[T, R] (
   {
     val loader = new FXMLLoader(contentPath)
     val content: Parent = loader.load()
-    viewController = loader.getController[T]()
-    getDialogPane.getStylesheets.add(cssPath)
     getDialogPane.setContent(content)
+    getDialogPane.getStylesheets.add(cssPath)
+    setTitle(title)
     setResizable(false)
-    setTitle("About")
     initOwner(owner)
     initModality(Modality.APPLICATION_MODAL)
 
+    viewController = loader.getController[T]()
+
+    makeCloseable()
+  }
+
+  private def makeCloseable(): Unit = {
     getDialogPane.getButtonTypes.add(ButtonType.CLOSE)
     val closeButton = getDialogPane.lookupButton(ButtonType.CLOSE)
     closeButton.managedProperty.bind(closeButton.visibleProperty())
