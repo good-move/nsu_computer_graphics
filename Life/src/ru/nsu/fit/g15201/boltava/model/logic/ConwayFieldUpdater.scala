@@ -83,8 +83,8 @@ class ConwayFieldUpdater extends Runnable {
     helperField = createHelperArray()
   }
 
-  private def neighborsFilter(p: Point): Boolean = {
-    p.x >= 0 && p.y >= 0 && p.x < mainField.length && p.y < mainField(0).length
+  private def neighborsFilter(point: Point): Boolean = {
+    point.x >= 0 && point.y >= 0 && point.x < mainField.length && point.y < mainField(0).length
   }
 
   private def countAliveFilter(p: Point, field: Array[Array[Cell]]): Boolean = {

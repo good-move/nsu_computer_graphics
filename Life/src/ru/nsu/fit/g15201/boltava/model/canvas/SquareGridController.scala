@@ -3,8 +3,6 @@ package ru.nsu.fit.g15201.boltava.model.canvas
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
 import ru.nsu.fit.g15201.boltava.model.logic.{Cell, HexagonCell}
 
-import scala.collection.mutable.ArrayBuffer
-
 class SquareGridController(private val squareSideSize: Int) extends IGridController {
 
   private val sideSize: Double = squareSideSize

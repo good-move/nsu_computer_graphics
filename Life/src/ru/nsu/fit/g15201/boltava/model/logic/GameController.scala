@@ -113,12 +113,8 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   // *************************** Game Lifecycle Routines ***************************
 
   override def start(): Unit = {
-    if (!this.isGameInitialized) {
-      throw new RuntimeException("Game Field is not initialized")
-    }
-
-    if (this.isGameReset || this.isGameFinished) {
-      throw new RuntimeException("Game ")
+    if (!this.isGameInitialized && !this.isGamePaused) {
+      throw new IllegalStateException("Game Field is not initialized")
     }
 
     if (!isGameRunning) {

@@ -9,32 +9,32 @@ object BresenhamLineCreator extends LineCreator {
   override def getLinePoints(from: Point, to: Point): Array[Point] = {
     val dx: Int = Math.abs(from.x - to.x)
     val dy: Int = Math.abs(from.y - to.y)
-    var linePoints = ArrayBuffer[Point]()
+    val linePoints = ArrayBuffer[Point]()
 
     val yStep = if (from.y <= to.y) 1 else -1
     val xStep = if (from.x <= to.x) 1 else -1
     var error: Int = 0
-    var x = from.x
-    var y = from.y
+    var currentX = from.x
+    var currentY = from.y
 
     val pointsToAdd: Int = Math.max(dx, dy)+1
 
     for (_ <- 1 to pointsToAdd) {
-      linePoints.append((x, y))
+      linePoints.append((currentX, currentY))
       if (dx >= dy) {
         error += dy
         if (2 * error >= dx) {
-          y += yStep
+          currentY += yStep
           error -= dx
         }
-        x += xStep
+        currentX += xStep
       } else {
         error += dx
         if (2 * error >= dy) {
-          x += xStep
+          currentX += xStep
           error -= dy
         }
-        y += yStep
+        currentY += yStep
       }
     }
 

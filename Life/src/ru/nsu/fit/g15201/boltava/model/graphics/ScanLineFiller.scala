@@ -19,28 +19,32 @@ class ScanLineFiller extends IColorFiller {
     stack.append(polygon.getCenter)
 
     while (stack.nonEmpty) {
-      val p = stack.remove(stack.size-1)
-      var y = p.y
-      while (y >= 0 && drawable.getColor(p.x, y) == oldColor) {
+      val pointToFill = stack.remove(stack.size-1)
+      var y = pointToFill.y
+      while (y >= 0 && drawable.getColor(pointToFill.x, y) == oldColor) {
         y -= 1
       }
       y += 1
       var filledLeft = false
       var filledRight = false
-      while (y < drawable.getHeight && drawable.getColor(p.x, y) == oldColor) {
-        drawable.setColor((p.x, y), newColor)
-        if (!filledLeft && p.x-1 >= 0 && drawable.getColor(p.x-1, y) == oldColor) {
-          stack.append((p.x - 1, y))
+
+      while (y < drawable.getHeight && drawable.getColor(pointToFill.x, y) == oldColor) {
+        drawable.setColor((pointToFill.x, y), newColor)
+
+        if (!filledLeft && pointToFill.x-1 >= 0 && drawable.getColor(pointToFill.x-1, y) == oldColor) {
+          stack.append((pointToFill.x - 1, y))
           filledLeft = true
-        } else if (filledLeft && p.x-1 >= 0 && drawable.getColor(p.x-1, y) != oldColor) {
+        } else if (filledLeft && pointToFill.x-1 >= 0 && drawable.getColor(pointToFill.x-1, y) != oldColor) {
           filledLeft = false
         }
-        if (!filledRight && p.x < drawable.getWidth-1 && drawable.getColor(p.x+1, y) == oldColor) {
-          stack.append((p.x + 1, y))
+
+        if (!filledRight && pointToFill.x < drawable.getWidth-1 && drawable.getColor(pointToFill.x+1, y) == oldColor) {
+          stack.append((pointToFill.x + 1, y))
           filledRight = true
-        } else if (filledRight && p.x+1 < drawable.getWidth && drawable.getColor(p.x+1, y) != oldColor) {
+        } else if (filledRight && pointToFill.x+1 < drawable.getWidth && drawable.getColor(pointToFill.x+1, y) != oldColor) {
           filledRight = false
         }
+
         y+=1
       }
 
