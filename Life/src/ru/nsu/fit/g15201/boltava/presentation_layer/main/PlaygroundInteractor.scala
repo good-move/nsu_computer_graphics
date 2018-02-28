@@ -1,7 +1,7 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.main
 
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.{DoublePoint, Point}
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.{Cell, IGameLogicController}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.IGameLogicController
 import ru.nsu.fit.g15201.boltava.presentation_layer.main.IContract.IInteractor
 
 class PlaygroundInteractor(private val gameController: IGameLogicController) extends IInteractor {

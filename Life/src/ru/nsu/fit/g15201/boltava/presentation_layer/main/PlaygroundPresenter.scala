@@ -9,7 +9,7 @@ import ru.nsu.fit.g15201.boltava.presentation_layer.main.IContract.{IInteractor,
 
 class PlaygroundPresenter(view: IView, interactor: IInteractor) extends IPresenter {
 
-  private val ALIVE_CELL_COLOR = Color.GRAY
+  private val ALIVE_CELL_COLOR = Color.ORANGE
   private val DEAD_CELL_COLOR = Color.WHITE
   private val CELL_BORDER_COLOR = Color.BLACK
 

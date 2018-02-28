@@ -3,7 +3,7 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.main
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.image.{ImageView, WritableImage}
-import javafx.scene.input.{DragEvent, MouseEvent}
+import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas._
@@ -83,10 +83,6 @@ class PlaygroundView extends IView {
   }
 
 }
-
-// todo: add menu
-// todo: add ability to change grid parameters while playing
-// todo: implement onExit method
 
 
 object PlaygroundView {

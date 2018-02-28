@@ -9,8 +9,10 @@ import ru.nsu.fit.g15201.boltava.presentation_layer.base.{IBasePresenter, IBaseV
 object IContract {
 
   trait IPresenter extends IBasePresenter with ICellStateObserver with IGridStateObserver {
+
     def onFieldDragOver(point: DoublePoint)
     def onFieldClick(point: DoublePoint)
+
   }
 
   trait IView extends IBaseView[IPresenter] {
@@ -23,9 +25,7 @@ object IContract {
   trait IInteractor extends ICellStateProvider with IGridStateProvider {
 
     def onFieldClick(point: DoublePoint)
-
     def shouldUpdateDraggedCell(point: DoublePoint): Boolean
-
     def getGridPixelSize(width: Int, height: Int): (Int, Int)
 
   }
