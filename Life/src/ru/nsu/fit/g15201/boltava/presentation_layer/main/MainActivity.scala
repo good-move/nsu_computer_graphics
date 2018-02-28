@@ -27,7 +27,7 @@ object MainActivity extends IBaseActivity {
 
     val content: Parent = FXMLLoader.load(contentPath)
 
-    toolbarPresenter = new ToolbarPresenter(ToolbarView.getInstance, new ToolbarInteractor(gameController))
+    toolbarPresenter = new ToolbarPresenter(ToolbarView.getInstance, new ToolbarInteractor(gameController, gameController))
     playgroundPresenter = new PlaygroundPresenter(PlaygroundView.getInstance, new PlaygroundInteractor(gameController))
 
     val scene = new Scene(content, 800, 500, Color.WHITE)
