@@ -3,7 +3,7 @@ package ru.nsu.fit.g15201.boltava
 import javafx.application.Application
 import javafx.stage.Stage
 
-import ru.nsu.fit.g15201.boltava.view.main.MainActivity
+import ru.nsu.fit.g15201.boltava.presentation_layer.main.MainActivity
 
 
 object LifeGame {
