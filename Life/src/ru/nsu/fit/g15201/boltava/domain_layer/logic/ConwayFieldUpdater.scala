@@ -3,6 +3,8 @@ package ru.nsu.fit.g15201.boltava.domain_layer.logic
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IGridController
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.State.State
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{ImpactScores, LifeScores}
+import ru.nsu.fit.g15201.boltava.domain_layer.utils.Extensions._
 
 
 /**
@@ -15,14 +17,14 @@ class ConwayFieldUpdater extends Runnable {
   private var gridController: IGridController = _
   private var mainField: Array[Array[Cell]] = _
   private var helperField: Array[Array[State]] = _
-  private var fieldStateObserver: IFieldStateObserver = _
+  private var fieldStateObserver: Option[IFieldStateObserver] = None
 
-  private var _closeNeighborsImpactScore: Double = 1.0
-  private var _distantNeighborsImpactScore: Double = .3
-  private var _lifeLowerBorderScore: Double = 2.0
-  private var _lifeUpperBorderScore: Double = 3.3
-  private var _birthLowerBorderScore: Double = 2.3
-  private var _birthUpperBorderScore: Double = 2.9
+  private var closeNeighborsImpactScore: Double = 1.0
+  private var distantNeighborsImpactScore: Double = .3
+  private var minAliveScore: Double = 2.0
+  private var maxAliveScore: Double = 3.3
+  private var minBirthScore: Double = 2.3
+  private var maxBirthScore: Double = 2.9
 
 
   def run(): Unit = {
@@ -31,7 +33,9 @@ class ConwayFieldUpdater extends Runnable {
 
   def makeStep(): Unit = {
     _nextStep()
-    fieldStateObserver.onFieldUpdated(mainField)
+    if (fieldStateObserver.isDefined) {
+      fieldStateObserver.get.onFieldUpdated(mainField)
+    }
   }
 
   private def _nextStep(): Unit = {
@@ -49,19 +53,19 @@ class ConwayFieldUpdater extends Runnable {
       val distantNeighborsCount = gridController.getCellDistantNeighbors((i, j))
         .filter(neighborsFilter).count(p => countAliveFilter(p, mainField))
 
-      val impact = closeNeighborsCount * closeNeighborsImpactScore +
+      val impactScore = closeNeighborsCount * closeNeighborsImpactScore +
         distantNeighborsCount * distantNeighborsImpactScore
 
       val cell = mainField(i)(j)
       if (cell.getState == State.DEAD) {
-        val canBeBorn = birthLowerBorderScore <= impact && impact <= birthUpperBorderScore
+        val canBeBorn = impactScore.within(minBirthScore, maxBirthScore)
         if (canBeBorn) {
           helperField(i)(j) = State.ALIVE
         } else {
           helperField(i)(j) = State.DEAD
         }
       } else if (cell.getState == State.ALIVE) {
-        val isStillAlive = lifeLowerBorderScore <= impact && impact <= lifeUpperBorderScore
+        val isStillAlive = impactScore.within(minAliveScore, maxAliveScore)
         if (!isStillAlive) {
           helperField(i)(j) = State.DEAD
         } else {
@@ -78,9 +82,10 @@ class ConwayFieldUpdater extends Runnable {
   }
 
   def setMainField(field: Array[Array[Cell]]): Unit = {
-    // TODO: make synchronized
-    mainField = field
-    helperField = createHelperArray()
+    synchronized {
+      mainField = field
+      helperField = createHelperArray()
+    }
   }
 
   private def neighborsFilter(point: Point): Boolean = {
@@ -92,13 +97,15 @@ class ConwayFieldUpdater extends Runnable {
   }
 
   def setStateObserver(fieldStateObserver: IFieldStateObserver): Unit = {
-    // TODO: make synchronized
-    this.fieldStateObserver = fieldStateObserver
+    synchronized {
+      this.fieldStateObserver = Some(fieldStateObserver)
+    }
   }
 
   def removeStateObserver(): Unit = {
-    // TODO: make synchronized
-    this.fieldStateObserver = null
+    synchronized {
+      this.fieldStateObserver = None
+    }
   }
 
   def setGridController(gridController: IGridController): Unit = {
@@ -113,48 +120,22 @@ class ConwayFieldUpdater extends Runnable {
     result
   }
 
-
-  // ******************************** Getters and Setters ********************************
-  // TODO: make all getters/setters sync?
-  def closeNeighborsImpactScore: Double = _closeNeighborsImpactScore
-
-  def closeNeighborsImpactScore_= (value: Double): Unit = {
-    _closeNeighborsImpactScore = value
+  def updateImpactScore(impactScores: ImpactScores): Unit = {
+    synchronized {
+      closeNeighborsImpactScore = impactScores.firstOrderImpact
+      distantNeighborsImpactScore = impactScores.secondOrderImpact
+    }
   }
 
+  def updateLifeScores(lifeScores: LifeScores): Unit = {
+    synchronized {
+      minAliveScore = lifeScores.minAliveScore
+      maxAliveScore = lifeScores.maxAliveScore
 
-  def distantNeighborsImpactScore: Double = _distantNeighborsImpactScore
-
-  def distantNeighborsImpactScore_=(value: Double): Unit = {
-    _distantNeighborsImpactScore = value
+      minBirthScore = lifeScores.minBirthScore
+      maxBirthScore = lifeScores.maxBirthScore
+    }
   }
 
-
-  def lifeLowerBorderScore: Double = _lifeLowerBorderScore
-
-  def lifeLowerBorderScore_=(value: Double): Unit = {
-    _lifeLowerBorderScore = value
-  }
-
-
-  def lifeUpperBorderScore: Double = _lifeUpperBorderScore
-
-  def lifeUpperBorderScore_=(value: Double): Unit = {
-    _lifeUpperBorderScore = value
-  }
-
-
-  def birthLowerBorderScore: Double = _birthLowerBorderScore
-
-  def birthLowerBorderScore_=(value: Double): Unit = {
-    _birthLowerBorderScore = value
-  }
-
-
-  def birthUpperBorderScore: Double = _birthUpperBorderScore
-
-  def birthUpperBorderScore_=(value: Double): Unit = {
-    _birthUpperBorderScore = value
-  }
 
 }
