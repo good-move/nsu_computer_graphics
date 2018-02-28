@@ -15,14 +15,16 @@ object IContract {
     def onNextStep()
     def onReset()
 
-    def onOpenModel(path: String)
-    def onSaveModel(path: String)
+    def onOpenModel()
+    def onSaveModel()
+    def onAgreeSaveModel()
 
     def onSetReplace()
     def onSetToggle()
 
     def onOpenSettings()
-    def getProperFileChooser(title: String): FileChooser
+
+    def onClose()
   }
 
   trait IView extends IBaseView[IPresenter] {
@@ -30,14 +32,18 @@ object IContract {
     def showError(title: String, body: String)
     def showWarning(title: String, body: String)
     def showInfo(title: String, body: String)
+    def showSaveFileChooser(fileChooser: FileChooser, onFileChosen: String => Unit)
+    def showOpenFileChooser(fileChooser: FileChooser, onFileChosen: String => Unit)
     def setCellSelectionButton(cellSelectionMode: CellSelectionMode)
+    def showOfferSaveModel(): Unit
 
   }
 
   trait IInteractor {
 
-    def onSaveModel(path: String)
+    def onSaveModel(path: Option[String])
     def onOpenModel(path: String)
+    def shouldSavePlaygroundState(): Boolean
 
     def getGameController: IGameLogicController
 
