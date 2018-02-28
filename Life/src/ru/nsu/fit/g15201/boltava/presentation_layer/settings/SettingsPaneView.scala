@@ -6,7 +6,7 @@ import javafx.scene.control.{Button, Slider, TextField}
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, SettingsBounds}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings._
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IPresenter, IView}
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.utils._
 
@@ -48,9 +48,11 @@ class SettingsPaneView extends IView {
     applyBounds()
   }
 
-  override def setGridSettings(gridSettings: GameSettings): Unit = {
-    currentGameSettings = gridSettings.copy()
-    applySettings()
+  override def setGridSettings(gameSettings: GameSettings): Unit = {
+    currentGameSettings = gameSettings.copy()
+    applyPlaygroundSettings(currentGameSettings.playgroundSettings)
+    applyLifeScores(currentGameSettings.lifeScores)
+    applyImpactScores(currentGameSettings.impactScores)
   }
 
   override def getGridSettings: GameSettings = currentGameSettings
@@ -73,15 +75,26 @@ class SettingsPaneView extends IView {
     slider.setMajorTickUnit(5)
   }
 
-  private def applySettings(): Unit = {
-    gridWidthTF.setText(currentGameSettings.gridWidth.toString)
-    gridHeightTF.setText(currentGameSettings.gridHeight.toString)
+  private def applyImpactScores(impactScores: ImpactScores): Unit = {
 
-    cellBorderWidthTF.setText(currentGameSettings.borderWidth.toString)
-    cellBorderWidthSlider.setValue(currentGameSettings.borderWidth)
+  }
 
-    cellBorderSizeTF.setText(currentGameSettings.borderSize.toString)
-    cellBorderSizeSlider.setValue(currentGameSettings.borderSize)
+  private def applyLifeScores(lifeScores: LifeScores): Unit = {
+    minBirthTF.setText(lifeScores.minBirthScore.toString)
+    maxBirthTF.setText(lifeScores.maxBirthScore.toString)
+    minAliveTF.setText(lifeScores.minAliveScore.toString)
+    maxAliveTF.setText(lifeScores.maxAliveScore.toString)
+  }
+
+  private def applyPlaygroundSettings(playgroundSettings: PlaygroundSettings): Unit = {
+    gridWidthTF.setText(playgroundSettings.gridWidth.toString)
+    gridHeightTF.setText(playgroundSettings.gridHeight.toString)
+
+    cellBorderWidthTF.setText(playgroundSettings.borderWidth.toString)
+    cellBorderWidthSlider.setValue(playgroundSettings.borderWidth)
+
+    cellBorderSizeTF.setText(playgroundSettings.borderSize.toString)
+    cellBorderSizeSlider.setValue(playgroundSettings.borderSize)
   }
 
   private def initSlidersListeners(): Unit = {
@@ -91,7 +104,7 @@ class SettingsPaneView extends IView {
         cellBorderWidthSlider.setValue(width)
         if (width.isWithinBounds(settingsBounds.minBorderWidth, settingsBounds.maxBorderWidth)) {
           cellBorderWidthTF.setText(width.toString)
-          currentGameSettings.borderWidth = width
+          currentGameSettings.playgroundSettings.borderWidth = width
         }
       }
     })
@@ -99,7 +112,7 @@ class SettingsPaneView extends IView {
     cellBorderWidthTF.onTextChanged(borderWidth => {
       if (isValidInt(borderWidth, settingsBounds.minBorderWidth, settingsBounds.maxBorderWidth)) {
         cellBorderWidthSlider.setValue(borderWidth.toDouble)
-        currentGameSettings.borderWidth = borderWidth.toInt
+        currentGameSettings.playgroundSettings.borderWidth = borderWidth.toInt
       }
     })
 
@@ -108,7 +121,7 @@ class SettingsPaneView extends IView {
         val borderSize = nextSize.asInstanceOf[Double].toInt
         if (borderSize.isWithinBounds(settingsBounds.minBorderSize, settingsBounds.maxBorderSize)) {
           cellBorderSizeTF.setText(borderSize.toString)
-          currentGameSettings.borderSize = borderSize
+          currentGameSettings.playgroundSettings.borderSize = borderSize
         }
       }
     })
@@ -116,7 +129,7 @@ class SettingsPaneView extends IView {
     cellBorderSizeTF.onTextChanged(borderSize => {
       if (isValidInt(borderSize, settingsBounds.minBorderSize, settingsBounds.maxBorderSize)) {
         cellBorderSizeSlider.setValue(borderSize.toDouble)
-        currentGameSettings.borderSize = borderSize.toDouble.toInt
+        currentGameSettings.playgroundSettings.borderSize = borderSize.toDouble.toInt
       }
     })
 
@@ -132,15 +145,13 @@ class SettingsPaneView extends IView {
   private def initTextFieldsListeners(): Unit = {
     gridWidthTF.onTextChanged(gridWidth => {
       if (isValidInt(gridWidth, 1, settingsBounds.maxGridSize)) {
-        cellBorderSizeSlider.setValue(gridWidth.toInt)
-        currentGameSettings.gridWidth = gridWidth.toDouble.toInt
+        currentGameSettings.playgroundSettings.gridWidth = gridWidth.toDouble.toInt
       }
     })
 
     gridHeightTF.onTextChanged(gridHeight => {
       if (isValidInt(gridHeight, 1, settingsBounds.maxGridSize)) {
-        cellBorderSizeSlider.setValue(gridHeight.toInt)
-        currentGameSettings.gridHeight = gridHeight.toDouble.toInt
+        currentGameSettings.playgroundSettings.gridHeight = gridHeight.toDouble.toInt
       }
     })
 
@@ -154,10 +165,10 @@ class SettingsPaneView extends IView {
       }
     }
 
-    minBirthTF.onTextChanged(setValueOrShowError(currentGameSettings.minBirthScore_=))
-    maxBirthTF.onTextChanged(setValueOrShowError(currentGameSettings.maxBirthScore_=))
-    minAliveTF.onTextChanged(setValueOrShowError(currentGameSettings.minAliveScore_=))
-    maxAliveTF.onTextChanged(setValueOrShowError(currentGameSettings.maxAliveScore_=))
+    minBirthTF.onTextChanged(setValueOrShowError(currentGameSettings.lifeScores.minBirthScore_=))
+    maxBirthTF.onTextChanged(setValueOrShowError(currentGameSettings.lifeScores.maxBirthScore_=))
+    minAliveTF.onTextChanged(setValueOrShowError(currentGameSettings.lifeScores.minAliveScore_=))
+    maxAliveTF.onTextChanged(setValueOrShowError(currentGameSettings.lifeScores.maxAliveScore_=))
   }
 
   private def initButtonListeners(): Unit = {
