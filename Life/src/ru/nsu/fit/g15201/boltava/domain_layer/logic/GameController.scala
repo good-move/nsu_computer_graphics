@@ -96,8 +96,8 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
     if (settings.aliveCells != null) {
       settings.aliveCells.foreach(cell => {
-        if (cell._1 < 0 || cell._1 >= settings.gridWidth ||
-          cell._2 < 0 || cell._2 >= settings.gridHeight) {
+        if (cell._1 < 0 || cell._1 >= settings.gridHeight ||
+          cell._2 < 0 || cell._2 >= settings.gridWidth) {
           throw new RuntimeException(s"Cell coordinates out of bounds: $cell " +
             s"(width: ${settings.gridWidth}, height: ${settings.gridHeight}).")
         }
