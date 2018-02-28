@@ -1,12 +1,14 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
 import javafx.fxml.FXML
-import javafx.scene.control.{ToggleButton, ToolBar}
+import javafx.scene.control.{ButtonType, ToggleButton, ToolBar}
 import javafx.scene.input.MouseEvent
+import javafx.stage.{FileChooser, Window}
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutDialog
 import ru.nsu.fit.g15201.boltava.presentation_layer.help.HelpDialog
+import ru.nsu.fit.g15201.boltava.presentation_layer.main.MainActivity
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode.CellSelectionMode
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.{CellSelectionMode, IPresenter, IView}
 
@@ -22,6 +24,9 @@ class ToolbarView extends IView {
   @FXML
   def initialize(): Unit = {
     ToolbarView.toolbarView = this
+    MainActivity.getWindow.setOnCloseRequest(_ => {
+      presenter.onClose()
+    })
   }
 
   @FXML
@@ -46,21 +51,14 @@ class ToolbarView extends IView {
 
   @FXML
   protected def onOpenModel(event: MouseEvent): Unit = {
-    val fileChooser = presenter.getProperFileChooser("Open Game Model File")
-    val file = fileChooser.showOpenDialog(toolbar.getScene.getWindow)
-    if (file != null) {
-      presenter.onOpenModel(file.getAbsolutePath)
-    }
+    presenter.onOpenModel()
   }
 
   @FXML
   protected def onSaveModel(event: MouseEvent): Unit = {
-    val fileChooser = presenter.getProperFileChooser("Select Model File")
-    val file = fileChooser.showSaveDialog(toolbar.getScene.getWindow)
-    if (file != null) {
-      presenter.onSaveModel(file.getAbsolutePath)
-    }
+    presenter.onSaveModel()
   }
+
   @FXML
   def onSetReplace(event: MouseEvent): Unit = {
     presenter.onSetReplace()
@@ -73,13 +71,13 @@ class ToolbarView extends IView {
 
   @FXML
   def onAbout(event: MouseEvent): Unit = {
-    val aboutDialog = new AboutDialog(toolbar.getScene.getWindow)
+    val aboutDialog = new AboutDialog(getWindow)
     aboutDialog.show()
   }
 
   @FXML
   def onHelp(event: MouseEvent): Unit = {
-    val helpDialog = new HelpDialog(toolbar.getScene.getWindow)
+    val helpDialog = new HelpDialog(getWindow)
     helpDialog.show()
   }
 
@@ -105,19 +103,43 @@ class ToolbarView extends IView {
   }
 
   override def showError(title: String, message: String): Unit = {
-    AlertHelper.showError(toolbar.getScene.getWindow, title, message)
+    AlertHelper.showError(getWindow, title, message)
   }
 
   override def showWarning(title: String, message: String): Unit = {
-    AlertHelper.showWarning(toolbar.getScene.getWindow, title, message)
+    AlertHelper.showWarning(getWindow, title, message)
   }
 
   override def showInfo(title: String, message: String): Unit = {
-    AlertHelper.showInformation(toolbar.getScene.getWindow, title, message)
+    AlertHelper.showInformation(getWindow, title, message)
   }
 
   override def setPresenter(presenter: IPresenter): Unit = this.presenter = presenter
 
+  override def showOfferSaveModel(): Unit = {
+    val result = AlertHelper.showConfirmation(getWindow, "Playground is modified", "Do you want to save playground model?")
+    if (result == ButtonType.OK) {
+      presenter.onAgreeSaveModel()
+    }
+  }
+
+  private def getWindow: Window = {
+    toolbar.getScene.getWindow
+  }
+
+  override def showSaveFileChooser(fileChooser: FileChooser, onFileChosen: String => Unit): Unit = {
+    val file = fileChooser.showSaveDialog(getWindow)
+    if (file != null) {
+      onFileChosen(file.getAbsolutePath)
+    }
+  }
+
+  override def showOpenFileChooser(fileChooser: FileChooser, onFileChosen: String => Unit): Unit = {
+    val file = fileChooser.showOpenDialog(getWindow)
+    if (file != null) {
+      onFileChosen(file.getAbsolutePath)
+    }
+  }
 }
 
 object ToolbarView {

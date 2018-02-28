@@ -7,7 +7,7 @@ import ru.nsu.fit.g15201.boltava.domain_layer.logic.ConfigManager
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode._
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.{IInteractor, IPresenter, IView}
 
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 class ToolbarPresenter(private val view: IView, private val interactor: IInteractor) extends IPresenter {
 
@@ -39,26 +39,30 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
     interactor.getGameController.reset()
   }
 
-  override def onOpenModel(path: String): Unit = {
-    Try(interactor.onOpenModel(path)) match {
-      case Failure(t) =>
-        t.printStackTrace()
-        view.showError("Failed to read configuration file", t.getMessage)
-      case _ =>
-    }
+  override def onOpenModel(): Unit = {
+    view.showOpenFileChooser(getProperFileChooser("Open Game Model"), (path: String) => {
+      Try(interactor.onOpenModel(path)) match {
+        case Failure(t) =>
+          t.printStackTrace()
+          view.showError("Failed to read configuration file", t.getMessage)
+        case _ =>
+      }
+    })
   }
 
-  override def onSaveModel(path: String): Unit = {
+  override def onSaveModel(): Unit = {
     if (interactor.getGameController.isGameRunning) {
       interactor.getGameController.pause()
     }
 
-    Try(interactor.onSaveModel(path)) match {
-      case Failure(t) =>
-        t.printStackTrace()
-        view.showError("Failed to save model configuration file", t.getMessage)
-      case _ =>
-    }
+    view.showSaveFileChooser(getProperFileChooser(""), (path: String) => {
+      Try(interactor.onSaveModel(Some(path))) match {
+        case Failure(t) =>
+          t.printStackTrace()
+          view.showError("Failed to save model configuration file", t.getMessage)
+        case _ =>
+      }
+    })
 
     if (interactor.getGameController.isGamePaused) {
       interactor.getGameController.start()
@@ -104,7 +108,7 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
     warningShown
   }
 
-  override def getProperFileChooser(title: String): FileChooser = {
+  def getProperFileChooser(title: String): FileChooser = {
     val fileChooser: FileChooser = new FileChooser()
     fileChooser.setTitle(title)
     fileChooser.getExtensionFilters.add(new ExtensionFilter(
@@ -112,4 +116,23 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
     ))
     fileChooser
   }
+
+  override def onClose(): Unit = {
+    if (interactor.shouldSavePlaygroundState()) {
+      view.showOfferSaveModel()
+    }
+  }
+
+  override def onAgreeSaveModel(): Unit = {
+    Try(interactor.onSaveModel(None)) match {
+      case Failure(t) =>
+        t.printStackTrace()
+        view.showWarning("File not found", "No model file has been opened. Choose file to save model to.")
+        view.showSaveFileChooser(getProperFileChooser("Select Model File"), (path: String) => {
+          interactor.onSaveModel(Some(path))
+        })
+      case _ =>
+    }
+  }
+
 }

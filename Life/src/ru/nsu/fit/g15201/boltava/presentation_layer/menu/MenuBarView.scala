@@ -3,7 +3,7 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.menu
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.MenuBar
-import javafx.stage.Window
+import javafx.stage.{FileChooser, Window}
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutDialog
@@ -45,21 +45,14 @@ class MenuBarView extends IView {
 
   @FXML
   protected def onOpenModel(event: ActionEvent): Unit = {
-    val fileChooser = presenter.getProperFileChooser("Open Game Model File")
-    val file = fileChooser.showOpenDialog(getWindow)
-    if (file != null) {
-      presenter.onOpenModel(file.getAbsolutePath)
-    }
+    presenter.onOpenModel()
   }
 
   @FXML
   protected def onSaveModel(event: ActionEvent): Unit = {
-    val fileChooser = presenter.getProperFileChooser("Select Model File")
-    val file = fileChooser.showSaveDialog(getWindow)
-    if (file != null) {
-      presenter.onSaveModel(file.getAbsolutePath)
-    }
+    presenter.onSaveModel()
   }
+
   @FXML
   def onSetReplace(event: ActionEvent): Unit = {
     presenter.onSetReplace()
@@ -107,6 +100,21 @@ class MenuBarView extends IView {
     AlertHelper.showInformation(getWindow, title, body)
   }
 
+  override def showSaveFileChooser(fileChooser: FileChooser, onFileChosen: (String) => Unit): Unit = {
+    val file = fileChooser.showSaveDialog(getWindow)
+    if (file != null) {
+      onFileChosen(file.getAbsolutePath)
+    }
+  }
+
+  override def showOpenFileChooser(fileChooser: FileChooser, onFileChosen: (String) => Unit): Unit = {
+    val file = fileChooser.showOpenDialog(getWindow)
+    if (file != null) {
+      onFileChosen(file.getAbsolutePath)
+    }
+  }
+
+  override def showOfferSaveModel(): Unit = {}
 }
 
 object MenuBarView {

@@ -12,14 +12,26 @@ import scala.collection.mutable.ArrayBuffer
 
 class ToolbarInteractor(private val gameController: IGameLogicController, private val settingsController: ISettingsController) extends IInteractor {
 
-  override def onSaveModel(path: String): Unit = {
+  override def onSaveModel(path: Option[String]): Unit = {
+    var configPath = path
+    if (configPath.isEmpty) {
+      val lastOpenedPath = ConfigManager.getLastOpenedPath
+      if (lastOpenedPath.isDefined) {
+        configPath = lastOpenedPath
+      } else {
+        throw new RuntimeException("No model file found")
+      }
+    }
+
     val aliveCells = new ArrayBuffer[Point]()
     gameController.getCells.foreach(_.foreach(cell => {
       if (cell.getState == State.ALIVE) {
         aliveCells.append((cell.getX, cell.getY))
       }
     }))
-    ConfigManager.saveGameModel(path, gameController.getGameSettings.playgroundSettings, aliveCells.toArray)
+
+    ConfigManager.saveGameModel(configPath.get, gameController.getGameSettings.playgroundSettings, aliveCells.toArray)
+    gameController.setPlaygroundModified(isModified = false)
   }
 
   override def onOpenModel(path: String): Unit = {
@@ -44,5 +56,8 @@ class ToolbarInteractor(private val gameController: IGameLogicController, privat
 
   override def getGameController: IGameLogicController = gameController
 
+  override def shouldSavePlaygroundState(): Boolean = {
+    gameController.getPlaygroundModified
+  }
 }
 
