@@ -32,8 +32,8 @@ object ConfigManager {
     try {
       val gridParameters = new GameSettings()
       val (width, height) = readDimensions(reader)
-      gridParameters.height = height
-      gridParameters.width = width
+      gridParameters.gridHeight = height
+      gridParameters.gridWidth = width
       gridParameters.borderWidth = reader.readLine().filterComments.toInt
       gridParameters.borderSize = reader.readLine().filterComments.toInt
       gridParameters.aliveCells = readAliveCells(reader)
@@ -73,7 +73,7 @@ object ConfigManager {
     val writer = new BufferedWriter(new FileWriter(file))
 
     // write grid dimensions
-    writer.write(s"${gridParameters.width} ${gridParameters.height}")
+    writer.write(s"${gridParameters.gridWidth} ${gridParameters.gridHeight}")
     writer.write(" // Grid dimensions\n")
 
     // write border width

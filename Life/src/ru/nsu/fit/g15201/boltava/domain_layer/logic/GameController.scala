@@ -7,7 +7,6 @@ import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, Sett
 import ru.nsu.fit.g15201.boltava.presentation_layer.main.{ICellStateObserver, IGridStateObserver}
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -71,8 +70,8 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   }
 
   private def validateGridParameters(gridParameters: GameSettings) = {
-    if (gridParameters.width <= 0 || gridParameters.width > MAX_GRID_SIDE_SIZE ||
-      gridParameters.height <= 0 || gridParameters.height > MAX_GRID_SIDE_SIZE) {
+    if (gridParameters.gridWidth <= 0 || gridParameters.gridWidth > MAX_GRID_SIDE_SIZE ||
+      gridParameters.gridHeight <= 0 || gridParameters.gridHeight > MAX_GRID_SIDE_SIZE) {
       throw new RuntimeException(
         s"Invalid grid dimensions. Grid width and height " +
           s"must be positive integers between 1 and $MAX_GRID_SIDE_SIZE.")
@@ -87,10 +86,10 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     }
 
     gridParameters.aliveCells.foreach(cell => {
-      if (cell._1 < 0 || cell._1 >= gridParameters.width ||
-        cell._2 < 0 || cell._2 >= gridParameters.height) {
+      if (cell._1 < 0 || cell._1 >= gridParameters.gridWidth ||
+        cell._2 < 0 || cell._2 >= gridParameters.gridHeight) {
         throw new RuntimeException(s"Cell coordinates out of bounds: $cell " +
-          s"(width: ${gridParameters.width}, height: ${gridParameters.height}).")
+          s"(width: ${gridParameters.gridWidth}, height: ${gridParameters.gridHeight}).")
       }
     })
 
@@ -166,7 +165,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   // *************************** Private Methods ***************************
 
   private def generateGrid(): Unit = {
-    cellGrid = gridController.generateGrid(gameSettings.width, gameSettings.height)
+    cellGrid = gridController.generateGrid(gameSettings.gridWidth, gameSettings.gridHeight)
   }
 
   private def setAliveCells(): Unit = {

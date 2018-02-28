@@ -49,7 +49,7 @@ class SettingsPaneView extends IView {
   }
 
   override def setGridSettings(gridSettings: GameSettings): Unit = {
-    currentGameSettings = GameSettings(gridSettings)
+    currentGameSettings = gridSettings.copy()
     applySettings()
   }
 
@@ -74,8 +74,8 @@ class SettingsPaneView extends IView {
   }
 
   private def applySettings(): Unit = {
-    gridWidthTF.setText(currentGameSettings.width.toString)
-    gridHeightTF.setText(currentGameSettings.height.toString)
+    gridWidthTF.setText(currentGameSettings.gridWidth.toString)
+    gridHeightTF.setText(currentGameSettings.gridHeight.toString)
 
     cellBorderWidthTF.setText(currentGameSettings.borderWidth.toString)
     cellBorderWidthSlider.setValue(currentGameSettings.borderWidth)
@@ -133,14 +133,14 @@ class SettingsPaneView extends IView {
     gridWidthTF.onTextChanged(gridWidth => {
       if (isValidInt(gridWidth, 1, settingsBounds.maxGridSize)) {
         cellBorderSizeSlider.setValue(gridWidth.toInt)
-        currentGameSettings.width = gridWidth.toDouble.toInt
+        currentGameSettings.gridWidth = gridWidth.toDouble.toInt
       }
     })
 
     gridHeightTF.onTextChanged(gridHeight => {
       if (isValidInt(gridHeight, 1, settingsBounds.maxGridSize)) {
         cellBorderSizeSlider.setValue(gridHeight.toInt)
-        currentGameSettings.height = gridHeight.toDouble.toInt
+        currentGameSettings.gridHeight = gridHeight.toDouble.toInt
       }
     })
 
