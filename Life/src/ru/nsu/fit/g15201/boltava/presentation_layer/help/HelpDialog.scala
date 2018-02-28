@@ -1,9 +1,6 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.help
 
-import javafx.fxml.{FXML, FXMLLoader}
-import javafx.scene.input.MouseEvent
-import javafx.scene.{Parent, Scene}
-import javafx.stage.{Modality, Stage, Window}
+import javafx.stage.Window
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.CustomModalDialog
 

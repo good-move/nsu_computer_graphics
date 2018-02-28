@@ -8,7 +8,7 @@ import scala.reflect.io.Path
 
 class AboutDialog(owner: Window = null)
       extends CustomModalDialog[AboutDialogController, Unit](
-        "About", AboutDialog.cssPath, AboutDialog.contentPath
+        AboutDialog.title, AboutDialog.cssPath, AboutDialog.contentPath
       ) {
   {
     initOwner(owner)
@@ -18,6 +18,7 @@ class AboutDialog(owner: Window = null)
 
 
 object AboutDialog {
+  private val title = "About"
   private val cssPath = Path("styles/about_modal.css").toString()
   private val contentPath = getClass.getResource("./about_modal_dialog.fxml")
 }
