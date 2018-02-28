@@ -1,5 +1,7 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
+import javafx.stage.FileChooser
+
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.IGameLogicController
 import ru.nsu.fit.g15201.boltava.presentation_layer.base.{IBasePresenter, IBaseView}
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode.CellSelectionMode
@@ -20,7 +22,7 @@ object IContract {
     def onSetToggle()
 
     def onOpenSettings()
-
+    def getProperFileChooser(title: String): FileChooser
   }
 
   trait IView extends IBaseView[IPresenter] {
@@ -28,7 +30,6 @@ object IContract {
     def showError(title: String, body: String)
     def showWarning(title: String, body: String)
     def showInfo(title: String, body: String)
-
     def setCellSelectionButton(cellSelectionMode: CellSelectionMode)
 
   }

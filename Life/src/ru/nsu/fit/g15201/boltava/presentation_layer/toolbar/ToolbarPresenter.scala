@@ -1,5 +1,9 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
+import javafx.stage.FileChooser
+import javafx.stage.FileChooser.ExtensionFilter
+
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.ConfigManager
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode._
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.{IInteractor, IPresenter, IView}
 
@@ -9,7 +13,6 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
 
   {
     view.setPresenter(this)
-    // todo: subscribe to interactor updates?
   }
 
   override def onPlay(): Unit = {
@@ -101,4 +104,12 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
     warningShown
   }
 
+  override def getProperFileChooser(title: String): FileChooser = {
+    val fileChooser: FileChooser = new FileChooser()
+    fileChooser.setTitle(title)
+    fileChooser.getExtensionFilters.add(new ExtensionFilter(
+      s"${ConfigManager.MODEL_FILE_DESCRIPTION}", s"*.${ConfigManager.MODEL_FILE_EXTENSION}"
+    ))
+    fileChooser
+  }
 }

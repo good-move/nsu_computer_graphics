@@ -1,14 +1,9 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
 import javafx.fxml.FXML
-import javafx.scene.control.{ScrollPane, ToggleButton, ToolBar}
-import javafx.scene.image.ImageView
+import javafx.scene.control.{ToggleButton, ToolBar}
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.VBox
-import javafx.stage.FileChooser.ExtensionFilter
-import javafx.stage.{FileChooser, Window}
 
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.ConfigManager
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutDialog
 import ru.nsu.fit.g15201.boltava.presentation_layer.help.HelpDialog
@@ -20,18 +15,12 @@ class ToolbarView extends IView {
 
   private var presenter: IPresenter = _
 
-  @FXML var root: VBox = _
   @FXML var toolbar: ToolBar = _
-  @FXML var gameFieldImageView: ImageView = _
-  @FXML var scrollPane: ScrollPane = _
   @FXML var setToggleModeBtn: ToggleButton = _
   @FXML var setReplaceModeBtn: ToggleButton = _
 
-  private var window: Window = _
-
   @FXML
   def initialize(): Unit = {
-//    window = toolbar.getScene.getWindow
     ToolbarView.toolbarView = this
   }
 
@@ -57,8 +46,8 @@ class ToolbarView extends IView {
 
   @FXML
   protected def onOpenModel(event: MouseEvent): Unit = {
-    val fileChooser = createProperFileChooser("Open Game Model File")
-    val file = fileChooser.showOpenDialog(window)
+    val fileChooser = presenter.getProperFileChooser("Open Game Model File")
+    val file = fileChooser.showOpenDialog(toolbar.getScene.getWindow)
     if (file != null) {
       presenter.onOpenModel(file.getAbsolutePath)
     }
@@ -66,8 +55,8 @@ class ToolbarView extends IView {
 
   @FXML
   protected def onSaveModel(event: MouseEvent): Unit = {
-    val fileChooser = createProperFileChooser("Select Model File")
-    val file = fileChooser.showSaveDialog(window)
+    val fileChooser = presenter.getProperFileChooser("Select Model File")
+    val file = fileChooser.showSaveDialog(toolbar.getScene.getWindow)
     if (file != null) {
       presenter.onSaveModel(file.getAbsolutePath)
     }
@@ -84,28 +73,19 @@ class ToolbarView extends IView {
 
   @FXML
   def onAbout(event: MouseEvent): Unit = {
-    val aboutDialog = new AboutDialog(window)
+    val aboutDialog = new AboutDialog(toolbar.getScene.getWindow)
     aboutDialog.show()
   }
 
   @FXML
   def onHelp(event: MouseEvent): Unit = {
-    val helpDialog = new HelpDialog(window)
+    val helpDialog = new HelpDialog(toolbar.getScene.getWindow)
     helpDialog.show()
   }
 
   @FXML
   def onOpenSettings(event: MouseEvent): Unit = {
     presenter.onOpenSettings()
-  }
-
-  private def createProperFileChooser(title: String): FileChooser = {
-    val fileChooser: FileChooser = new FileChooser()
-    fileChooser.setTitle(title)
-    fileChooser.getExtensionFilters.add(new ExtensionFilter(
-      s"${ConfigManager.MODEL_FILE_DESCRIPTION}", s"*.${ConfigManager.MODEL_FILE_EXTENSION}"
-    ))
-    fileChooser
   }
 
   override def setCellSelectionButton(cellSelectionMode: CellSelectionMode): Unit = {
