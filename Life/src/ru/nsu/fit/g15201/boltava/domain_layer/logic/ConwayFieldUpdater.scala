@@ -43,8 +43,6 @@ class ConwayFieldUpdater extends Runnable {
       throw new RuntimeException("Field is not initialized for field updater")
     }
 
-    println("Next step")
-
     for (i <- mainField.indices; j <- mainField(i).indices) {
       // TODO: optimize neighbors counting performance?
 
@@ -77,8 +75,6 @@ class ConwayFieldUpdater extends Runnable {
     for (i <- helperField.indices; j <- helperField(i).indices) {
       mainField(i)(j).setState(helperField(i)(j))
     }
-
-    println("step done")
   }
 
   def setMainField(field: Array[Array[Cell]]): Unit = {
