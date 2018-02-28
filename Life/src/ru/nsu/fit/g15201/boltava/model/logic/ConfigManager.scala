@@ -64,10 +64,10 @@ object ConfigManager {
     aliveCells
   }
 
-  def saveGameModel(configFile: File, gridParameters: GameSettings, aliveCells: Array[Point]): Unit = {
-    var file = configFile
-    if(!file.getName.endsWith(s".$MODEL_FILE_EXTENSION")) {
-      file = new File(s"${file.getAbsolutePath}.$MODEL_FILE_EXTENSION")
+  def saveGameModel(configPath: String, gridParameters: GameSettings, aliveCells: Array[Point]): Unit = {
+    var file: File = null
+    if(!configPath.endsWith(s".$MODEL_FILE_EXTENSION")) {
+      file = new File(s"$configPath.$MODEL_FILE_EXTENSION")
     }
     val writer = new BufferedWriter(new FileWriter(file))
 
