@@ -2,11 +2,12 @@ package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
 import java.util.concurrent.{ScheduledFuture, ScheduledThreadPoolExecutor, TimeUnit}
 
-import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IGridController
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, SettingsBounds}
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.{HexagonalGridController, IGridController}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings._
 import ru.nsu.fit.g15201.boltava.presentation_layer.main.{ICellStateObserver, IGridStateObserver}
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -19,11 +20,11 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private val fieldUpdateInterval = 1000
   private var updateTask: ScheduledFuture[_] = _
 
-  private var gridController: IGridController = _
-  private var gameSettings = new GameSettings
+  private var gridController: Option[IGridController] = None
+  private val gameSettings = new GameSettings()
   private val boundsSettings = new SettingsBounds
 
-  private var cellGrid: Array[Array[Cell]] = _
+  private var currentCellGrid: Option[Array[Array[Cell]]] = None
   private var cellSelectionMode = CellSelectionMode.TOGGLE
 
   private var fieldUpdater: ConwayFieldUpdater = _
@@ -32,77 +33,85 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   private var gameState = GameState.UNINITIALIZED
 
-  private val MAX_GRID_SIDE_SIZE = 500
-  private val MAX_BORDER_WIDTH = 15
-  private val MAX_CELL_SIDE_SIZE = 50
-
-
-  { // constructor code
+  {
     fieldUpdater = new ConwayFieldUpdater
     fieldUpdater.setStateObserver(this)
-    boundsSettings.minBorderSize = 10
-    boundsSettings.maxBorderSize = MAX_CELL_SIDE_SIZE
-    boundsSettings.minBorderWidth = 1
-    boundsSettings.maxBorderWidth = MAX_BORDER_WIDTH
-    boundsSettings.maxGridSize - MAX_GRID_SIDE_SIZE
+    initBounds()
+    initLifeScores()
+    initImpactScores()
+  }
+
+  private def initBounds(): Unit = {
+    boundsSettings.minBorderSize = GameSettings.MIN_BORDER_SIZE
+    boundsSettings.maxBorderSize = GameSettings.MAX_BORDER_SIZE
+    boundsSettings.minBorderWidth = GameSettings.MIN_BORDER_WIDTH
+    boundsSettings.maxBorderWidth = GameSettings.MAX_BORDER_WIDTH
+    boundsSettings.maxGridSize = GameSettings.MAX_GRID_SIZE
+  }
+
+  private def initLifeScores(): Unit = {
+    gameSettings.lifeScores.maxAliveScore = GameSettings.MAX_ALIVE_SCORE
+    gameSettings.lifeScores.minAliveScore = GameSettings.MIN_ALIVE_SCORE
+    gameSettings.lifeScores.maxBirthScore = GameSettings.MAX_BIRTH_SCORE
+    gameSettings.lifeScores.minBirthScore = GameSettings.MIN_BIRTH_SCORE
+
+    fieldUpdater.updateLifeScores(gameSettings.lifeScores)
+  }
+
+  private def initImpactScores(): Unit = {
+    gameSettings.impactScores.firstOrderImpact = GameSettings.FIRST_ORDER_IMPACT
+    gameSettings.impactScores.secondOrderImpact = GameSettings.SECOND_ORDER_IMPACT
+
+    fieldUpdater.updateImpactScore(gameSettings.impactScores)
   }
 
   override def getSettingsBounds: SettingsBounds = boundsSettings
 
-  override def setGridParams(gameSettings: GameSettings): Unit = {
-    Try(validateGridParameters(gameSettings)) match {
-      case Success(_) => applyGameSettings(gameSettings)
+  override def setPlaygroundSettings(playgroundSettings: PlaygroundSettings): Unit = {
+    Try(validatePlaygroundSettings(playgroundSettings)) match {
+      case Success(_) => this.gameSettings.playgroundSettings = playgroundSettings
       case Failure(t) => throw t
     }
   }
 
   override def getGameSettings: GameSettings = this.gameSettings
 
-  private def applyGameSettings(gameSettings: GameSettings): Unit = {
-    if (gameState == GameState.UNINITIALIZED) {
-      gameState = GameState.INITIALIZED
-    }
-    this.gameSettings = gameSettings
-    generateGrid()
-    setAliveCells()
-    notifyGridObservers()
-    fieldUpdater.setMainField(cellGrid)
-  }
-
-  private def validateGridParameters(gridParameters: GameSettings) = {
-    if (gridParameters.gridWidth <= 0 || gridParameters.gridWidth > MAX_GRID_SIDE_SIZE ||
-      gridParameters.gridHeight <= 0 || gridParameters.gridHeight > MAX_GRID_SIDE_SIZE) {
+  private def validatePlaygroundSettings(settings: PlaygroundSettings) = {
+    if (settings.gridWidth <= 0 || settings.gridWidth > GameSettings.MAX_GRID_SIZE ||
+      settings.gridHeight <= 0 || settings.gridHeight > GameSettings.MAX_GRID_SIZE) {
       throw new RuntimeException(
         s"Invalid grid dimensions. Grid width and height " +
-          s"must be positive integers between 1 and $MAX_GRID_SIDE_SIZE.")
+          s"must be positive integers between 1 and ${GameSettings.MAX_GRID_SIZE}.")
     }
 
-    if (gridParameters.borderWidth <= 0 || gridParameters.borderWidth > MAX_BORDER_WIDTH) {
-      throw new RuntimeException(s"Border width must be a positive integer not greater than $MAX_BORDER_WIDTH.")
+    if (settings.borderWidth <= 0 || settings.borderWidth > GameSettings.MAX_BORDER_WIDTH) {
+      throw new RuntimeException(s"Border width must be a positive integer not greater than ${GameSettings.MAX_BORDER_WIDTH}.")
     }
 
-    if (gridParameters.borderSize <= 0 || gridParameters.borderSize > MAX_CELL_SIDE_SIZE) {
-      throw new RuntimeException(s"Cell side size must be a positive integer not grater than $MAX_CELL_SIDE_SIZE.")
+    if (settings.borderSize <= 0 || settings.borderSize > GameSettings.MAX_BORDER_SIZE) {
+      throw new RuntimeException(s"Cell side size must be a positive integer not grater than ${GameSettings.MAX_BORDER_SIZE}.")
     }
 
-    gridParameters.aliveCells.foreach(cell => {
-      if (cell._1 < 0 || cell._1 >= gridParameters.gridWidth ||
-        cell._2 < 0 || cell._2 >= gridParameters.gridHeight) {
-        throw new RuntimeException(s"Cell coordinates out of bounds: $cell " +
-          s"(width: ${gridParameters.gridWidth}, height: ${gridParameters.gridHeight}).")
-      }
-    })
+    if (settings.aliveCells != null) {
+      settings.aliveCells.foreach(cell => {
+        if (cell._1 < 0 || cell._1 >= settings.gridWidth ||
+          cell._2 < 0 || cell._2 >= settings.gridHeight) {
+          throw new RuntimeException(s"Cell coordinates out of bounds: $cell " +
+            s"(width: ${settings.gridWidth}, height: ${settings.gridHeight}).")
+        }
+      })
+    }
 
   }
 
-  override def getCells: Array[Array[Cell]] = cellGrid
+  override def getCells: Array[Array[Cell]] = currentCellGrid.get
 
   override def setGridController(gridController: IGridController): Unit = {
-    this.gridController = gridController
+    this.gridController = Some(gridController)
     fieldUpdater.setGridController(gridController)
   }
 
-  override def getGridController: IGridController = gridController
+  override def getGridController: IGridController = gridController.get
 
   override def setCellSelectionMode(newCellSelectionMode: CellSelectionMode.Value): Unit = {
     cellSelectionMode = newCellSelectionMode
@@ -130,18 +139,18 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   override def reset(): Unit = {
     if (isGameReset) return
-
+    if (currentCellGrid.isEmpty) return
     gameState = GameState.RESET
     stopUpdater()
 
-    cellGrid.foreach(_.foreach(cell => {
+    currentCellGrid.get.foreach(_.foreach(cell => {
       val oldState = cell.getState
       cell.setState(State.DEAD)
       if (oldState != cell.getState) {
         notifyCellStateObservers(cell)
       }
     }))
-    fieldUpdater.setMainField(cellGrid)
+    fieldUpdater.setMainField(currentCellGrid.get)
   }
 
   override def nextStep(): Unit = {
@@ -164,12 +173,13 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   // *************************** Private Methods ***************************
 
-  private def generateGrid(): Unit = {
-    cellGrid = gridController.generateGrid(gameSettings.gridWidth, gameSettings.gridHeight)
-  }
-
   private def setAliveCells(): Unit = {
-    gameSettings.aliveCells.foreach(coords => cellGrid(coords._1)(coords._2).setState(State.ALIVE))
+    if (currentCellGrid.isEmpty) return
+    if (gameSettings.playgroundSettings.aliveCells == null) return
+
+    gameSettings.playgroundSettings
+      .aliveCells
+      .foreach(coords => currentCellGrid.get(coords._1)(coords._2).setState(State.ALIVE))
   }
 
   private def stopUpdater(): Unit = {
@@ -205,6 +215,16 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     cellStateObservers.foreach(o => o.onCellStateChange(cell))
   }
 
+  private def notifyGridObservers(): Unit = {
+    if (currentCellGrid.isEmpty) return
+    var aliveCells = new Array[Cell](0)
+    if (gameSettings.playgroundSettings.aliveCells != null) {
+       aliveCells = gameSettings.playgroundSettings.aliveCells.map(t => currentCellGrid.get(t._1)(t._2))
+    }
+
+    gridStateObservers.foreach(o => o.onGridStructureChange(currentCellGrid.get, aliveCells))
+  }
+
   // *************************** ICellStateProvider ***************************
 
   override def addCellStateObserver(cellStateObserver: ICellStateObserver): Unit = {
@@ -229,10 +249,71 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     gridStateObservers.remove(gridStateObserver)
   }
 
-  private def notifyGridObservers(): Unit = {
-    val aliveCells = gameSettings.aliveCells.map(t => cellGrid(t._1)(t._2))
+  override def applyImpactScores(impactScores: ImpactScores): Unit = {
+    fieldUpdater.updateImpactScore(impactScores)
+  }
 
-    gridStateObservers.foreach(o => o.onGridStructureChange(cellGrid, aliveCells))
+  override def applyLifeScores(lifeScores: LifeScores): Unit = {
+    gameSettings.lifeScores = lifeScores
+    fieldUpdater.updateLifeScores(lifeScores)
+  }
+
+  override def applyPlaygroundSettings(playgroundSettings: PlaygroundSettings): Unit = {
+    synchronized {
+      if (isGameRunning) {
+        pause()
+      }
+
+      setPlaygroundSettings(playgroundSettings)
+      setGridController(new HexagonalGridController(playgroundSettings.borderSize))
+
+      _initGame(true)
+
+      if (isGamePaused) {
+        start()
+      }
+    }
+  }
+
+  private def deepCopyGrid(source: Array[Array[Cell]], destination: Array[Array[Cell]]): Unit = {
+    val aliveCells = new ArrayBuffer[(Int, Int)]()
+    for {
+      x <- 0 until Math.min(source.length, destination.length)
+      y <- 0 until Math.min(source(0).length, destination(0).length)
+    } {
+      destination(x)(y) = source(x)(y)
+      if (source(x)(y).getState == State.ALIVE) {
+        aliveCells.append((x, y))
+      }
+    }
+
+    gameSettings.playgroundSettings.aliveCells = aliveCells.toArray
+  }
+
+  override def initGame(): Unit = {
+    _initGame()
+  }
+
+  private def _initGame(onApplySettings: Boolean = false): Unit = {
+    if (gameState == GameState.UNINITIALIZED) {
+      gameState = GameState.INITIALIZED
+    }
+
+    val nextCellGrid = gridController.get.generateGrid(
+      gameSettings.playgroundSettings.gridWidth, gameSettings.playgroundSettings.gridHeight
+    )
+
+    if (onApplySettings && currentCellGrid.nonEmpty) {
+      deepCopyGrid(currentCellGrid.get, nextCellGrid)
+    }
+    currentCellGrid = Some(nextCellGrid)
+
+    if (!onApplySettings) {
+      setAliveCells()
+    }
+    fieldUpdater.setMainField(currentCellGrid.get)
+    fieldUpdater.setGridController(gridController.get)
+    notifyGridObservers()
   }
 
 }

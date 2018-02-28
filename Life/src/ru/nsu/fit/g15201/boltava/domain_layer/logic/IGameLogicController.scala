@@ -2,18 +2,19 @@ package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IGridController
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.CellSelectionMode.CellSelectionMode
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.GameState.GameState
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, SettingsBounds}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, ISettingsController, PlaygroundSettings, SettingsBounds}
 import ru.nsu.fit.g15201.boltava.presentation_layer.main.IGridStateProvider
 
-trait IGameLogicController extends ICellStateProvider with ICellClickListener with IGridStateProvider {
+trait IGameLogicController extends ICellStateProvider with ICellClickListener with IGridStateProvider with ISettingsController {
+
+  def initGame()
 
   def start(): Unit
   def nextStep(): Unit
   def pause(): Unit
   def reset(): Unit
 
-  def setGridParams(gridParameters: GameSettings): Unit
+  def setPlaygroundSettings(playgroundSettings: PlaygroundSettings): Unit
   def getGameSettings: GameSettings
 
   def getSettingsBounds: SettingsBounds
