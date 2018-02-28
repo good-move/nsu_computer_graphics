@@ -1,46 +1,38 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.logic.settings
 
-class GameSettings (
-  var gridWidth: Int = 0,
-  var gridHeight: Int = 0,
-  var borderWidth: Int = 0,
-  var borderSize: Int = 0,
-  var aliveCells: Array[(Int, Int)] = null,
-  var minAliveScore: Double = 0,
-  var maxAliveScore: Double = 0,
-  var minBirthScore: Double = 0,
-  var maxBirthScore: Double = 0,
-  var firstOrderImpact: Double = 0,
-  var secondOrderImpact: Double = 0
+class GameSettings(
+  var playgroundSettings: PlaygroundSettings = new PlaygroundSettings(),
+  var lifeScores: LifeScores = new LifeScores(),
+  var impactScores: ImpactScores = new ImpactScores()
 ) {
 
-  def copy(
-    gridWidth: Int = this.gridWidth,
-    gridHeight: Int = this.gridHeight,
-    borderWidth: Int = this.borderWidth,
-    borderSize: Int = this.borderSize,
-    aliveCells: Array[(Int, Int)] = this.aliveCells,
-    minAliveScore: Double = this.minAliveScore,
-    maxAliveScore: Double = this.maxAliveScore,
-    minBirthScore: Double = this.minBirthScore,
-    maxBirthScore: Double = this.maxBirthScore,
-    firstOrderImpact: Double = this.firstOrderImpact,
-    secondOrderImpact: Double = this.secondOrderImpact
-  ): GameSettings = {
+  def copy(): GameSettings = {
     new GameSettings(
-      gridWidth,
-      gridHeight,
-      borderWidth,
-      borderSize,
-      aliveCells,
-      minAliveScore,
-      maxAliveScore,
-      minBirthScore,
-      maxBirthScore,
-      firstOrderImpact,
-      secondOrderImpact
+      playgroundSettings.copy(),
+      lifeScores.copy(),
+      impactScores.copy()
     )
-
   }
+}
+
+
+object GameSettings {
+
+  val MIN_ALIVE_SCORE = 2.0
+  val MAX_ALIVE_SCORE = 3.3
+
+  val MIN_BIRTH_SCORE = 2.3
+  val MAX_BIRTH_SCORE = 2.9
+
+  val FIRST_ORDER_IMPACT = 1.0
+  val SECOND_ORDER_IMPACT = .3
+
+  val MAX_GRID_SIZE = 500
+
+  val MIN_BORDER_SIZE = 5
+  val MAX_BORDER_SIZE = 50
+
+  val MIN_BORDER_WIDTH = 1
+  val MAX_BORDER_WIDTH = 15
 
 }
