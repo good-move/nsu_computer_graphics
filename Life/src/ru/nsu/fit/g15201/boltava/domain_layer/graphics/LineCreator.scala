@@ -1,6 +1,6 @@
-package ru.nsu.fit.g15201.boltava.model.graphics
+package ru.nsu.fit.g15201.boltava.domain_layer.graphics
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
 
 /**
   * Base interface for all line drawers

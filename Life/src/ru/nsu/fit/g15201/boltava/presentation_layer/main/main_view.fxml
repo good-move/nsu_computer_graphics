@@ -5,7 +5,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:controller="ru.nsu.fit.g15201.boltava.view.main.PlaygroundView"
+<VBox fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.main.PlaygroundView"
       fx:id="root"
       xmlns:fx="http://javafx.com/fxml"
       minWidth="300"

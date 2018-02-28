@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.model.logic
+package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
 class GameSettings {
 

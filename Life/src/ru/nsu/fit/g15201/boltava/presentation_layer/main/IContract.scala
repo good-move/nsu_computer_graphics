@@ -1,10 +1,10 @@
-package ru.nsu.fit.g15201.boltava.view.main
+package ru.nsu.fit.g15201.boltava.presentation_layer.main
 
 import javafx.scene.paint.Color
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.DoublePoint
-import ru.nsu.fit.g15201.boltava.model.logic.{Cell, ICellStateProvider}
-import ru.nsu.fit.g15201.boltava.view.base.{IBasePresenter, IBaseView}
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.DoublePoint
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.{Cell, ICellStateProvider}
+import ru.nsu.fit.g15201.boltava.presentation_layer.base.{IBasePresenter, IBaseView}
 
 object IContract {
 

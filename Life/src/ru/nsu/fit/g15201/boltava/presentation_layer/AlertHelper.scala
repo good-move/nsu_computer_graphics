@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.view
+package ru.nsu.fit.g15201.boltava.presentation_layer
 
 import javafx.scene.Node
 import javafx.scene.control.Alert

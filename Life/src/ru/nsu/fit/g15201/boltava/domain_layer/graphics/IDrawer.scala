@@ -1,10 +1,10 @@
-package ru.nsu.fit.g15201.boltava.model.graphics
+package ru.nsu.fit.g15201.boltava.domain_layer.graphics
 
 import javafx.scene.paint.Color
 
-import ru.nsu.fit.g15201.boltava.model.canvas.IDrawable
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
-import ru.nsu.fit.g15201.boltava.model.logic.Cell
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IDrawable
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.Cell
 
 trait IDrawer {
   def drawLine(drawable: IDrawable, from: Point, to: Point, color: Color)

@@ -1,9 +1,9 @@
-package ru.nsu.fit.g15201.boltava.model.logic
+package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
 import java.util.concurrent.{ScheduledFuture, ScheduledThreadPoolExecutor, TimeUnit}
 
-import ru.nsu.fit.g15201.boltava.model.canvas.IGridController
-import ru.nsu.fit.g15201.boltava.view.main.{ICellStateObserver, IGridStateObserver}
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IGridController
+import ru.nsu.fit.g15201.boltava.presentation_layer.main.{ICellStateObserver, IGridStateObserver}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

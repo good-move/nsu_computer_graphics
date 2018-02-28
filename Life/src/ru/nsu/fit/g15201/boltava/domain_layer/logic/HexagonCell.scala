@@ -1,6 +1,6 @@
-package ru.nsu.fit.g15201.boltava.model.logic
+package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
 
 class HexagonCell(private val center: Point,
                   private val vertices: Array[Point],

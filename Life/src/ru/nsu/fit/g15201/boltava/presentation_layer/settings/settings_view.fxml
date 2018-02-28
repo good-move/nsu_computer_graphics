@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox minWidth="700" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112" fx:controller="ru.nsu.fit.g15201.boltava.view.settings.SettingsPaneView">
+<VBox minWidth="700" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112" fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.settings.SettingsPaneView">
     <padding><Insets bottom="10" left="10" right="10" top="10" /></padding>
     <TabPane>
         <Tab closable="false" text="Grid">

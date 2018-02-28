@@ -1,9 +1,9 @@
-package ru.nsu.fit.g15201.boltava.view.settings
+package ru.nsu.fit.g15201.boltava.presentation_layer.settings
 
 import javafx.stage.Window
 
-import ru.nsu.fit.g15201.boltava.model.logic.{BoundsSettings, GameSettings, IGameLogicController}
-import ru.nsu.fit.g15201.boltava.view.settings.IContract.{IInteractor, IPresenter}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.{BoundsSettings, GameSettings, IGameLogicController}
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IInteractor, IPresenter}
 
 object SettingsPaneActivity {
 

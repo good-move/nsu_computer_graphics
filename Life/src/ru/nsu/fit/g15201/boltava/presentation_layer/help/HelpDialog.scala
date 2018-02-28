@@ -1,11 +1,11 @@
-package ru.nsu.fit.g15201.boltava.view.help
+package ru.nsu.fit.g15201.boltava.presentation_layer.help
 
 import javafx.fxml.{FXML, FXMLLoader}
 import javafx.scene.input.MouseEvent
 import javafx.scene.{Parent, Scene}
 import javafx.stage.{Modality, Stage, Window}
 
-import ru.nsu.fit.g15201.boltava.view.CustomModalDialog
+import ru.nsu.fit.g15201.boltava.presentation_layer.CustomModalDialog
 
 import scala.reflect.io.Path
 

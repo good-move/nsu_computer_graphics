@@ -1,11 +1,11 @@
-package ru.nsu.fit.g15201.boltava.view.main
+package ru.nsu.fit.g15201.boltava.presentation_layer.main
 
 import javafx.application.Platform
 import javafx.scene.paint.Color
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.DoublePoint
-import ru.nsu.fit.g15201.boltava.model.logic.{Cell, State}
-import ru.nsu.fit.g15201.boltava.view.main.IContract.{IInteractor, IPresenter, IView}
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.DoublePoint
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.{Cell, State}
+import ru.nsu.fit.g15201.boltava.presentation_layer.main.IContract.{IInteractor, IPresenter, IView}
 
 class PlaygroundPresenter(view: IView, interactor: IInteractor) extends IPresenter {
 

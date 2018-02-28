@@ -1,9 +1,9 @@
-package ru.nsu.fit.g15201.boltava.view.settings
+package ru.nsu.fit.g15201.boltava.presentation_layer.settings
 
 import javafx.stage.Window
 
-import ru.nsu.fit.g15201.boltava.view.CustomModalDialog
-import ru.nsu.fit.g15201.boltava.view.settings.IContract.IView
+import ru.nsu.fit.g15201.boltava.presentation_layer.CustomModalDialog
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.IView
 
 import scala.reflect.io.Path
 

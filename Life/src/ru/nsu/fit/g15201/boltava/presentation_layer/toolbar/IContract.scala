@@ -1,8 +1,8 @@
-package ru.nsu.fit.g15201.boltava.view.toolbar
+package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
-import ru.nsu.fit.g15201.boltava.model.logic.IGameLogicController
-import ru.nsu.fit.g15201.boltava.view.base.{IBasePresenter, IBaseView}
-import ru.nsu.fit.g15201.boltava.view.toolbar.IContract.CellSelectionMode.CellSelectionMode
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.IGameLogicController
+import ru.nsu.fit.g15201.boltava.presentation_layer.base.{IBasePresenter, IBaseView}
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode.CellSelectionMode
 
 object IContract {
 

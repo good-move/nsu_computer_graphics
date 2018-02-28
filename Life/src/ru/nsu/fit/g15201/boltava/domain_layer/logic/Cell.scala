@@ -1,6 +1,6 @@
-package ru.nsu.fit.g15201.boltava.model.logic
+package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
 
 trait Cell {
 

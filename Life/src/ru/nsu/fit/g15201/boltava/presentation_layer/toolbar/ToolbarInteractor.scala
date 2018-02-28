@@ -1,11 +1,11 @@
-package ru.nsu.fit.g15201.boltava.view.toolbar
+package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
-import ru.nsu.fit.g15201.boltava.model.canvas.HexagonalGridController
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
-import ru.nsu.fit.g15201.boltava.model.logic._
-import ru.nsu.fit.g15201.boltava.view.main.MainActivity
-import ru.nsu.fit.g15201.boltava.view.settings.SettingsPaneActivity
-import ru.nsu.fit.g15201.boltava.view.toolbar.IContract.IInteractor
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.HexagonalGridController
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
+import ru.nsu.fit.g15201.boltava.domain_layer.logic._
+import ru.nsu.fit.g15201.boltava.presentation_layer.main.MainActivity
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.SettingsPaneActivity
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.IInteractor
 
 import scala.collection.mutable.ArrayBuffer
 

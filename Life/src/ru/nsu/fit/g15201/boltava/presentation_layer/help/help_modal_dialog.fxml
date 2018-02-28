@@ -6,7 +6,7 @@
 <?import javafx.scene.control.Button?>
 <VBox   xmlns:fx="http://javafx.com/fxml"
         styleClass="root"
-        fx:controller="ru.nsu.fit.g15201.boltava.view.help.HelpDialogController">
+        fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.help.HelpDialogController">
     <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
 
     <Label wrapText="true" text="Game Rules" styleClass="h2"/>

@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.view.toolbar
+package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
 import javafx.fxml.FXML
 import javafx.scene.control.{ScrollPane, ToggleButton, ToolBar}
@@ -8,12 +8,12 @@ import javafx.scene.layout.VBox
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.{FileChooser, Window}
 
-import ru.nsu.fit.g15201.boltava.model.logic.ConfigManager
-import ru.nsu.fit.g15201.boltava.view.AlertHelper
-import ru.nsu.fit.g15201.boltava.view.about.AboutDialog
-import ru.nsu.fit.g15201.boltava.view.help.HelpDialog
-import ru.nsu.fit.g15201.boltava.view.toolbar.IContract.CellSelectionMode.CellSelectionMode
-import ru.nsu.fit.g15201.boltava.view.toolbar.IContract.{CellSelectionMode, IPresenter, IView}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.ConfigManager
+import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
+import ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutDialog
+import ru.nsu.fit.g15201.boltava.presentation_layer.help.HelpDialog
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode.CellSelectionMode
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.{CellSelectionMode, IPresenter, IView}
 
 
 class ToolbarView extends IView {

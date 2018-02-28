@@ -1,8 +1,8 @@
-package ru.nsu.fit.g15201.boltava.model.logic
+package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
-import ru.nsu.fit.g15201.boltava.model.canvas.IGridController
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
-import ru.nsu.fit.g15201.boltava.model.logic.State.State
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IGridController
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.State.State
 
 
 /**

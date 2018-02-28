@@ -1,7 +1,7 @@
-package ru.nsu.fit.g15201.boltava.view.toolbar
+package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
-import ru.nsu.fit.g15201.boltava.view.toolbar.IContract.CellSelectionMode._
-import ru.nsu.fit.g15201.boltava.view.toolbar.IContract.{IInteractor, IPresenter, IView}
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode._
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.{IInteractor, IPresenter, IView}
 
 import scala.util.{Failure, Try}
 

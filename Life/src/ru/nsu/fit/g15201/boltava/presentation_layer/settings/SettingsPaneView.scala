@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.view.settings
+package ru.nsu.fit.g15201.boltava.presentation_layer.settings
 
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.fxml.FXML
@@ -6,9 +6,9 @@ import javafx.scene.control.{Button, Slider, TextField}
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 
-import ru.nsu.fit.g15201.boltava.model.logic.{BoundsSettings, GameSettings}
-import ru.nsu.fit.g15201.boltava.view.settings.IContract.{IPresenter, IView}
-import ru.nsu.fit.g15201.boltava.view.settings.utils._
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.{BoundsSettings, GameSettings}
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IPresenter, IView}
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.utils._
 
 class SettingsPaneView extends IView {
 

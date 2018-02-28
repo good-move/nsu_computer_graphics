@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.view.help
+package ru.nsu.fit.g15201.boltava.presentation_layer.help
 
 import javafx.fxml.FXML
 import javafx.scene.control.Button

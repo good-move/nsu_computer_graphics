@@ -6,7 +6,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToggleButton?>
 <ToolBar
-        fx:controller="ru.nsu.fit.g15201.boltava.view.toolbar.ToolbarView"
+        fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.ToolbarView"
         xmlns:fx="http://javafx.com/fxml"
         fx:id="toolbar"
 >

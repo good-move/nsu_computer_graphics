@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.view.base
+package ru.nsu.fit.g15201.boltava.presentation_layer.base
 
 import javafx.stage.Window
 

@@ -1,19 +1,19 @@
-package ru.nsu.fit.g15201.boltava.view.main
+package ru.nsu.fit.g15201.boltava.presentation_layer.main
 
 import javafx.fxml.FXMLLoader
 import javafx.scene.paint.Color
 import javafx.scene.{Parent, Scene}
 import javafx.stage.{Stage, Window}
 
-import ru.nsu.fit.g15201.boltava.model.logic.GameController
-import ru.nsu.fit.g15201.boltava.view.base.IBaseActivity
-import ru.nsu.fit.g15201.boltava.view.toolbar.{ToolbarInteractor, ToolbarPresenter, ToolbarView}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.GameController
+import ru.nsu.fit.g15201.boltava.presentation_layer.base.IBaseActivity
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.{ToolbarInteractor, ToolbarPresenter, ToolbarView}
 
 
 object MainActivity extends IBaseActivity {
 
   private val windowTitle = "Conway Game Of Life"
-  private val contentPath = getClass.getResource("/ru/nsu/fit/g15201/boltava/view/main/main_view.fxml")
+  private val contentPath = getClass.getResource("/ru/nsu/fit/g15201/boltava/presentation_layer/main/main_view.fxml")
 
   private var window: Window = _
 

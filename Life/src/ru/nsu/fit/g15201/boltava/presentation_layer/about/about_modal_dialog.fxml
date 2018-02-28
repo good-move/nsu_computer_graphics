@@ -7,7 +7,7 @@
 <?import javafx.scene.control.Button?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:id="root"
-      fx:controller="ru.nsu.fit.g15201.boltava.view.about.AboutDialogController"
+      fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutDialogController"
 >
 
     <padding><Insets top="10" right="10" bottom="10" left="10" /></padding>

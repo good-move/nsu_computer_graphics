@@ -1,7 +1,7 @@
-package ru.nsu.fit.g15201.boltava.model.canvas
+package ru.nsu.fit.g15201.boltava.domain_layer.canvas
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.{DoublePoint, Point}
-import ru.nsu.fit.g15201.boltava.model.logic.{Cell, HexagonCell}
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.{DoublePoint, Point}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.{Cell, HexagonCell}
 
 import scala.collection.mutable.ArrayBuffer
 

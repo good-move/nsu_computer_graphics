@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.view.main
+package ru.nsu.fit.g15201.boltava.presentation_layer.main
 
 import javafx.application.Platform
 import javafx.fxml.FXML
@@ -6,10 +6,10 @@ import javafx.scene.image.{ImageView, WritableImage}
 import javafx.scene.input.{DragEvent, MouseEvent}
 import javafx.scene.paint.Color
 
-import ru.nsu.fit.g15201.boltava.model.canvas._
-import ru.nsu.fit.g15201.boltava.model.graphics._
-import ru.nsu.fit.g15201.boltava.model.logic._
-import ru.nsu.fit.g15201.boltava.view.main.IContract.{IPresenter, IView}
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas._
+import ru.nsu.fit.g15201.boltava.domain_layer.graphics._
+import ru.nsu.fit.g15201.boltava.domain_layer.logic._
+import ru.nsu.fit.g15201.boltava.presentation_layer.main.IContract.{IPresenter, IView}
 
 
 

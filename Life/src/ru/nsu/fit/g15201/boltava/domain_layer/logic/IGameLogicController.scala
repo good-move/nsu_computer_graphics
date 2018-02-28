@@ -1,9 +1,9 @@
-package ru.nsu.fit.g15201.boltava.model.logic
+package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
-import ru.nsu.fit.g15201.boltava.model.canvas.IGridController
-import ru.nsu.fit.g15201.boltava.model.logic.CellSelectionMode.CellSelectionMode
-import ru.nsu.fit.g15201.boltava.model.logic.GameState.GameState
-import ru.nsu.fit.g15201.boltava.view.main.IGridStateProvider
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IGridController
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.CellSelectionMode.CellSelectionMode
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.GameState.GameState
+import ru.nsu.fit.g15201.boltava.presentation_layer.main.IGridStateProvider
 
 trait IGameLogicController extends ICellStateProvider with ICellClickListener with IGridStateProvider {
 

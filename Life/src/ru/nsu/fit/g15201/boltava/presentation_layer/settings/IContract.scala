@@ -1,7 +1,7 @@
-package ru.nsu.fit.g15201.boltava.view.settings
+package ru.nsu.fit.g15201.boltava.presentation_layer.settings
 
-import ru.nsu.fit.g15201.boltava.model.logic.{BoundsSettings, GameSettings}
-import ru.nsu.fit.g15201.boltava.view.base.{IBasePresenter, IBaseView}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.{BoundsSettings, GameSettings}
+import ru.nsu.fit.g15201.boltava.presentation_layer.base.{IBasePresenter, IBaseView}
 
 object IContract {
 

@@ -1,8 +1,8 @@
-package ru.nsu.fit.g15201.boltava.model.canvas
+package ru.nsu.fit.g15201.boltava.domain_layer.canvas
 
 import javafx.scene.paint.Color
 
-import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
 
 trait IDrawable {
   def getHeight: Double
