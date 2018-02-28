@@ -7,17 +7,15 @@ import scala.collection.mutable.ArrayBuffer
 
 class HexagonalGridController(private val hexSideSize: Int) extends IGridController {
 
-  private val _size: Double = hexSideSize
-  private val R: Double = _size
-  private val r: Double = Math.sqrt(3)* _size/2.0
+  private val size: Double = hexSideSize
+  private val R: Double = size // radius of the hexagon circumcircle
+  private val r: Double = Math.sqrt(3)* size/2.0 // radius of the hexagon incircle
   private val xStep: Double = 2.0*r
   private val yStep: Double = 1.5*R
   private val bias: (Double, Double) = (r, R)
 
   private val ROTATION_ANGLE = 60.0
   private val OFFSET_ANGLE = 30.0
-
-  def getSideSize: Int = hexSideSize
 
   override def generateGrid(width: Int, height: Int): Array[Array[Cell]] = {
     val grid = new Array[Array[HexagonCell]](height)
@@ -40,10 +38,6 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     (x, y)
   }
 
-  private def getVerticesForHex(point: Point): Array[Point] = {
-    getVerticesForHexCenter(getCellCenter(point))
-  }
-
   private def getVerticesForHexCenter(center: DoublePoint): Array[Point] = {
     val vertices = ArrayBuffer[Point]()
 
@@ -52,8 +46,8 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
       angle_deg += ROTATION_ANGLE
       val angle_rad = angle_deg/180.0  * Math.PI
       vertices.append((
-        (center.x + _size * Math.cos(angle_rad)).ceil.toInt,
-        (center.y + _size * Math.sin(angle_rad)).ceil.toInt
+        (center.x + size * Math.cos(angle_rad)).ceil.toInt,
+        (center.y + size * Math.sin(angle_rad)).ceil.toInt
       ))
     }
 
@@ -67,28 +61,28 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     * @return cell coordinate in custom (internal) coordinate system
     */
   override def getCellByPoint(point: DoublePoint): Point = {
-    val H = 1.5*R
-    val W = 2.0*r
+    val boxHeight = 1.5*R
+    val boxWidth = 2.0*r
     // figure out hexagon box coordinates
-    val yt: Int = Math.floor(point.y / H).toInt
-    val xBiased: Double = point.x - r*(yt%2)
-    val xt: Int = Math.floor(xBiased / W).toInt
+    val boxY: Int = Math.floor(point.y / boxHeight).toInt
+    val xBiased: Double = point.x - r*(boxY%2)
+    val boxX: Int = Math.floor(xBiased / boxWidth).toInt
 
     // figure out point coordinates inside the box
-    val yIn: Double = point.y- H*yt.toDouble
-    val xIn: Double = xBiased - W*xt.toDouble
+    val innerY: Double = point.y - boxHeight * boxY.toDouble
+    val innerX: Double = xBiased - boxWidth * boxX.toDouble
 
     // figure out, what hexagon part we're in
     val slope = R/r/2
-    val lineValue = slope*Math.abs(xIn - W/2)
-    if (yIn < lineValue) {
-      if (xIn < W/2) {
-        (yt - 1, xt - (yt+1)%2)
+    val lineValue = slope*Math.abs(innerX - boxWidth/2)
+    if (innerY < lineValue) {
+      if (innerX < boxWidth/2) {
+        (boxY - 1, boxX - (boxY+1)%2)
       } else {
-        (yt - 1, xt + yt%2)
+        (boxY - 1, boxX + boxY%2)
       }
-    } else if (yIn > lineValue) {
-      (yt, xt)
+    } else if (innerY > lineValue) {
+      (boxY, boxX)
     } else {
       (-1, -1)
     }
@@ -125,10 +119,11 @@ class HexagonalGridController(private val hexSideSize: Int) extends IGridControl
     )
   }
 
-  override def getCartesianFieldSize(width: Int, height: Int): (Double, Double) = {
-    val w = 2*r * (width+1)
-    val h = R*1.5*height + R
-    (w + bias._1, h)
+  override def getCartesianFieldSize(columnsCount: Int, rowsCount: Int): (Double, Double) = {
+    val fieldWidth = 2 * r * (columnsCount+1)
+    val fieldHeight = R * 1.5 * rowsCount + R
+
+    (fieldWidth + bias._1, fieldHeight)
   }
 
 }
