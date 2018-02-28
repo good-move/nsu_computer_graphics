@@ -12,6 +12,7 @@
       minHeight="300"
 
 >
+    <fx:include fx:id="menuBar" source="../menu/menu.fxml" />
     <fx:include fx:id="toolbar" source="../toolbar/toolbar.fxml" />
 
     <ScrollPane fx:id="scrollPane"

@@ -7,6 +7,7 @@ import javafx.stage.{Stage, Window}
 
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.GameController
 import ru.nsu.fit.g15201.boltava.presentation_layer.base.IBaseActivity
+import ru.nsu.fit.g15201.boltava.presentation_layer.menu.MenuBarView
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.{ToolbarInteractor, ToolbarPresenter, ToolbarView}
 
 
@@ -19,6 +20,7 @@ object MainActivity extends IBaseActivity {
 
   private var playgroundPresenter: PlaygroundPresenter = _
   private var toolbarPresenter: ToolbarPresenter = _
+  private var menubarPresenter: ToolbarPresenter = _
 
   private val gameController = new GameController
 
@@ -27,6 +29,7 @@ object MainActivity extends IBaseActivity {
 
     val content: Parent = FXMLLoader.load(contentPath)
 
+    menubarPresenter = new ToolbarPresenter(MenuBarView.getInstance, new ToolbarInteractor(gameController, gameController))
     toolbarPresenter = new ToolbarPresenter(ToolbarView.getInstance, new ToolbarInteractor(gameController, gameController))
     playgroundPresenter = new PlaygroundPresenter(PlaygroundView.getInstance, new PlaygroundInteractor(gameController))
 

@@ -1,0 +1,31 @@
+<?import javafx.scene.control.MenuBar?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+
+<MenuBar
+        fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.menu.MenuBarView"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:id="menuBar"
+>
+    <Menu text="File">
+        <MenuItem text="Open model" onAction="#onOpenModel"/>
+        <MenuItem text="Save model" onAction="#onSaveModel" />
+        <MenuItem text="Save As..." />
+    </Menu>
+
+    <Menu text="Game" >
+        <MenuItem text="Play" onAction="#onPlay" />
+        <MenuItem text="Pause" onAction="#onPause" />
+        <MenuItem text="Make step" onAction="#onNextStep" />
+        <MenuItem text="Reset" onAction="#onReset" />
+        <MenuItem text="Set Toggle mode" onAction="#onSetToggle" />
+        <MenuItem text="Set Replace mode" onAction="#onSetReplace" />
+    </Menu>
+
+    <Menu text="Help">
+        <MenuItem text="Settings" onAction="#onOpenSettings" />
+        <MenuItem text="Help" onAction="#onHelp" />
+        <MenuItem text="About" onAction="#onAbout" />
+    </Menu>
+</MenuBar>
