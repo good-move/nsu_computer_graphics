@@ -1,6 +1,6 @@
-package ru.nsu.fit.g15201.boltava.domain_layer.logic
+package ru.nsu.fit.g15201.boltava.domain_layer.logic.settings
 
-class BoundsSettings {
+class SettingsBounds {
 
   var maxBorderSize: Int = 0
   var minBorderSize: Int = 0

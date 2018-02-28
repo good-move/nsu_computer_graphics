@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.domain_layer.logic
+package ru.nsu.fit.g15201.boltava.domain_layer.logic.settings
 
 class GameSettings {
 
@@ -11,7 +11,20 @@ class GameSettings {
   private var _maxBirthScore: Double = 0
   private var _maxAliveScore: Double = 0
   private var _minBirthScore: Double = 0
+  private var _firstOrderImpact: Double = 0
+  private var _secondOrderImpact: Double = 0
 
+  def firstOrderImpact: Double = _firstOrderImpact
+
+  def firstOrderImpact_=(value: Double): Unit = {
+    _firstOrderImpact = value
+  }
+
+  def secondOrderImpact: Double = _secondOrderImpact
+
+  def secondOrderImpact_=(value: Double): Unit = {
+    _secondOrderImpact = value
+  }
 
   def minAliveScore: Double = _minAliveScore
 
