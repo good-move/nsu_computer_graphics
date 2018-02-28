@@ -2,6 +2,8 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.settings
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IInteractor, IPresenter, IView}
 
+import scala.util.{Failure, Success, Try}
+
 class SettingsPanePresenter(private val view: IView, private val interactor: IInteractor) extends IPresenter {
 
   {
@@ -11,13 +13,22 @@ class SettingsPanePresenter(private val view: IView, private val interactor: IIn
   }
 
   override def onApplyClicked(): Unit = {
-    interactor.applyGameSettings(view.getGridSettings)
+    tryApplySettings()
   }
 
   override def onOkClicked(): Unit = {
-    interactor.applyGameSettings(view.getGridSettings)
+    tryApplySettings(shouldCloseWindow = true)
   }
 
-  override def onCancelClicked(): Unit = {}
+  private def tryApplySettings(shouldCloseWindow: Boolean = false): Unit = {
+    Try(interactor.applyGameSettings(view.getGridSettings)) match {
+      case Success(_) => if (shouldCloseWindow) view.close()
+      case Failure(t) => view.showError("Invalid Settings", t.getMessage)
+    }
+  }
+
+  override def onCancelClicked(): Unit = {
+    view.close()
+  }
 
 }

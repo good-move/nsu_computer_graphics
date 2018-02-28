@@ -7,6 +7,7 @@ import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings._
+import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IPresenter, IView}
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.utils._
 
@@ -183,20 +184,22 @@ class SettingsPaneView extends IView {
       if (presenter != null) {
         presenter.onOkClicked()
       }
-      closeWindow(okButton)
     })
 
     cancelButton.setOnMouseClicked((_: MouseEvent) => {
       if (presenter != null) {
         presenter.onCancelClicked()
       }
-      closeWindow(cancelButton)
     })
 
   }
 
-  private def closeWindow(button: Button): Unit = {
-    button.getScene.getWindow.asInstanceOf[Stage].close()
+  override def showError(title: String, message: String): Unit = {
+    AlertHelper.showError(applyButton.getScene.getWindow, title, message)
+  }
+
+  override def close(): Unit = {
+    applyButton.getScene.getWindow.asInstanceOf[Stage].close()
   }
 
 }

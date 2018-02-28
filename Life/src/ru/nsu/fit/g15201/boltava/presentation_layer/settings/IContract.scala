@@ -18,6 +18,8 @@ object IContract {
     def setBoundsSettings(boundsSettings: SettingsBounds)
     def setGridSettings(gridSettings: GameSettings)
     def getGridSettings: GameSettings
+    def showError(title: String, message: String)
+    def close()
 
   }
 
@@ -25,7 +27,6 @@ object IContract {
 
     def getGameSettings: GameSettings
     def getSettingsBounds: SettingsBounds
-
     def applyGameSettings(gridSettings: GameSettings)
 
   }
