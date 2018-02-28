@@ -31,6 +31,8 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private val cellStateObservers = new mutable.HashSet[ICellStateObserver]()
   private val gridStateObservers = new mutable.HashSet[IGridStateObserver]()
 
+  private var isPlaygroundModified: Boolean = false
+
   private var gameState = GameState.UNINITIALIZED
 
   {
@@ -212,6 +214,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   }
 
   private def notifyCellStateObservers(cell: Cell): Unit = {
+    isPlaygroundModified = true
     cellStateObservers.foreach(o => o.onCellStateChange(cell))
   }
 
@@ -259,6 +262,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   }
 
   override def applyPlaygroundSettings(playgroundSettings: PlaygroundSettings): Unit = {
+    isPlaygroundModified = true
     synchronized {
       if (isGameRunning) {
         pause()
@@ -316,4 +320,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     notifyGridObservers()
   }
 
+  override def getPlaygroundModified: Boolean = isPlaygroundModified
+
+  override def setPlaygroundModified(isModified: Boolean): Unit = isPlaygroundModified = isModified
 }

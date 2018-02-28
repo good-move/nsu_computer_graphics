@@ -28,6 +28,9 @@ trait IGameLogicController extends ICellStateProvider with ICellClickListener wi
   def isGameReset: Boolean
   def isGameFinished: Boolean
 
+  def getPlaygroundModified: Boolean
+  def setPlaygroundModified(isModified: Boolean): Unit
+
   // TODO: move these out
   def setGridController(gridController: IGridController)
   def getGridController: IGridController
