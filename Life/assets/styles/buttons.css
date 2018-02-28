@@ -5,7 +5,6 @@
     -fx-background-size: 28 28;
     -fx-background-position: center center;
     -fx-border-style: none;
-    -fx-background-color: transparent;
 }
 
 .toolbar-btn:pressed {
@@ -19,27 +18,33 @@
 }
 
 .open-model-btn {
+    -fx-background-color: transparent;
     -fx-background-image: url("/icons/png/open.png")
 }
 
 .save-model-btn {
+    -fx-background-color: transparent;
     -fx-background-image: url("/icons/png/save.png");
 }
 
 .play-btn {
     -fx-background-image: url("/icons/png/set1/play.png");
+    -fx-background-color: transparent;
 }
 
 .pause-btn {
     -fx-background-image: url("/icons/png/set2/pause.png");
+    -fx-background-color: transparent;
 }
 
 .step-btn {
     -fx-background-image: url("/icons/png/set2/step.png");
+    -fx-background-color: transparent;
 }
 
 .reset-btn {
     -fx-background-image: url("/icons/png/set3/clear2.png");
+    -fx-background-color: transparent;
 }
 
 .set-replace-btn {
@@ -52,14 +57,17 @@
 
 .help-btn {
     -fx-background-image: url("/icons/png/help.png");
+    -fx-background-color: transparent;
 }
 
 .about-btn {
     -fx-background-image: url("/icons/png/about.png");
+    -fx-background-color: transparent;
 }
 
 .settings-btn {
     -fx-background-image: url("/icons/png/setting.png");
+    -fx-background-color: transparent;
 }
 
 .active-button {
