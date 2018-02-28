@@ -1,8 +1,8 @@
 package ru.nsu.fit.g15201.boltava.model.logic
 
-import ru.nsu.fit.g15201.boltava.view.ICellStateObserver
+import ru.nsu.fit.g15201.boltava.view.main.ICellStateObserver
 
 trait ICellStateProvider {
-  def subscribe(cellStateObserver: ICellStateObserver)
-  def unsubscribe(cellStateObserver: ICellStateObserver)
+  def addCellStateObserver(cellStateObserver: ICellStateObserver)
+  def removeCellStateObserver(cellStateObserver: ICellStateObserver)
 }

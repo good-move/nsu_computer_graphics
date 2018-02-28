@@ -3,9 +3,11 @@ package ru.nsu.fit.g15201.boltava.model.logic
 import java.util.concurrent.{ScheduledFuture, ScheduledThreadPoolExecutor, TimeUnit}
 
 import ru.nsu.fit.g15201.boltava.model.canvas.IGridController
-import ru.nsu.fit.g15201.boltava.view.ICellStateObserver
+import ru.nsu.fit.g15201.boltava.view.main.{ICellStateObserver, IGridStateObserver}
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
+import scala.util.{Failure, Success, Try}
 
 /**
   * Controls logic of the whole game.
@@ -26,6 +28,8 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   private var fieldUpdater: ConwayFieldUpdater = _
   private val cellStateObservers = new mutable.HashSet[ICellStateObserver]()
+  private val gridStateObservers = new mutable.HashSet[IGridStateObserver]()
+
   private var gameState = GameState.UNINITIALIZED
 
   private val MAX_GRID_SIDE_SIZE = 500
@@ -43,17 +47,27 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     boundsSettings.maxGridSize - MAX_GRID_SIDE_SIZE
   }
 
-  override def setGridParams(gridParameters: GameSettings): Unit = {
-    validateGridParameters(gridParameters)
-    if (gameState == GameState.UNINITIALIZED) {
-      gameState = GameState.INITIALIZED
+  override def getBoundsSettings: BoundsSettings = boundsSettings
+
+  override def setGridParams(gameSettings: GameSettings): Unit = {
+    Try(validateGridParameters(gameSettings)) match {
+      case Success(_) => applyGameSettings(gameSettings)
+      case Failure(t) => throw t
     }
-    this.gameSettings = gridParameters
-    generateGrid()
-    fieldUpdater.setMainField(cellGrid)
   }
 
   override def getGameSettings: GameSettings = this.gameSettings
+
+  private def applyGameSettings(gameSettings: GameSettings): Unit = {
+    if (gameState == GameState.UNINITIALIZED) {
+      gameState = GameState.INITIALIZED
+    }
+    this.gameSettings = gameSettings
+    generateGrid()
+    setAliveCells()
+    notifyGridObservers()
+    fieldUpdater.setMainField(cellGrid)
+  }
 
   private def validateGridParameters(gridParameters: GameSettings) = {
     if (gridParameters.width <= 0 || gridParameters.width > MAX_GRID_SIDE_SIZE ||
@@ -83,16 +97,20 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   override def getCells: Array[Array[Cell]] = cellGrid
 
-  override def getGridController: IGridController = gridController
-
   override def setGridController(gridController: IGridController): Unit = {
     this.gridController = gridController
     fieldUpdater.setGridController(gridController)
   }
 
+  override def getGridController: IGridController = gridController
+
   override def setCellSelectionMode(newCellSelectionMode: CellSelectionMode.Value): Unit = {
     cellSelectionMode = newCellSelectionMode
   }
+
+  override def getCellSelectionMode: CellSelectionMode.Value = cellSelectionMode
+
+  // *************************** Game Lifecycle Routines ***************************
 
   override def start(): Unit = {
     if (!this.isGameInitialized) {
@@ -138,12 +156,24 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     fieldUpdater.makeStep()
   }
 
-  override def getCellSelectionMode: CellSelectionMode.Value = cellSelectionMode
+  override def isGameInitialized: Boolean = gameState != GameState.UNINITIALIZED
+
+  override def isGameRunning: Boolean = gameState == GameState.RUNNING
+
+  override def isGamePaused: Boolean = gameState == GameState.PAUSED
+
+  override def isGameReset: Boolean = gameState == GameState.RESET
+
+  override def isGameFinished: Boolean = gameState == GameState.FINISHED
 
   // *************************** Private Methods ***************************
 
   private def generateGrid(): Unit = {
     cellGrid = gridController.generateGrid(gameSettings.width, gameSettings.height)
+  }
+
+  private def setAliveCells(): Unit = {
+    gameSettings.aliveCells.foreach(coords => cellGrid(coords._1)(coords._2).setState(State.ALIVE))
   }
 
   private def stopUpdater(): Unit = {
@@ -181,11 +211,11 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   // *************************** ICellStateProvider ***************************
 
-  override def subscribe(cellStateObserver: ICellStateObserver): Unit = {
+  override def addCellStateObserver(cellStateObserver: ICellStateObserver): Unit = {
     cellStateObservers.add(cellStateObserver)
   }
 
-  override def unsubscribe(cellStateObserver: ICellStateObserver): Unit = {
+  override def removeCellStateObserver(cellStateObserver: ICellStateObserver): Unit = {
     cellStateObservers.remove(cellStateObserver)
   }
 
@@ -195,15 +225,18 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     cellStateObservers.foreach(o => o.onCellsStateChange(nextField))
   }
 
-  override def isGameInitialized: Boolean = gameState != GameState.UNINITIALIZED
+  override def addGridStateObserver(gridStateObserver: IGridStateObserver): Unit = {
+    gridStateObservers.add(gridStateObserver)
+  }
 
-  override def isGameRunning: Boolean = gameState == GameState.RUNNING
+  override def removeGridStateObserver(gridStateObserver: IGridStateObserver): Unit = {
+    gridStateObservers.remove(gridStateObserver)
+  }
 
-  override def isGamePaused: Boolean = gameState == GameState.PAUSED
+  private def notifyGridObservers(): Unit = {
+    val aliveCells = gameSettings.aliveCells.map(t => cellGrid(t._1)(t._2))
 
-  override def isGameReset: Boolean = gameState == GameState.RESET
+    gridStateObservers.foreach(o => o.onGridStructureChange(cellGrid, aliveCells))
+  }
 
-  override def isGameFinished: Boolean = gameState == GameState.FINISHED
-
-  override def getBoundsSettings: BoundsSettings = boundsSettings
 }

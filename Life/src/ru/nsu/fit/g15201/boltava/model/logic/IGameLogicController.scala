@@ -3,8 +3,9 @@ package ru.nsu.fit.g15201.boltava.model.logic
 import ru.nsu.fit.g15201.boltava.model.canvas.IGridController
 import ru.nsu.fit.g15201.boltava.model.logic.CellSelectionMode.CellSelectionMode
 import ru.nsu.fit.g15201.boltava.model.logic.GameState.GameState
+import ru.nsu.fit.g15201.boltava.view.main.IGridStateProvider
 
-trait IGameLogicController extends ICellStateProvider with ICellClickListener {
+trait IGameLogicController extends ICellStateProvider with ICellClickListener with IGridStateProvider {
 
   def start(): Unit
   def nextStep(): Unit
