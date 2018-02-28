@@ -5,7 +5,8 @@ import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IInterac
 class SettingsPanePresenter(private val view: IView, private val interactor: IInteractor) extends IPresenter {
 
   {
-    view.setBoundsSettings(interactor.getBoundsSettings)
+    view.setPresenter(this)
+    view.setBoundsSettings(interactor.getSettingsBounds)
     view.setGridSettings(interactor.getGameSettings)
   }
 
