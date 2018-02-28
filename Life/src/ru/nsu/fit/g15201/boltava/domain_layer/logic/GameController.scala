@@ -281,9 +281,9 @@ class GameController extends IGameLogicController with IFieldStateObserver {
       x <- 0 until Math.min(source.length, destination.length)
       y <- 0 until Math.min(source(0).length, destination(0).length)
     } {
-      destination(x)(y) = source(x)(y)
       if (source(x)(y).getState == State.ALIVE) {
         aliveCells.append((x, y))
+        destination(x)(y).setState(State.ALIVE)
       }
     }
 
