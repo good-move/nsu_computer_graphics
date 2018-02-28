@@ -168,14 +168,14 @@ class SettingsPaneView extends IView {
       }
     })
 
-    okButton.setOnMouseClicked((event: MouseEvent) => {
+    okButton.setOnMouseClicked((_: MouseEvent) => {
       if (presenter != null) {
         presenter.onOkClicked()
       }
       closeWindow(okButton)
     })
 
-    cancelButton.setOnMouseClicked((event: MouseEvent) => {
+    cancelButton.setOnMouseClicked((_: MouseEvent) => {
       if (presenter != null) {
         presenter.onCancelClicked()
       }

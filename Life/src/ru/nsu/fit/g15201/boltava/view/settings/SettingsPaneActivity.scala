@@ -8,7 +8,6 @@ import ru.nsu.fit.g15201.boltava.view.settings.IContract.{IInteractor, IPresente
 object SettingsPaneActivity {
 
   private var settingsPane: SettingsPane = _
-  private var settingsPaneView: SettingsPaneView = _
   private var gameController: IGameLogicController = _
   private var presenter: IPresenter = _
 
@@ -34,4 +33,5 @@ class SettingsPaneActivity extends IInteractor {
   override def applyGameSettings(gameSettings: GameSettings): Unit = {
 //    SettingsPaneActivity.gameController.applyGameSettings(gameSettings)
   }
+
 }
