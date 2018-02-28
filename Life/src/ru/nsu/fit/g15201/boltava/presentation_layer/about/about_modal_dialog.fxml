@@ -6,7 +6,6 @@
 
 <?import javafx.scene.control.Button?>
 <VBox xmlns:fx="http://javafx.com/fxml"
-      fx:id="root"
       fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutDialogController"
 >
 

@@ -12,14 +12,12 @@
 >
     <!-- Uncomment this to remove padding inside Toolbar -->
     <HBox>
-        <Button fx:id="openGameModelBtn"
-                onMouseClicked="#onOpenModel"
+        <Button onMouseClicked="#onOpenModel"
                 styleClass="toolbar-btn, open-model-btn"
         >
             <tooltip><Tooltip text="Open game field model"/></tooltip>
         </Button>
-        <Button fx:id="saveGameModelBtn"
-                onMouseClicked="#onSaveModel"
+        <Button onMouseClicked="#onSaveModel"
                 styleClass="toolbar-btn, save-model-btn"
         >
             <tooltip><Tooltip text="Save game field model"/></tooltip>
@@ -27,30 +25,22 @@
 
         <Separator orientation="VERTICAL" />
 
-        <Button
-                fx:id="playBtn"
-                onMouseClicked="#onPlay"
+        <Button onMouseClicked="#onPlay"
                 styleClass="toolbar-btn, play-btn"
         >
             <tooltip><Tooltip text="Start the game"/></tooltip>
         </Button>
-        <Button
-                fx:id="pauseBtn"
-                onMouseClicked="#onPause"
+        <Button onMouseClicked="#onPause"
                 styleClass="toolbar-btn, pause-btn"
         >
             <tooltip><Tooltip text="Pause the game"/></tooltip>
         </Button>
-        <Button
-                fx:id="nextStepBtn"
-                onMouseClicked="#onNextStep"
+        <Button onMouseClicked="#onNextStep"
                 styleClass="toolbar-btn, step-btn"
         >
             <tooltip><Tooltip text="Make one step in the game"/></tooltip>
         </Button>
-        <Button
-                fx:id="clearFieldBtn"
-                onMouseClicked="#onReset"
+        <Button onMouseClicked="#onReset"
                 styleClass="toolbar-btn, reset-btn"
         >
             <tooltip><Tooltip text="Clear the field"/></tooltip>
@@ -76,25 +66,19 @@
 
         <Separator orientation="VERTICAL" />
 
-        <Button
-                fx:id="settingsBtn"
-                onMouseClicked="#onOpenSettings"
+        <Button onMouseClicked="#onOpenSettings"
                 styleClass="toolbar-btn, settings-btn"
         >
             <tooltip><Tooltip text="Settings"/></tooltip>
         </Button>
 
-        <Button
-                fx:id="aboutBtn"
-                onMouseClicked="#onAbout"
+        <Button onMouseClicked="#onAbout"
                 styleClass="toolbar-btn, about-btn"
         >
             <tooltip><Tooltip text="About"/></tooltip>
         </Button>
 
-        <Button
-                fx:id="helpBtn"
-                onMouseClicked="#onHelp"
+        <Button onMouseClicked="#onHelp"
                 styleClass="toolbar-btn, help-btn"
         >
             <tooltip><Tooltip text="Help"/></tooltip>

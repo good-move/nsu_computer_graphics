@@ -6,7 +6,6 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.main.PlaygroundView"
-      fx:id="root"
       xmlns:fx="http://javafx.com/fxml"
       minWidth="300"
       minHeight="300"
@@ -15,8 +14,7 @@
     <fx:include fx:id="menuBar" source="../menu/menu.fxml" />
     <fx:include fx:id="toolbar" source="../toolbar/toolbar.fxml" />
 
-    <ScrollPane fx:id="scrollPane"
-                style="-fx-background:white;"
+    <ScrollPane style="-fx-background:white;"
                 VBox.vgrow="ALWAYS"
 
     >
