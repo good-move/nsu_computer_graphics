@@ -4,7 +4,7 @@ import java.io.{BufferedReader, BufferedWriter, File, FileWriter}
 import java.nio.file.{Files, Paths}
 
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.GameSettings
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, PlaygroundSettings}
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.utils._
 
 import scala.io.Source
@@ -17,7 +17,7 @@ object ConfigManager {
   val MODEL_FILE_EXTENSION = "life"
   val MODEL_FILE_DESCRIPTION = "LIFE model file"
 
-  def openGameModel(configPath: String): GameSettings = {
+  def openGameModel(configPath: String): PlaygroundSettings = {
     if (!configPath.endsWith(".life")) {
       throw new RuntimeException(s"Configuration file extension must be .$MODEL_FILE_EXTENSION.")
     }
@@ -30,7 +30,7 @@ object ConfigManager {
     val reader = bufferedSource.bufferedReader()
 
     try {
-      val gridParameters = new GameSettings()
+      val gridParameters = new PlaygroundSettings()
       val (width, height) = readDimensions(reader)
       gridParameters.gridHeight = height
       gridParameters.gridWidth = width
@@ -65,7 +65,7 @@ object ConfigManager {
     aliveCells
   }
 
-  def saveGameModel(configPath: String, gridParameters: GameSettings, aliveCells: Array[Point]): Unit = {
+  def saveGameModel(configPath: String, settings: PlaygroundSettings, aliveCells: Array[Point]): Unit = {
     var file: File = null
     if(!configPath.endsWith(s".$MODEL_FILE_EXTENSION")) {
       file = new File(s"$configPath.$MODEL_FILE_EXTENSION")
@@ -73,15 +73,15 @@ object ConfigManager {
     val writer = new BufferedWriter(new FileWriter(file))
 
     // write grid dimensions
-    writer.write(s"${gridParameters.gridWidth} ${gridParameters.gridHeight}")
+    writer.write(s"${settings.gridWidth} ${settings.gridHeight}")
     writer.write(" // Grid dimensions\n")
 
     // write border width
-    writer.write(s"${gridParameters.borderWidth}")
+    writer.write(s"${settings.borderWidth}")
     writer.write(" // Border width in pixels\n")
 
     // write cell side size
-    writer.write(s"${gridParameters.borderSize}")
+    writer.write(s"${settings.borderSize}")
     writer.write(" // Cell side size in pixels\n")
 
     // write alive cells coordinates
