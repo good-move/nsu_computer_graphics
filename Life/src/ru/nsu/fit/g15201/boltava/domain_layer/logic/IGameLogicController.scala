@@ -3,6 +3,7 @@ package ru.nsu.fit.g15201.boltava.domain_layer.logic
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IGridController
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.CellSelectionMode.CellSelectionMode
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.GameState.GameState
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, SettingsBounds}
 import ru.nsu.fit.g15201.boltava.presentation_layer.main.IGridStateProvider
 
 trait IGameLogicController extends ICellStateProvider with ICellClickListener with IGridStateProvider {
@@ -15,7 +16,7 @@ trait IGameLogicController extends ICellStateProvider with ICellClickListener wi
   def setGridParams(gridParameters: GameSettings): Unit
   def getGameSettings: GameSettings
 
-  def getBoundsSettings: BoundsSettings
+  def getSettingsBounds: SettingsBounds
 
   def setCellSelectionMode(cellSelectionMode: CellSelectionMode)
   def getCellSelectionMode: CellSelectionMode

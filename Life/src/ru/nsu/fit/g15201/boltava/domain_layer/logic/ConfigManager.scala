@@ -4,6 +4,7 @@ import java.io.{BufferedReader, BufferedWriter, File, FileWriter}
 import java.nio.file.{Files, Paths}
 
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.GameSettings
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.utils._
 
 import scala.io.Source

@@ -6,7 +6,7 @@ import javafx.scene.control.{Button, Slider, TextField}
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.{BoundsSettings, GameSettings}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, SettingsBounds}
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IPresenter, IView}
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.utils._
 
@@ -32,7 +32,7 @@ class SettingsPaneView extends IView {
   @FXML var okButton: Button = _
 
   private var currentGameSettings = new GameSettings
-  private var boundsSettings = new BoundsSettings
+  private var settingsBounds = new SettingsBounds
 
   private var presenter: IPresenter = _
 
@@ -43,8 +43,8 @@ class SettingsPaneView extends IView {
     initButtonListeners()
   }
 
-  override def setBoundsSettings(boundsSettings: BoundsSettings): Unit = {
-    this.boundsSettings = boundsSettings
+  override def setBoundsSettings(boundsSettings: SettingsBounds): Unit = {
+    this.settingsBounds = boundsSettings
     applyBounds()
   }
 
@@ -58,12 +58,12 @@ class SettingsPaneView extends IView {
   override def setPresenter(presenter: IPresenter): Unit = this.presenter = presenter
 
   private def applyBounds(): Unit = {
-    cellBorderSizeSlider.setMin(boundsSettings.minBorderSize)
-    cellBorderSizeSlider.setMax(boundsSettings.maxBorderSize)
+    cellBorderSizeSlider.setMin(settingsBounds.minBorderSize)
+    cellBorderSizeSlider.setMax(settingsBounds.maxBorderSize)
     setSliderProps(cellBorderSizeSlider)
 
-    cellBorderWidthSlider.setMin(boundsSettings.minBorderWidth)
-    cellBorderWidthSlider.setMax(boundsSettings.maxBorderWidth)
+    cellBorderWidthSlider.setMin(settingsBounds.minBorderWidth)
+    cellBorderWidthSlider.setMax(settingsBounds.maxBorderWidth)
     setSliderProps(cellBorderWidthSlider)
   }
 
@@ -89,7 +89,7 @@ class SettingsPaneView extends IView {
       override def changed(observable: ObservableValue[_ <: Number], oldValue: Number, nextWidth: Number): Unit = {
         val width = nextWidth.asInstanceOf[Double].toInt
         cellBorderWidthSlider.setValue(width)
-        if (width.isWithinBounds(boundsSettings.minBorderWidth, boundsSettings.maxBorderWidth)) {
+        if (width.isWithinBounds(settingsBounds.minBorderWidth, settingsBounds.maxBorderWidth)) {
           cellBorderWidthTF.setText(width.toString)
           currentGameSettings.borderWidth = width
         }
@@ -97,7 +97,7 @@ class SettingsPaneView extends IView {
     })
 
     cellBorderWidthTF.onTextChanged(borderWidth => {
-      if (isValidInt(borderWidth, boundsSettings.minBorderWidth, boundsSettings.maxBorderWidth)) {
+      if (isValidInt(borderWidth, settingsBounds.minBorderWidth, settingsBounds.maxBorderWidth)) {
         cellBorderWidthSlider.setValue(borderWidth.toDouble)
         currentGameSettings.borderWidth = borderWidth.toInt
       }
@@ -106,7 +106,7 @@ class SettingsPaneView extends IView {
     cellBorderSizeSlider.valueProperty().addListener(new ChangeListener[Number] {
       override def changed(observable: ObservableValue[_ <: Number], oldValue: Number, nextSize: Number): Unit = {
         val borderSize = nextSize.asInstanceOf[Double].toInt
-        if (borderSize.isWithinBounds(boundsSettings.minBorderSize, boundsSettings.maxBorderSize)) {
+        if (borderSize.isWithinBounds(settingsBounds.minBorderSize, settingsBounds.maxBorderSize)) {
           cellBorderSizeTF.setText(borderSize.toString)
           currentGameSettings.borderSize = borderSize
         }
@@ -114,7 +114,7 @@ class SettingsPaneView extends IView {
     })
 
     cellBorderSizeTF.onTextChanged(borderSize => {
-      if (isValidInt(borderSize, boundsSettings.minBorderSize, boundsSettings.maxBorderSize)) {
+      if (isValidInt(borderSize, settingsBounds.minBorderSize, settingsBounds.maxBorderSize)) {
         cellBorderSizeSlider.setValue(borderSize.toDouble)
         currentGameSettings.borderSize = borderSize.toDouble.toInt
       }
@@ -131,14 +131,14 @@ class SettingsPaneView extends IView {
 
   private def initTextFieldsListeners(): Unit = {
     gridWidthTF.onTextChanged(gridWidth => {
-      if (isValidInt(gridWidth, 1, boundsSettings.maxGridSize)) {
+      if (isValidInt(gridWidth, 1, settingsBounds.maxGridSize)) {
         cellBorderSizeSlider.setValue(gridWidth.toInt)
         currentGameSettings.width = gridWidth.toDouble.toInt
       }
     })
 
     gridHeightTF.onTextChanged(gridHeight => {
-      if (isValidInt(gridHeight, 1, boundsSettings.maxGridSize)) {
+      if (isValidInt(gridHeight, 1, settingsBounds.maxGridSize)) {
         cellBorderSizeSlider.setValue(gridHeight.toInt)
         currentGameSettings.height = gridHeight.toDouble.toInt
       }

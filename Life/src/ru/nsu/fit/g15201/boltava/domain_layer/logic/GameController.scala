@@ -3,6 +3,7 @@ package ru.nsu.fit.g15201.boltava.domain_layer.logic
 import java.util.concurrent.{ScheduledFuture, ScheduledThreadPoolExecutor, TimeUnit}
 
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.IGridController
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, SettingsBounds}
 import ru.nsu.fit.g15201.boltava.presentation_layer.main.{ICellStateObserver, IGridStateObserver}
 
 import scala.collection.mutable
@@ -21,7 +22,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
 
   private var gridController: IGridController = _
   private var gameSettings = new GameSettings
-  private val boundsSettings = new BoundsSettings
+  private val boundsSettings = new SettingsBounds
 
   private var cellGrid: Array[Array[Cell]] = _
   private var cellSelectionMode = CellSelectionMode.TOGGLE
@@ -47,7 +48,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
     boundsSettings.maxGridSize - MAX_GRID_SIDE_SIZE
   }
 
-  override def getBoundsSettings: BoundsSettings = boundsSettings
+  override def getSettingsBounds: SettingsBounds = boundsSettings
 
   override def setGridParams(gameSettings: GameSettings): Unit = {
     Try(validateGridParameters(gameSettings)) match {

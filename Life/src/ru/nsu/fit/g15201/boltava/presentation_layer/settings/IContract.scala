@@ -1,6 +1,6 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.settings
 
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.{BoundsSettings, GameSettings}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, SettingsBounds}
 import ru.nsu.fit.g15201.boltava.presentation_layer.base.{IBasePresenter, IBaseView}
 
 object IContract {
@@ -15,7 +15,7 @@ object IContract {
 
   trait IView extends IBaseView[IPresenter] {
 
-    def setBoundsSettings(boundsSettings: BoundsSettings)
+    def setBoundsSettings(boundsSettings: SettingsBounds)
     def setGridSettings(gridSettings: GameSettings)
     def getGridSettings: GameSettings
 
@@ -24,7 +24,7 @@ object IContract {
   trait IInteractor {
 
     def getGameSettings: GameSettings
-    def getBoundsSettings: BoundsSettings
+    def getSettingsBounds: SettingsBounds
 
     def applyGameSettings(gridSettings: GameSettings)
 
