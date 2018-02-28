@@ -4,7 +4,7 @@ import java.io.{BufferedReader, BufferedWriter, File, FileWriter}
 import java.nio.file.{Files, Paths}
 
 import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{GameSettings, PlaygroundSettings}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.PlaygroundSettings
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.utils._
 
 import scala.io.Source
@@ -16,6 +16,8 @@ object ConfigManager {
 
   val MODEL_FILE_EXTENSION = "life"
   val MODEL_FILE_DESCRIPTION = "LIFE model file"
+
+  private var lastOpenedPath: Option[String] = None
 
   def openGameModel(configPath: String): PlaygroundSettings = {
     if (!configPath.endsWith(".life")) {
@@ -38,6 +40,7 @@ object ConfigManager {
       gridParameters.borderSize = reader.readLine().filterComments.toInt
       gridParameters.aliveCells = readAliveCells(reader)
 
+      lastOpenedPath = Some(configPath)
       gridParameters
     } catch {
       case e: Exception => throw new RuntimeException("Failed to read grid configuration file. Check out config file structure description.", e)
@@ -66,10 +69,13 @@ object ConfigManager {
   }
 
   def saveGameModel(configPath: String, settings: PlaygroundSettings, aliveCells: Array[Point]): Unit = {
-    var file: File = null
-    if(!configPath.endsWith(s".$MODEL_FILE_EXTENSION")) {
-      file = new File(s"$configPath.$MODEL_FILE_EXTENSION")
+    var path = configPath
+
+    if (!configPath.endsWith(s".$MODEL_FILE_EXTENSION")) {
+      path += s".$MODEL_FILE_DESCRIPTION"
     }
+
+    val file = new File(path)
     val writer = new BufferedWriter(new FileWriter(file))
 
     // write grid dimensions
@@ -94,6 +100,8 @@ object ConfigManager {
 
     writer.flush()
   }
+
+  def getLastOpenedPath: Option[String] = lastOpenedPath
 
 }
 
