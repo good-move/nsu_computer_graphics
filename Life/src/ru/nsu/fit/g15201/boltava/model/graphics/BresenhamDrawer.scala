@@ -1,16 +1,20 @@
 package ru.nsu.fit.g15201.boltava.model.graphics
+
+
 import javafx.scene.paint.Color
 
 import ru.nsu.fit.g15201.boltava.model.canvas.IDrawable
 import ru.nsu.fit.g15201.boltava.model.canvas.geometry.Point
 import ru.nsu.fit.g15201.boltava.model.logic.Cell
 
+
+
 class BresenhamDrawer extends IDrawer {
 
   override def drawLine(drawable: IDrawable, from: Point, to: Point, color: Color): Unit = {
-    val f = if (from.x > to.x) from else to
-    val t = if (from.x > to.x) to else from
-    val linePoints = BresenhamLineCreator.getLinePoints(f, t)
+    val higherPoint = if (from.x > to.x) from else to
+    val lowerPoint = if (from.x > to.x) to else from
+    val linePoints = BresenhamLineCreator.getLinePoints(higherPoint, lowerPoint)
     drawable.draw(linePoints)
   }
 

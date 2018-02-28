@@ -7,14 +7,11 @@ import scala.collection.mutable.ArrayBuffer
 
 class SquareGridController(private val squareSideSize: Int) extends IGridController {
 
-  private val _size: Double = squareSideSize
-  private val _halfSize: Double = _size / 2
-  private val xStep: Double = _size
-  private val yStep: Double = _size
-  private val bias: (Double, Double) = (_size/2, _size/2)
-
-  private val ROTATION_ANGLE = 90.0
-  private val OFFSET_ANGLE = 45.0
+  private val sideSize: Double = squareSideSize
+  private val halfSize: Double = sideSize / 2
+  private val xStep: Double = sideSize
+  private val yStep: Double = sideSize
+  private val bias: (Double, Double) = (halfSize, halfSize)
 
   def getSideSize: Int = squareSideSize
 
@@ -25,7 +22,7 @@ class SquareGridController(private val squareSideSize: Int) extends IGridControl
       grid(x) = new Array[HexagonCell](width)
       for (y <- 0 until width) {
         val center = getCellCenter(x,y)
-        val vertices = getVerticesForHexCenter(center)
+        val vertices = getVerticesForSquareCenter(center)
         grid(x)(y) = new HexagonCell((center.x.toInt, center.y.toInt), vertices, y, x)
       }
     }
@@ -39,16 +36,12 @@ class SquareGridController(private val squareSideSize: Int) extends IGridControl
     (x, y)
   }
 
-  private def getVerticesForHex(point: Point): Array[Point] = {
-    getVerticesForHexCenter(getCellCenter(point))
-  }
-
-  private def getVerticesForHexCenter(center: DoublePoint): Array[Point] = {
+  private def getVerticesForSquareCenter(center: DoublePoint): Array[Point] = {
     Array[Point](
-      ((center.x + _halfSize).round.toInt, (center.y + _halfSize).round.toInt),
-      ((center.x - _halfSize).round.toInt, (center.y + _halfSize).round.toInt),
-      ((center.x - _halfSize).round.toInt, (center.y - _halfSize).round.toInt),
-      ((center.x + _halfSize).round.toInt, (center.y - _halfSize).round.toInt)
+      ((center.x + halfSize).round.toInt, (center.y + halfSize).round.toInt),
+      ((center.x - halfSize).round.toInt, (center.y + halfSize).round.toInt),
+      ((center.x - halfSize).round.toInt, (center.y - halfSize).round.toInt),
+      ((center.x + halfSize).round.toInt, (center.y - halfSize).round.toInt)
     )
   }
 
@@ -59,8 +52,8 @@ class SquareGridController(private val squareSideSize: Int) extends IGridControl
     * @return cell coordinate in custom (internal) coordinate system
     */
   override def getCellByPoint(point: DoublePoint): Point = {
-    val x = (point.y / _size).toInt
-    val y = (point.x / _size).toInt
+    val x = (point.y / sideSize).toInt
+    val y = (point.x / sideSize).toInt
     (x, y)
   }
 
@@ -79,6 +72,7 @@ class SquareGridController(private val squareSideSize: Int) extends IGridControl
   override def getCellDistantNeighbors(point: Point): Array[Point] = {
     val x = point.x
     val y = point.y
+
     Array[Point](
       (x-1, y-1),
       (x+1, y-1),
@@ -87,10 +81,10 @@ class SquareGridController(private val squareSideSize: Int) extends IGridControl
     )
   }
 
-  override def getCartesianFieldSize(width: Int, height: Int): (Double, Double) = {
-    val w = (width+1) * _size
-    val h = (height+1) * _size
-    (w, h)
+  override def getCartesianFieldSize(columnsCount: Int, rowsCount: Int): (Double, Double) = {
+    val fieldWidth = (columnsCount+1) * sideSize
+    val fieldHeight = (rowsCount+1) * sideSize
+    (fieldWidth, fieldHeight)
   }
 
 }
