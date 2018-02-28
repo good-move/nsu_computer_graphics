@@ -1,4 +1,4 @@
-package ru.nsu.fit.g15201.boltava.view
+package ru.nsu.fit.g15201.boltava.view.main
 
 import ru.nsu.fit.g15201.boltava.model.logic.Cell
 
