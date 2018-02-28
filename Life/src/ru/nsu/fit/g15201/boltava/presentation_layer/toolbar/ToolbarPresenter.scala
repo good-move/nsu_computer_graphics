@@ -121,6 +121,7 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
     if (interactor.shouldSavePlaygroundState()) {
       view.showOfferSaveModel()
     }
+    interactor.finish()
   }
 
   override def onAgreeSaveModel(): Unit = {

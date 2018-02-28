@@ -51,6 +51,7 @@ object IContract {
     def onSetToggle()
 
     def onOpenSettings()
+    def finish()
 
   }
 

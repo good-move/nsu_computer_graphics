@@ -59,5 +59,10 @@ class ToolbarInteractor(private val gameController: IGameLogicController, privat
   override def shouldSavePlaygroundState(): Boolean = {
     gameController.getPlaygroundModified
   }
+
+  override def finish(): Unit = {
+    gameController.finishGame()
+  }
+
 }
 

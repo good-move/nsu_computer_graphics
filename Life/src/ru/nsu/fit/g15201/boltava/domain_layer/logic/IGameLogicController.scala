@@ -8,6 +8,7 @@ import ru.nsu.fit.g15201.boltava.presentation_layer.main.IGridStateProvider
 trait IGameLogicController extends ICellStateProvider with ICellClickListener with IGridStateProvider with ISettingsController {
 
   def initGame()
+  def finishGame(): Unit
 
   def start(): Unit
   def nextStep(): Unit

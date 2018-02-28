@@ -323,4 +323,8 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   override def getPlaygroundModified: Boolean = isPlaygroundModified
 
   override def setPlaygroundModified(isModified: Boolean): Unit = isPlaygroundModified = isModified
+
+  override def finishGame(): Unit = {
+    executor.shutdownNow()
+  }
 }
