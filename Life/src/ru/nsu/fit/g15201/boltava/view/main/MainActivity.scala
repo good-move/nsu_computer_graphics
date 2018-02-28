@@ -12,6 +12,7 @@ import ru.nsu.fit.g15201.boltava.view.toolbar.{ToolbarInteractor, ToolbarPresent
 
 object MainActivity extends IBaseActivity {
 
+  private val windowTitle = "Conway Game Of Life"
   private val contentPath = getClass.getResource("/ru/nsu/fit/g15201/boltava/view/main/main_view.fxml")
 
   private var window: Window = _
@@ -31,6 +32,8 @@ object MainActivity extends IBaseActivity {
 
     val scene = new Scene(content, 800, 500, Color.WHITE)
     scene.getStylesheets.add(getClass.getResource("/styles/buttons.css").toExternalForm)
+
+    stage.setTitle(windowTitle)
     stage.setScene(scene)
     stage.show()
   }
