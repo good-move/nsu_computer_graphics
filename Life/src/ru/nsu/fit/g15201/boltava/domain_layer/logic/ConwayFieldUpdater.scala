@@ -55,6 +55,7 @@ class ConwayFieldUpdater extends Runnable {
         distantNeighborsCount * distantNeighborsImpactScore
 
       val cell = mainField(i)(j)
+      cell.setImpact(impactScore)
       if (cell.getState == State.DEAD) {
         val canBeBorn = impactScore.within(minBirthScore, maxBirthScore)
         if (canBeBorn) {

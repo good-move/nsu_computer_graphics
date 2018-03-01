@@ -4,7 +4,8 @@ import ru.nsu.fit.g15201.boltava.domain_layer.canvas.geometry.Point
 
 class HexagonCell(private val center: Point,
                   private val vertices: Array[Point],
-                  private val x: Int, private val y: Int
+                  private val x: Int, private val y: Int,
+                  private var impact: Double = 0
                  ) extends Cell {
 
   var state: State.State = State.DEAD
@@ -22,4 +23,8 @@ class HexagonCell(private val center: Point,
   override def getX: Int = x
 
   override def getY: Int = y
+
+  override def getImpact: Double = impact
+
+  override def setImpact(impact: Double): Unit = this.impact = impact
 }

@@ -10,6 +10,9 @@ trait Cell {
   def getX: Int
   def getY: Int
 
+  def getImpact: Double
+  def setImpact(impact: Double)
+
   def getState: State.State
   def setState(state: State.State): Unit
 
