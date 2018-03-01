@@ -72,7 +72,7 @@ object ConfigManager {
     var path = configPath
 
     if (!configPath.endsWith(s".$MODEL_FILE_EXTENSION")) {
-      path += s".$MODEL_FILE_DESCRIPTION"
+      path += s".$MODEL_FILE_EXTENSION"
     }
 
     val file = new File(path)
