@@ -58,8 +58,15 @@ class PlaygroundPresenter(view: IView, interactor: IInteractor) extends IPresent
     })
   }
 
-  override def onShowImpactChange(isShowImpactEnabled: Boolean): Unit = {
-    this.isShowImpactEnabled = !isShowImpactEnabled
+  override def onShowImpactChange(isShowImpactEnabled: Boolean, cells: Option[Array[Array[Cell]]]): Unit = {
+    this.isShowImpactEnabled = isShowImpactEnabled
+    if (isShowImpactEnabled) {
+      Platform.runLater(() => {
+        cells.get.foreach(_.foreach(cell => view.drawCellImpact(cell, IMPACT_SCORE_COLOR)))
+      })
+    } else {
+      view.clearImpactScores()
+    }
   }
 
 }

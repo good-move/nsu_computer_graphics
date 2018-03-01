@@ -110,6 +110,13 @@ class PlaygroundView extends IView {
     }
   }
 
+  override def clearImpactScores(): Unit = {
+    impactScoresCanvas.getGraphicsContext2D.clearRect(
+      0, 0,
+      gameFieldImageView.getImage.getWidth,
+      gameFieldImageView.getImage.getHeight
+    )
+  }
 }
 
 
