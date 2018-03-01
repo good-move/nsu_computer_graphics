@@ -17,6 +17,7 @@ trait IGameLogicController extends ICellStateProvider with ICellClickListener wi
 
   def setPlaygroundSettings(playgroundSettings: PlaygroundSettings): Unit
   def getGameSettings: GameSettings
+  def toggleImpactScores()
 
   def getSettingsBounds: SettingsBounds
 

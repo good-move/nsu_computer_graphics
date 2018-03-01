@@ -19,21 +19,23 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   private val executor = new ScheduledThreadPoolExecutor(1)
   private val fieldUpdateInterval = 1000
   private var updateTask: ScheduledFuture[_] = _
+  private var fieldUpdater: ConwayFieldUpdater = _
 
   private var gridController: Option[IGridController] = None
+  private var currentCellGrid: Option[Array[Array[Cell]]] = None
+
   private val gameSettings = new GameSettings()
   private val boundsSettings = new SettingsBounds
 
-  private var currentCellGrid: Option[Array[Array[Cell]]] = None
-  private var cellSelectionMode = CellSelectionMode.TOGGLE
 
-  private var fieldUpdater: ConwayFieldUpdater = _
   private val cellStateObservers = new mutable.HashSet[ICellStateObserver]()
   private val gridStateObservers = new mutable.HashSet[IGridStateObserver]()
 
-  private var isPlaygroundModified: Boolean = false
 
   private var gameState = GameState.UNINITIALIZED
+  private var cellSelectionMode = CellSelectionMode.TOGGLE
+  private var isImpactScoresEnabled = false
+  private var isPlaygroundModified: Boolean = false
 
   {
     fieldUpdater = new ConwayFieldUpdater
@@ -327,4 +329,13 @@ class GameController extends IGameLogicController with IFieldStateObserver {
   override def finishGame(): Unit = {
     executor.shutdownNow()
   }
+
+  override def toggleImpactScores(): Unit = {
+    this.isImpactScoresEnabled = !this.isImpactScoresEnabled
+    gridStateObservers.foreach(_.onShowImpactChange(
+      isImpactScoresEnabled,
+      if (isImpactScoresEnabled) currentCellGrid else None
+    ))
+  }
+
 }
