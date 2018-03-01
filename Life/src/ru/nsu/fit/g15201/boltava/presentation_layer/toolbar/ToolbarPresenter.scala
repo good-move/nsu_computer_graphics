@@ -136,4 +136,8 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
     }
   }
 
+  override def onToggleImpactScores(): Unit = {
+    interactor.toggleImpactScores()
+  }
+
 }

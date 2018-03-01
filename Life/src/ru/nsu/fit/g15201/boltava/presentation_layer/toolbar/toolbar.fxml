@@ -64,6 +64,12 @@
             <tooltip><Tooltip text="Set 'replace' mode"/></tooltip>
         </ToggleButton>
 
+        <ToggleButton onMouseClicked="#onToggleImpactScores"
+                styleClass="toolbar-btn, impact-scores-btn"
+        >
+            <tooltip><Tooltip text="Enable impact scores"/></tooltip>
+        </ToggleButton>
+
         <Separator orientation="VERTICAL" />
 
         <Button onMouseClicked="#onOpenSettings"

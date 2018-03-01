@@ -86,6 +86,11 @@ class ToolbarView extends IView {
     presenter.onOpenSettings()
   }
 
+  @FXML
+  def onToggleImpactScores(event: MouseEvent): Unit = {
+    presenter.onToggleImpactScores()
+  }
+
   override def setCellSelectionButton(cellSelectionMode: CellSelectionMode): Unit = {
     cellSelectionMode match {
       case CellSelectionMode.TOGGLE =>

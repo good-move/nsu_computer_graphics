@@ -10,7 +10,8 @@ import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.IInteracto
 
 import scala.collection.mutable.ArrayBuffer
 
-class ToolbarInteractor(private val gameController: IGameLogicController, private val settingsController: ISettingsController) extends IInteractor {
+class ToolbarInteractor(private val gameController: IGameLogicController,
+                        private val settingsController: ISettingsController) extends IInteractor {
 
   override def onSaveModel(path: Option[String]): Unit = {
     var configPath = path
@@ -62,6 +63,10 @@ class ToolbarInteractor(private val gameController: IGameLogicController, privat
 
   override def finish(): Unit = {
     gameController.finishGame()
+  }
+
+  override def toggleImpactScores(): Unit = {
+    gameController.toggleImpactScores()
   }
 
 }

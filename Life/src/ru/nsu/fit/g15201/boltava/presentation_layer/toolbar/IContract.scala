@@ -18,6 +18,7 @@ object IContract {
     def onOpenModel()
     def onSaveModel()
     def onAgreeSaveModel()
+    def onToggleImpactScores()
 
     def onSetReplace()
     def onSetToggle()
@@ -52,6 +53,8 @@ object IContract {
 
     def onOpenSettings()
     def finish()
+
+    def toggleImpactScores()
 
   }
 
