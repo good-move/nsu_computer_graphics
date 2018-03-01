@@ -56,6 +56,11 @@ class PlaygroundPresenter(view: IView, interactor: IInteractor) extends IPresent
     Platform.runLater(() => {
       aliveCells.foreach(onCellStateChange)
     })
+    if (isShowImpactEnabled) {
+      Platform.runLater(() => {
+        grid.foreach(_.foreach(cell => view.drawCellImpact(cell, IMPACT_SCORE_COLOR)))
+      })
+    }
   }
 
   override def onShowImpactChange(isShowImpactEnabled: Boolean, cells: Option[Array[Array[Cell]]]): Unit = {
