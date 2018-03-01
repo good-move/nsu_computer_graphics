@@ -70,6 +70,11 @@
     -fx-background-color: transparent;
 }
 
+.impact-scores-btn {
+    -fx-background-image: url("/icons/png/tag.png");
+    -fx-background-color: transparent;
+}
+
 .active-button {
     -fx-background-color: red
 }
