@@ -7,7 +7,7 @@ import ru.nsu.fit.g15201.boltava.domain_layer.logic.ConfigManager
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode._
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.{IInteractor, IPresenter, IView}
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 class ToolbarPresenter(private val view: IView, private val interactor: IInteractor) extends IPresenter {
 
