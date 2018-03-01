@@ -12,6 +12,9 @@ class PlaygroundPresenter(view: IView, interactor: IInteractor) extends IPresent
   private val ALIVE_CELL_COLOR = Color.ORANGE
   private val DEAD_CELL_COLOR = Color.WHITE
   private val CELL_BORDER_COLOR = Color.BLACK
+  private val IMPACT_SCORE_COLOR = Color.BLUE
+
+  private var isShowImpactEnabled = false
 
   {
     view.setPresenter(this)
@@ -36,6 +39,9 @@ class PlaygroundPresenter(view: IView, interactor: IInteractor) extends IPresent
     }
 
     view.fillCell(cell, color)
+    if (isShowImpactEnabled) {
+      view.drawCellImpact(cell, IMPACT_SCORE_COLOR)
+    }
   }
 
   override def onCellsStateChange(cells: Array[Array[Cell]]): Unit = {
@@ -50,6 +56,10 @@ class PlaygroundPresenter(view: IView, interactor: IInteractor) extends IPresent
     Platform.runLater(() => {
       aliveCells.foreach(onCellStateChange)
     })
+  }
+
+  override def onShowImpactChange(isShowImpactEnabled: Boolean): Unit = {
+    this.isShowImpactEnabled = !isShowImpactEnabled
   }
 
 }

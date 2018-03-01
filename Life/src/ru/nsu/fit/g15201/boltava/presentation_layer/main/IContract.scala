@@ -19,6 +19,7 @@ object IContract {
 
     def drawGrid(width: Int, height: Int, cells: Array[Array[Cell]], borderColor: Color)
     def fillCell(cell: Cell, color: Color)
+    def drawCellImpact(cell: Cell, color: Color)
 
   }
 
