@@ -61,6 +61,7 @@ class PlaygroundPresenter(view: IView, interactor: IInteractor) extends IPresent
   override def onShowImpactChange(isShowImpactEnabled: Boolean, cells: Option[Array[Array[Cell]]]): Unit = {
     this.isShowImpactEnabled = isShowImpactEnabled
     if (isShowImpactEnabled) {
+      if (cells.isEmpty) return
       Platform.runLater(() => {
         cells.get.foreach(_.foreach(cell => view.drawCellImpact(cell, IMPACT_SCORE_COLOR)))
       })
