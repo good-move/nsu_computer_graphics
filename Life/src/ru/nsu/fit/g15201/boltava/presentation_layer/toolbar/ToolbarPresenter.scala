@@ -126,18 +126,20 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
 
   override def onAgreeSaveModel(): Unit = {
     Try(interactor.onSaveModel(None)) match {
-      case Failure(t) =>
-        t.printStackTrace()
+      case Failure(_) =>
         view.showWarning("File not found", "No model file has been opened. Choose file to save model to.")
         view.showSaveFileChooser(getProperFileChooser("Select Model File"), (path: String) => {
           interactor.onSaveModel(Some(path))
         })
       case _ =>
     }
+    view.close()
   }
 
   override def onToggleImpactScores(): Unit = {
     interactor.toggleImpactScores()
   }
+
+  override def onRejectSaveModel(): Unit = {}
 
 }

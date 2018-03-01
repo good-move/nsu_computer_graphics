@@ -3,11 +3,12 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.menu
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.MenuBar
-import javafx.stage.{FileChooser, Window}
+import javafx.stage.{FileChooser, Stage, Window}
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutDialog
 import ru.nsu.fit.g15201.boltava.presentation_layer.help.HelpDialog
+import ru.nsu.fit.g15201.boltava.presentation_layer.main.MainActivity
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.CellSelectionMode.CellSelectionMode
 import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.IContract.{IPresenter, IView}
 
@@ -115,6 +116,10 @@ class MenuBarView extends IView {
   }
 
   override def showOfferSaveModel(): Unit = {}
+
+  override def close(): Unit = {
+    MainActivity.getWindow.asInstanceOf[Stage].close()
+  }
 }
 
 object MenuBarView {

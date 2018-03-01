@@ -18,6 +18,7 @@ object IContract {
     def onOpenModel()
     def onSaveModel()
     def onAgreeSaveModel()
+    def onRejectSaveModel()
     def onToggleImpactScores()
 
     def onSetReplace()
@@ -37,6 +38,7 @@ object IContract {
     def showOpenFileChooser(fileChooser: FileChooser, onFileChosen: String => Unit)
     def setCellSelectionButton(cellSelectionMode: CellSelectionMode)
     def showOfferSaveModel(): Unit
+    def close()
 
   }
 

@@ -3,7 +3,7 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 import javafx.fxml.FXML
 import javafx.scene.control.{ButtonType, ToggleButton, ToolBar}
 import javafx.scene.input.MouseEvent
-import javafx.stage.{FileChooser, Window}
+import javafx.stage.{FileChooser, Stage, Window, WindowEvent}
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutDialog
@@ -24,8 +24,9 @@ class ToolbarView extends IView {
   @FXML
   def initialize(): Unit = {
     ToolbarView.toolbarView = this
-    MainActivity.getWindow.setOnCloseRequest(_ => {
+    MainActivity.getWindow.setOnCloseRequest((event: WindowEvent) => {
       presenter.onClose()
+      event.consume()
     })
   }
 
@@ -125,6 +126,8 @@ class ToolbarView extends IView {
     val result = AlertHelper.showConfirmation(getWindow, "Playground is modified", "Do you want to save playground model?")
     if (result == ButtonType.OK) {
       presenter.onAgreeSaveModel()
+    } else {
+      presenter.onRejectSaveModel()
     }
   }
 
@@ -145,10 +148,16 @@ class ToolbarView extends IView {
       onFileChosen(file.getAbsolutePath)
     }
   }
+
+  override def close(): Unit = {
+    MainActivity.getWindow.asInstanceOf[Stage].close()
+  }
+
 }
 
 object ToolbarView {
   private var toolbarView: ToolbarView = _
 
   def getInstance: ToolbarView = toolbarView
+
 }
