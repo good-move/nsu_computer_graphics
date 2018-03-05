@@ -2,7 +2,7 @@ package ru.nsu.fit.g15201.boltava.domain_layer.logic
 
 import java.util.concurrent.{ScheduledFuture, ScheduledThreadPoolExecutor, TimeUnit}
 
-import ru.nsu.fit.g15201.boltava.domain_layer.canvas.{HexagonalGridController, IGridController}
+import ru.nsu.fit.g15201.boltava.domain_layer.canvas.{GridControllerFactory, HexagonalGridController, IGridController}
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings._
 import ru.nsu.fit.g15201.boltava.presentation_layer.main.{ICellStateObserver, IGridStateObserver}
 
@@ -271,7 +271,7 @@ class GameController extends IGameLogicController with IFieldStateObserver {
       }
 
       setPlaygroundSettings(playgroundSettings)
-      setGridController(new HexagonalGridController(playgroundSettings.borderSize))
+      setGridController(GridControllerFactory(playgroundSettings.gridType)(playgroundSettings.borderSize))
 
       _initGame(true)
 
