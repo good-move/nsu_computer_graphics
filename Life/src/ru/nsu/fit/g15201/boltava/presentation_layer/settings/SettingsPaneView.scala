@@ -206,19 +206,19 @@ class SettingsPaneView extends IView {
 
 object utils {
 
-  implicit class StringExtension(val s: String) {
+  implicit class StringExtension(private val s: String) extends AnyVal {
     def isNonNegativeInteger: Boolean = {
       s.length > 0 && s.forall(c => c.isDigit)
     }
   }
 
-  implicit class DoubleExtension(val n: Double) {
+  implicit class DoubleExtension(private val n: Double) extends AnyVal {
     def isWithinBounds(lowerBound: Double, upperBound: Double): Boolean = {
       lowerBound <= n && n <= upperBound
     }
   }
 
-  implicit class TextFieldWrapper(val textField: TextField) {
+  implicit class TextFieldWrapper(private val textField: TextField) extends AnyVal {
     def onTextChanged(handler: String => Unit): Unit = {
       textField.textProperty().addListener(new ChangeListener[String] {
         override def changed(observable: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
