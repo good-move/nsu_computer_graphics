@@ -99,12 +99,7 @@ class SettingsPaneInteractor(private val settingsController: ISettingsController
       return Left(s"Grid dimensions must be in range [${0}, ${settingsBounds.maxGridSize}]")
     }
 
-    Right(new PlaygroundSettings(
-      settings.gridWidth,
-      settings.gridHeight,
-      settings.borderSize,
-      settings.borderWidth
-    ))
+    Right(settings)
   }
 
 }

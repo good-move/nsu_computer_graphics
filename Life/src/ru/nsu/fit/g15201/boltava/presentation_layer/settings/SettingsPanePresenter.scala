@@ -1,5 +1,6 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.settings
 
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.GridType
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IInteractor, IPresenter, IView}
 
 import scala.util.{Failure, Success, Try}
@@ -9,7 +10,9 @@ class SettingsPanePresenter(private val view: IView, private val interactor: IIn
   {
     view.setPresenter(this)
     view.setBoundsSettings(interactor.getSettingsBounds)
-    view.setGridSettings(interactor.getGameSettings)
+    val gameSettings = interactor.getGameSettings
+    view.setGridSettings(gameSettings)
+    view.setGridTypesList(GridType.values.toSeq)
   }
 
   override def onApplyClicked(): Unit = {

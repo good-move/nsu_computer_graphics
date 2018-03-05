@@ -120,6 +120,8 @@ class ToolbarPresenter(private val view: IView, private val interactor: IInterac
   override def onClose(): Unit = {
     if (interactor.shouldSavePlaygroundState()) {
       view.showOfferSaveModel()
+    } else {
+      view.close()
     }
     interactor.finish()
   }

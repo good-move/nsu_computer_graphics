@@ -1,11 +1,16 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.settings
 
+import javafx.beans.Observable
 import javafx.beans.value.{ChangeListener, ObservableValue}
+import javafx.collections.{FXCollections, ObservableList}
 import javafx.fxml.FXML
-import javafx.scene.control.{Button, Slider, TextField}
+import javafx.scene.AccessibleAttribute
+import javafx.scene.control._
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
 
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.GridType
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.GridType.GridType
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings._
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.IContract.{IPresenter, IView}
@@ -31,6 +36,8 @@ class SettingsPaneView extends IView {
   @FXML var cancelButton: Button = _
   @FXML var applyButton: Button = _
   @FXML var okButton: Button = _
+
+  @FXML var gridTypeChoiceBox: ChoiceBox[GridType] = _
 
   private var currentGameSettings = new GameSettings
   private var settingsBounds = new SettingsBounds
@@ -201,6 +208,30 @@ class SettingsPaneView extends IView {
   override def close(): Unit = {
     applyButton.getScene.getWindow.asInstanceOf[Stage].close()
   }
+
+  override def setGridTypesList(gridTypes: Seq[GridType]): Unit = {
+    val observableList = FXCollections.observableArrayList[GridType]()
+    gridTypes.foreach(observableList.add)
+    gridTypeChoiceBox.setItems(observableList)
+    gridTypeChoiceBox.setSelectionModel(new GridTypeSelectionModel(gridTypes))
+    setSelectionModelListener()
+  }
+
+  private def setSelectionModelListener(): Unit = {
+    gridTypeChoiceBox.getSelectionModel.selectedIndexProperty().addListener(new ChangeListener[Number] {
+      override def changed(observable: ObservableValue[_ <: Number], oldValue: Number, newValue: Number): Unit = {
+        currentGameSettings.playgroundSettings.gridType = gridTypeChoiceBox.getItems.get(newValue.asInstanceOf[Int])
+      }
+    })
+  }
+
+}
+
+class GridTypeSelectionModel(private val gridTypes: Seq[GridType]) extends SingleSelectionModel[GridType] {
+
+  override def getModelItem(index: Int): GridType = gridTypes(index)
+
+  override def getItemCount: Int = gridTypes.length
 
 }
 
