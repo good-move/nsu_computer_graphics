@@ -11,6 +11,7 @@ object GridControllerFactory {
     gridType match {
       case HEXAGON => new HexagonalGridController(cellSideSize)
       case SQUARE => new SquareGridController(cellSideSize)
+      case TRIANGLE => new TriangularGridController(cellSideSize)
       case _ => throw UnknownGridTypeException(s"Unknown grid type: $gridType")
     }
 
