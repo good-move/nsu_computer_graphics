@@ -1,15 +1,13 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.workbench
 
 import ru.nsu.fit.g15201.boltava.domain_layer.transform.TransformableImage
-import Contract.{IWorkbenchPresenter, IWorkbenchView}
+import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchPresenter, IWorkbenchView}
 
-import scalafx.scene.control.ScrollPane
 import scalafx.scene.image.{Image, ImageView, WritableImage}
 import scalafxml.core.macros.sfxml
 
 @sfxml
 class WorkbenchView(
-                   val scrollPane: ScrollPane,
                    val mainImage: ImageView,
                    val croppedImage: ImageView,
                    val filteredImage: ImageView
@@ -17,13 +15,6 @@ class WorkbenchView(
                 extends IWorkbenchView {
 
   private var presenter: Option[IWorkbenchPresenter] = None
-
-  {
-//    Try(mainImage.image = new Image(Path("images/bmp/Lena.bmp").toString)) match {
-//      case Failure(t) => t.printStackTrace()
-//      case _ =>
-//    }
-  }
 
   override def setMainImage(image: Image): Unit = {
     mainImage.image = image

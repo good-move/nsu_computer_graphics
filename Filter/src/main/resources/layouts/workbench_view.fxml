@@ -1,16 +1,38 @@
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.image.ImageView?>
 
-<ScrollPane
-        xmlns:fx="http://javafx.com/fxml"
-        fx:id="scrollPane"
-        fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.workbench.WorkbenchView"
+<?import javafx.scene.layout.BorderPane?>
+
+<?import java.lang.Double?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.scene.layout.VBox?>
+
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.workbench.WorkbenchView"
+      minWidth="400"
 >
-    <HBox>
-        <ImageView fx:id="mainImage"/>
-        <ImageView fx:id="croppedImage"/>
-        <ImageView fx:id="filteredImage" />
+
+    <fx:define>
+        <Double fx:id="CONTENT_SPACING" fx:value="10"/>
+        <Double fx:id="INNER_SPACING" fx:value="10"/>
+    </fx:define>
+
+    <HBox spacing="$CONTENT_SPACING" alignment="CENTER">
+        <padding>
+            <Insets top="$INNER_SPACING" right="$INNER_SPACING" bottom="$INNER_SPACING" left="$INNER_SPACING" />
+        </padding>
+
+        <BorderPane styleClass="image-block" HBox.hgrow="ALWAYS">
+            <ImageView fx:id="mainImage" pickOnBounds="true" />
+        </BorderPane>
+        <BorderPane styleClass="image-block" HBox.hgrow="ALWAYS">
+            <ImageView fx:id="croppedImage" pickOnBounds="true" />
+        </BorderPane>
+        <BorderPane styleClass="image-block" HBox.hgrow="ALWAYS">
+            <ImageView fx:id="filteredImage" pickOnBounds="true" />
+        </BorderPane>
     </HBox>
 
-</ScrollPane>
+</VBox>

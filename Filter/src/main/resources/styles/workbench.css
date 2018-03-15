@@ -1,0 +1,7 @@
+.image-block {
+    -fx-min-width: 350px;
+    -fx-min-height: 350px;
+    -fx-border-width: 1px;
+    -fx-border-style: dashed;
+    -fx-border-color: #000;
+}
