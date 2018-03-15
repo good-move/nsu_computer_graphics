@@ -8,17 +8,14 @@
 <ToolBar
         fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.ToolbarView"
         xmlns:fx="http://javafx.com/fxml"
-        fx:id="toolbar"
 >
     <HBox>
 
         <Button onMouseClicked="#onOpenFile"
                 styleClass="toolbar-btn, open-file-btn"
         >
-            <tooltip><Tooltip text="Open game field model"/></tooltip>
+            <tooltip><Tooltip text="Open image"/></tooltip>
         </Button>
-
-        <fx:include source="workbench_view.fxml" />
 
     </HBox>
 
