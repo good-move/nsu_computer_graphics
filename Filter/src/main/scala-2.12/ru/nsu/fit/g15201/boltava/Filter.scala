@@ -13,6 +13,6 @@ object Filter extends JFXApp {
     title = "Filter"
   }
 
-  MainActivity.launch(stage)
+  MainActivity.launch()(stage)
 
 }
