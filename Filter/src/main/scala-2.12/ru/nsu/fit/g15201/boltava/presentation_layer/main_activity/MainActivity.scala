@@ -7,7 +7,7 @@ import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.IWorkbenc
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.{WorkbenchComponent, WorkbenchPresenter}
 
 import scalafx.scene.Scene
-import scalafx.scene.layout.VBox
+import scalafx.scene.layout.{Priority, VBox}
 import scalafx.stage.{Stage, Window}
 
 object MainActivity extends IBaseActivity[MainContext] {
@@ -26,11 +26,12 @@ object MainActivity extends IBaseActivity[MainContext] {
     toolbarPresenter = Some(new ToolbarPresenter(toolbar.view, new ToolbarInteractor))
 
     stage.scene = new Scene {
-      content = new VBox {
+      root = new VBox {
         children = Seq(
           toolbar.root,
           workbench.root
         )
+        workbench.root.vgrow = Priority.Always
       }
     }
   }

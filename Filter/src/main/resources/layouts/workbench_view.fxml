@@ -11,7 +11,7 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.workbench.WorkbenchView"
-      minWidth="400"
+      styleClass="xob"
 >
 
     <fx:define>
@@ -19,7 +19,7 @@
         <Double fx:id="INNER_SPACING" fx:value="10"/>
     </fx:define>
 
-    <HBox spacing="$CONTENT_SPACING" alignment="CENTER">
+    <HBox spacing="$CONTENT_SPACING" alignment="CENTER" VBox.vgrow="ALWAYS" styleClass="box">
         <padding>
             <Insets top="$INNER_SPACING" right="$INNER_SPACING" bottom="$INNER_SPACING" left="$INNER_SPACING" />
         </padding>
