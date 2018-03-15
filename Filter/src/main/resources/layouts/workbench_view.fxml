@@ -1,0 +1,16 @@
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.image.ImageView?>
+
+<ScrollPane
+        xmlns:fx="http://javafx.com/fxml"
+        fx:id="scrollPane"
+        fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.workbench.WorkbenchView"
+>
+    <HBox>
+        <ImageView fx:id="mainImage"/>
+        <ImageView fx:id="croppedImage"/>
+        <ImageView fx:id="filteredImage" />
+    </HBox>
+
+</ScrollPane>
