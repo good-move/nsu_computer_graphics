@@ -13,6 +13,7 @@
 
         <Button onMouseClicked="#onOpenFile"
                 styleClass="toolbar-btn, open-file-btn"
+                text="Open"
         >
             <tooltip><Tooltip text="Open image"/></tooltip>
         </Button>

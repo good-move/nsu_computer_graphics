@@ -1,9 +1,12 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
-import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.Contract.{IToolbarInteractor, IToolbarPresenter, IToolbarView}
+import java.io.File
 
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.Contract.{IToolbarInteractor, IToolbarPresenter, IToolbarView}
+import scalafx.scene.image.Image
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{FileChooser, Window}
+
 
 class ToolbarPresenter(private val view: IToolbarView,
                        private val interactor: IToolbarInteractor
@@ -13,15 +16,20 @@ class ToolbarPresenter(private val view: IToolbarView,
     view.setPresenter(this)
   }
 
-  override def onOpenImage(imagePath: String): Unit = {
-    view.showSaveFile(createFileChooser("Open image")) { path =>
-      println(s"Opening $path")
+  private def fileToUri(file: File) = s"${file.toURI.toString}"
+
+  override def onOpenImage(): Unit = {
+    view.showOpenFile(createFileChooser("Open image")) { file =>
+      val uri = fileToUri(file)
+      println(s"Opening $uri")
+      interactor.onImageOpened(new Image(uri))
     }
   }
 
-  override def onSaveImage(imagePath: String): Unit = {
-    view.showSaveFile(createFileChooser("Save image")) { path =>
-      println(s"Saving to $path")
+  override def onSaveImage(): Unit = {
+    view.showSaveFile(createFileChooser("Save image")) { file =>
+      val uri = fileToUri(file)
+      println(s"Saving to $uri")
     }
   }
 
@@ -33,6 +41,7 @@ class ToolbarPresenter(private val view: IToolbarView,
         new ExtensionFilter(extension.extension.toUpperCase , s"*.${extension.extension}")
       )
     }
+    fileChooser.initialDirectory = new File(".").getAbsoluteFile
     fileChooser
   }
 
