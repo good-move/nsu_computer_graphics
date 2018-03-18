@@ -1,7 +1,7 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.workbench
 
 import ru.nsu.fit.g15201.boltava.domain_layer.filter._
-import ru.nsu.fit.g15201.boltava.domain_layer.geometry.DoublePoint
+import ru.nsu.fit.g15201.boltava.domain_layer.geometry.{Dimensions, DoublePoint}
 import ru.nsu.fit.g15201.boltava.domain_layer.storage.{IImageObserver, ImageHolder}
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchPresenter, IWorkbenchView}
 import scalafx.scene.image.{Image, PixelFormat, WritableImage}
@@ -22,7 +22,9 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit window: Window) extends 
   override def getWindow: Window = window
 
   override def onMainImageChanged(newImage: RawImage): Unit = {
-    val image = fillDisplayImage(Transformable(newImage).transform(CropFilter((100,100), (350, 350)), GrayScaleFilter).get)
+    val image = fillDisplayImage(
+      Transformable(newImage).transform(UniformDownscale(Dimensions(350, 350))).get
+    )
     view.setMainImage(image)
   }
 

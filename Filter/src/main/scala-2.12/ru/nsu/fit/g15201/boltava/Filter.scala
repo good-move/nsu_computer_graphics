@@ -1,7 +1,6 @@
 package ru.nsu.fit.g15201.boltava
 
-import ru.nsu.fit.g15201.boltava.presentation_layer.main_activity.{MainActivity, MainContext}
-
+import ru.nsu.fit.g15201.boltava.presentation_layer.main_activity.MainActivity
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 
