@@ -41,7 +41,7 @@ sealed class Downscale(val dimensions: Dimensions) extends Transformer {
         colOffset <- 0 until sampleSize
       } yield content(initialOffset + rowOffset*image.width + colOffset)
 
-      averageFilter(sampleSource)
+      UniformScaling.averageFilter(sampleSource)
     }
 
     RawImage(
@@ -63,18 +63,7 @@ sealed class Downscale(val dimensions: Dimensions) extends Transformer {
       colOffset <- 0 until colProp._2
     } yield source.content((initialRow + rowOffset)*sourceWidth + initialCol + colOffset)
 
-    averageFilter(sampleSource)
-  }
-
-  private def averageFilter(argb: Seq[Int]): Int = {
-    val length = argb.length
-    val summer = (fetcher: Int => Int) => (sum: Int, current: Int) => sum + fetcher(current)
-    val alpha = argb.fold(0)(summer(ColorHelpers.alpha)) / length
-    val red = argb.fold(0)(summer(ColorHelpers.red)) / length
-    val green = argb.fold(0)(summer(ColorHelpers.green)) / length
-    val blue = argb.fold(0)(summer(ColorHelpers.blue)) / length
-
-    ColorHelpers.intArgb(alpha, red, green, blue)
+    UniformScaling.averageFilter(sampleSource)
   }
 
   private def halfDownscale(image: RawImage): RawImage = {
@@ -87,7 +76,7 @@ sealed class Downscale(val dimensions: Dimensions) extends Transformer {
       col <- 0 until (image.width, 2)
     } yield {
       val mappedIndex = row * image.width + col
-      averageFilter(Seq(
+      UniformScaling.averageFilter(Seq(
         content(mappedIndex),
         content(mappedIndex + 1),
         content(mappedIndex + image.width),
