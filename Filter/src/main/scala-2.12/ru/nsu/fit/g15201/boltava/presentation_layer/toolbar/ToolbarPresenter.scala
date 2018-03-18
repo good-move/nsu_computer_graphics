@@ -36,11 +36,16 @@ class ToolbarPresenter(private val view: IToolbarView,
   private def createFileChooser(title: String): FileChooser = {
     val fileChooser = new FileChooser()
     fileChooser.setTitle(title)
-    interactor.getValidImageExtensions.foreach { extension =>
-      fileChooser.extensionFilters.add(
-        new ExtensionFilter(extension.extension.toUpperCase , s"*.${extension.extension}")
-      )
-    }
+    fileChooser
+      .extensionFilters
+      .add(new ExtensionFilter("All", interactor.getValidImageExtensions.map(e => s"*.${e.extension}")))
+    interactor
+      .getValidImageExtensions
+      .foreach { extension =>
+        fileChooser.extensionFilters.add(
+          new ExtensionFilter(extension.extension.toUpperCase , s"*.${extension.extension}")
+        )
+      }
     fileChooser.initialDirectory = new File(".").getAbsoluteFile
     fileChooser
   }

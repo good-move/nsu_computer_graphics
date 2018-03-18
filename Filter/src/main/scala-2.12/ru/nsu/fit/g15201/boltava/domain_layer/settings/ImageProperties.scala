@@ -4,7 +4,9 @@ object ImageProperties {
 
   val allowedExtensions = Seq(
     FileExtension("bmp"),
-    FileExtension("png")
+    FileExtension("png"),
+    FileExtension("jpeg"),
+    FileExtension("jpg")
   )
 
   val allowedDepth = ImageDepth(24)
