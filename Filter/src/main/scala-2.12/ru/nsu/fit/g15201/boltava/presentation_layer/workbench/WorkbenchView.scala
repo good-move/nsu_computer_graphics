@@ -19,27 +19,16 @@ class WorkbenchView(
     mainImage.image = image
   }
 
-  override def setCroppedImage(transformableImage: RawImage): Unit = {
-    croppedImage.image = setImage(transformableImage)
+  override def setCroppedImage(image: Image): Unit = {
+    croppedImage.image = image
   }
 
-  override def setFilteredImage(transformableImage: RawImage): Unit = {
-    filteredImage.image = setImage(transformableImage)
+  override def setFilteredImage(image: Image): Unit = {
+    filteredImage.image = image
   }
 
   override def setPresenter(presenter: IWorkbenchPresenter): Unit = {
     this.presenter = Some(presenter)
-  }
-
-  private def setImage(source: RawImage): WritableImage = {
-    val image = new WritableImage(source.width, source.height)
-    for {
-      x <- 0 until image.width.value.toInt
-      y <- 0 until image.height.value.toInt
-    } {
-      image.pixelWriter.setArgb(x, y, source.content(x * source.width + y))
-    }
-    image
   }
 
 }

@@ -18,8 +18,8 @@ object Contract {
   trait IWorkbenchView extends IBaseView[IWorkbenchPresenter] {
 
     def setMainImage(image: Image)
-    def setCroppedImage(transformableImage: RawImage)
-    def setFilteredImage(transformableImage: RawImage)
+    def setCroppedImage(image: Image)
+    def setFilteredImage(image: Image)
 
   }
 
