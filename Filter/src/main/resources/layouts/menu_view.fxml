@@ -1,0 +1,34 @@
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+
+
+<?import javafx.scene.control.MenuBar?>
+
+<MenuBar
+        fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.menu.MenuPresenter"
+        xmlns:fx="http://javafx.com/fxml">
+
+    <Menu text="File">
+        <MenuItem text="Open" onAction="#onOpenImage" />
+        <MenuItem text="Save As..." onAction="#onSaveImage" />
+        <MenuItem text="Exit" onAction="#onExit" />
+    </Menu>
+
+    <Menu text="Tools">
+        <Menu text="Filters">
+            <MenuItem text="Negative" onAction="#onNegativeChosen" />
+            <MenuItem text="Gray Scale" onAction="#onGrayScaleChosen" />
+            <MenuItem text="Edge Detection" onAction="#onEdgeDetectionChosen" />
+        </Menu>
+        <Menu text="Transformations" >
+            <MenuItem text="Double Upscale" onAction="#onDoubleUpscale" />
+        </Menu>
+    </Menu>
+
+    <Menu text="Help"
+    >
+        <MenuItem text="About" />
+        <MenuItem text="Help" />
+    </Menu>
+
+</MenuBar>

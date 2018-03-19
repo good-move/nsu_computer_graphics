@@ -1,22 +1,20 @@
-package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
+package ru.nsu.fit.g15201.boltava.presentation_layer.menu
 
 import javafx.scene.image.PixelFormat
 import ru.nsu.fit.g15201.boltava.domain_layer.exception.ImageInitializationError
+import ru.nsu.fit.g15201.boltava.domain_layer.filter._
 import ru.nsu.fit.g15201.boltava.domain_layer.settings.{FileExtension, ImageProperties}
 import ru.nsu.fit.g15201.boltava.domain_layer.storage.ImageHolder
-import ru.nsu.fit.g15201.boltava.domain_layer.filter.RawImage
-import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.Contract.IToolbarInteractor
+import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.IMenuInteractor
 import scalafx.scene.image.Image
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class ToolbarInteractor extends IToolbarInteractor {
+class MenuInteractor extends IMenuInteractor {
 
   override def getValidImageExtensions: Seq[FileExtension] = ImageProperties.allowedExtensions
-
-
 
   override def onImageOpened(image: Image): Unit = {
     if (image.pixelReader.isDefined) {
@@ -47,5 +45,27 @@ class ToolbarInteractor extends IToolbarInteractor {
     imageContent
   }
 
+  override def applyDoubleUpscale(): Unit = {
+    setFilteredImage(DoubleUpscale)
+  }
+
+  override def applyGrayScaleFilter(): Unit = {
+    setFilteredImage(GrayScaleFilter)
+  }
+
+  override def applyNegativeFilter(): Unit = {
+    setFilteredImage(NegateFilter)
+  }
+
+  def setFilteredImage(transformer: Transformer)(implicit ev: RawImage=>Transformable): Unit = {
+    val image = ImageHolder.getCroppedImage
+    if (image.isDefined) {
+      ImageHolder.setFilteredImage(image.get.transform(transformer).get)
+    } else {
+      throw new IllegalStateException("Cannot apply filter: cropped image is not set")
+    }
+  }
+
+  override def canApplyFilter: Boolean = ImageHolder.getCroppedImage.isDefined
 }
 
