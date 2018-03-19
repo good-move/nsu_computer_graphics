@@ -19,11 +19,6 @@ object Contract {
   type FileChooserCallback = File => Unit
 
   trait IToolbarView extends IBaseView[IToolbarPresenter] {
-
-
-    def showSaveFile(fileChooser: FileChooser)(callback: FileChooserCallback)
-    def showOpenFile(fileChooser: FileChooser)(callback: FileChooserCallback)
-
   }
 
   trait IToolbarInteractor {

@@ -1,55 +1,23 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.toolbar
 
-import java.io.File
-
-import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.Contract.{IToolbarInteractor, IToolbarPresenter, IToolbarView}
-import scalafx.scene.image.Image
-import scalafx.stage.FileChooser.ExtensionFilter
-import scalafx.stage.{FileChooser, Window}
+import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, IMenuPresenter}
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.Contract.{IToolbarPresenter, IToolbarView}
+import scalafx.stage.Stage
 
 
 class ToolbarPresenter(private val view: IToolbarView,
-                       private val interactor: IToolbarInteractor
-                      )(implicit window: Window) extends IToolbarPresenter {
+                       private val menuPresenter: IMenuPresenter,
+                       private val interactor: IMenuInteractor
+                      )(implicit stage: Stage) extends IToolbarPresenter {
 
   {
     view.setPresenter(this)
   }
 
-  private def fileToUri(file: File) = s"${file.toURI.toString}"
+  override def onOpenImage(): Unit = menuPresenter.onOpenImage()
 
-  override def onOpenImage(): Unit = {
-    view.showOpenFile(createFileChooser("Open image")) { file =>
-      val uri = fileToUri(file)
-      println(s"Opening $uri")
-      interactor.onImageOpened(new Image(uri))
-    }
-  }
+  override def onSaveImage(): Unit = menuPresenter.onSaveImage()
 
-  override def onSaveImage(): Unit = {
-    view.showSaveFile(createFileChooser("Save image")) { file =>
-      val uri = fileToUri(file)
-      println(s"Saving to $uri")
-    }
-  }
-
-  private def createFileChooser(title: String): FileChooser = {
-    val fileChooser = new FileChooser()
-    fileChooser.setTitle(title)
-    fileChooser
-      .extensionFilters
-      .add(new ExtensionFilter("All", interactor.getValidImageExtensions.map(e => s"*.${e.extension}")))
-    interactor
-      .getValidImageExtensions
-      .foreach { extension =>
-        fileChooser.extensionFilters.add(
-          new ExtensionFilter(extension.extension.toUpperCase , s"*.${extension.extension}")
-        )
-      }
-    fileChooser.initialDirectory = new File(".").getAbsoluteFile
-    fileChooser
-  }
-
-  override def getWindow: Window = window
+  override def getStage: Stage = stage
 
 }

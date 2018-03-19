@@ -19,18 +19,4 @@ class ToolbarView(toolbar: ToolBar) extends IToolbarView {
     this.presenter = Some(presenter)
   }
 
-  override def showSaveFile(fileChooser: FileChooser)(callback: FileChooserCallback): Unit = {
-    val file = fileChooser.showSaveDialog(presenter.get.getWindow)
-    if (file != null) {
-      callback(file)
-    }
-  }
-
-  override def showOpenFile(fileChooser: FileChooser)(callback: FileChooserCallback): Unit = {
-    val file = fileChooser.showOpenDialog(presenter.get.getWindow)
-    if (file != null) {
-      callback(file)
-    }
-  }
-
 }
