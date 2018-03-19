@@ -53,4 +53,10 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
     scaled
   }
 
+  override def onImageReset(): Unit = {
+    val empty = new WritableImage(1,1)
+    view.setMainImage(empty)
+    view.setCroppedImage(empty)
+    view.setFilteredImage(empty)
+  }
 }

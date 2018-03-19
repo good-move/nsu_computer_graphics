@@ -8,4 +8,6 @@ trait IImageObserver {
   def onCroppedImageChanged(newImage: RawImage)
   def onFilteredImageChanged(newImage: RawImage)
 
+  def onImageReset()
+
 }

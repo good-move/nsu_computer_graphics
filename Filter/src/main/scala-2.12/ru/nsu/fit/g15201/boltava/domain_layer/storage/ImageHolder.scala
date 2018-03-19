@@ -16,7 +16,11 @@ object ImageHolder extends IImageHolder with IImageProvider {
 
   override def setMainImage(transformableImage: RawImage): Unit = {
     mainImage = Some(transformableImage)
-    observers.foreach(_.onMainImageChanged(transformableImage))
+    observers.foreach({ o =>
+      o.onImageReset()
+      o.onMainImageChanged(transformableImage)
+    })
+
   }
 
   override def getCroppedImage: Option[RawImage] = croppedImage
