@@ -5,6 +5,5 @@ import scalafx.stage.{Stage, Window}
 trait IBaseActivity[T <: IActivityContext] {
 
   def launch(context: Option[T] = None)(implicit stage: Stage)
-  def getWindow: Window
 
 }
