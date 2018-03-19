@@ -1,25 +1,19 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.filter
 
-object DoubleUpscale {
 
-  def apply(): Transformer = new DoubleUpscale
-
-
-}
-
-class DoubleUpscale extends Transformer {
+object DoubleUpscale extends Transformer {
 
   override def transform(image: RawImage): RawImage = {
     semiBilinear(image)
   }
 
-  def semiBilinear(image: RawImage): RawImage = {
+  private def semiBilinear(image: RawImage): RawImage = {
     val factor = 2
     val width = image.width * factor
     val height = image.height * factor
     val content = for {
-      row <- 0 until width
-      col <- 0 until height
+      row <- 0 until height
+      col <- 0 until width
     } yield {
       val evenRow = row % 2 == 0
       val evenCol = col % 2 == 0
@@ -45,7 +39,7 @@ class DoubleUpscale extends Transformer {
     )
   }
 
-  def bilinear(image: RawImage): RawImage = {
+  private def bilinear(image: RawImage): RawImage = {
     val scaleFactor = 2
     val width = image.width * scaleFactor
     val height = image.height * scaleFactor
