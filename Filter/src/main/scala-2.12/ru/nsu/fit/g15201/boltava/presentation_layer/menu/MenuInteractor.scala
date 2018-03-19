@@ -3,9 +3,10 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.menu
 import javafx.scene.image.PixelFormat
 import ru.nsu.fit.g15201.boltava.domain_layer.exception.ImageInitializationError
 import ru.nsu.fit.g15201.boltava.domain_layer.filter._
+import ru.nsu.fit.g15201.boltava.domain_layer.filter.edge_detection.{EdgeDetectionKernel, PrewittKernel, RobertKernel, SobelKernel}
 import ru.nsu.fit.g15201.boltava.domain_layer.settings.{FileExtension, ImageProperties}
 import ru.nsu.fit.g15201.boltava.domain_layer.storage.ImageHolder
-import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.IMenuInteractor
+import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, KernelType}
 import scalafx.scene.image.Image
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -67,5 +68,20 @@ class MenuInteractor extends IMenuInteractor {
   }
 
   override def canApplyFilter: Boolean = ImageHolder.getCroppedImage.isDefined
+
+  override def getKernelsList: Seq[String] = KernelType.values.toSeq.map(_.toString)
+
+  override def applyEdgeDetectionKernel(kernelString: String): Unit = {
+    val kernel = KernelType.values.zip(getKernelsList).find(e => e._2 == kernelString).get._1
+    kernel match {
+      case KernelType.Sobel => apply(SobelKernel)
+      case KernelType.Prewitt => apply(PrewittKernel)
+      case KernelType.Robert => apply(RobertKernel)
+    }
+  }
+
+  private def apply(kernel: EdgeDetectionKernel): Unit = {
+    ImageHolder.setFilteredImage(EdgeSelectionFilter(kernel).transform(ImageHolder.getCroppedImage.get))
+  }
 }
 

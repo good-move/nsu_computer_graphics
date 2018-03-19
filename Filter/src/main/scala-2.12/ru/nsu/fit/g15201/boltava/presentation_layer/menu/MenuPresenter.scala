@@ -4,6 +4,7 @@ import java.io.File
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{FileChooserCallback, IMenuInteractor, IMenuPresenter}
+import scalafx.scene.control.{ButtonType, ChoiceDialog}
 import scalafx.scene.image.Image
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{FileChooser, Stage}
@@ -87,7 +88,21 @@ class MenuPresenter(stage: Stage, interactor: IMenuInteractor) extends IMenuPres
   }
 
   override def onEdgeDetectionChosen(): Unit = {
-//    val edgeDetectionKernel = EdgeDetectionActivity.launch()
+    val choices = interactor.getKernelsList
+
+    val dialog = new ChoiceDialog(defaultChoice = choices.head, choices = choices) {
+      initOwner(stage)
+      title = "Edge Detection Configuration"
+      contentText = "Choose filter kernel:"
+    }
+
+    val selectedKernel = dialog.showAndWait()
+
+    selectedKernel match {
+      case Some(kernel) => interactor.applyEdgeDetectionKernel(kernel)
+      case None =>
+    }
+
   }
 
   override def onDoubleUpscale(): Unit = {
