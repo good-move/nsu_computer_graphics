@@ -34,9 +34,16 @@ object Contract {
     def applyGrayScaleFilter(): Unit
     def applyNegativeFilter(): Unit
 
+    def getKernelsList: Seq[String]
+    def applyEdgeDetectionKernel(kernel: String): Unit
+
     def getValidImageExtensions: Seq[FileExtension]
     def onImageOpened(image: Image)
   }
 
+  case object KernelType extends Enumeration {
+    type KernelType = Value
+    val Robert, Prewitt, Sobel = Value
+  }
 
 }
