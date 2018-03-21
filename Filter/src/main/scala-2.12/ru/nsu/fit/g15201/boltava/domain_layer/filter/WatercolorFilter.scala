@@ -1,5 +1,7 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.filter
 
+import Transformable._
+
 object WatercolorFilter {
 
   def apply(neighborsGridSize: Int): Transformer = new WatercolorFilter(neighborsGridSize)
@@ -9,7 +11,7 @@ object WatercolorFilter {
 class WatercolorFilter(neighborsGridSize: Int) extends Transformer {
 
   override def transform(image: RawImage): RawImage = {
-    Transformable(image).transform(MedianFilter(neighborsGridSize), SharpenFilter).get
+    image.transform(MedianFilter(neighborsGridSize), SharpenFilter).get
   }
 
 }
