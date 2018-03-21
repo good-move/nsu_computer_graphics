@@ -5,6 +5,13 @@ abstract class Point[T](_x: T, _y: T) {
   def getY: T = _y
 }
 
+object IntPoint {
+  def apply(doublePoint: DoublePoint, ceil: Boolean = false): IntPoint = {
+    if (!ceil) new IntPoint(doublePoint.x.toInt, doublePoint.y.toInt)
+    else new IntPoint(doublePoint.x.ceil.toInt, doublePoint.y.ceil.toInt)
+  }
+}
+
 case class IntPoint(x: Int, y: Int) extends Point[Int](x, y) {
   def +(other: IntPoint): IntPoint = {
     IntPoint(x + other.x, y + other.y)

@@ -4,11 +4,13 @@ import ru.nsu.fit.g15201.boltava.domain_layer.geometry.DoublePoint
 import ru.nsu.fit.g15201.boltava.domain_layer.geometry.Point._
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchPresenter, IWorkbenchView}
 import scalafx.Includes._
+import scalafx.application.Platform
 import scalafx.scene.Cursor
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.{AnchorPane, BorderPane}
 import scalafxml.core.macros.sfxml
+
 
 @sfxml
 class WorkbenchView(
@@ -28,8 +30,6 @@ class WorkbenchView(
 
   {
     selectionBox.visible = false
-    AnchorPane.setTopAnchor(selectionBox, 100)
-    AnchorPane.setLeftAnchor(selectionBox, 200)
 
     selectionBox.onMouseEntered = _ => {
       if (!draggingSelectionBox) {
@@ -64,11 +64,13 @@ class WorkbenchView(
     }
 
     selectionBox.onMouseDragged = (mouseEvent: MouseEvent) => {
-      val nextCoordinates = clampPoint(calculateSelectionCoordinates((mouseEvent.x, mouseEvent.y)))
-      limitedMoveSelectionBox(nextCoordinates)
-      val selectionBottomX = nextCoordinates.x + selectionBox.width.value
-      val selectionBottomY = nextCoordinates.y + selectionBox.height.value
-      presenter.get.onImagePartSelected(nextCoordinates, (selectionBottomX, selectionBottomY))
+      val nextOffset = clampPoint(calculateSelectionBoxCoordinates((mouseEvent.x, mouseEvent.y)))
+      moveSelectionBox(nextOffset)
+      val selectionBottomX = nextOffset.x + selectionBox.prefWidth.value
+      val selectionBottomY = nextOffset.y + selectionBox.prefHeight.value
+//      Platform.runLater {
+        presenter.get.onImagePartSelected(nextOffset, (selectionBottomX, selectionBottomY))
+//      }
     }
 
   }
@@ -84,6 +86,8 @@ class WorkbenchView(
   }
 
   override def setCroppedImage(image: Image): Unit = {
+//    croppedImage.fitWidth = 500
+//    croppedImage.fitHeight = 500
     croppedImage.image = image
   }
 
@@ -102,7 +106,7 @@ class WorkbenchView(
     selectionBox.prefHeight = minHeight
   }
 
-  private def calculateSelectionCoordinates(dragCoordinates: DoublePoint): DoublePoint = {
+  private def calculateSelectionBoxCoordinates(dragCoordinates: DoublePoint): DoublePoint = {
     val curX = AnchorPane.getLeftAnchor(selectionBox)
     val curY = AnchorPane.getTopAnchor(selectionBox)
     val shift = dragCoordinates - pressCoordinates

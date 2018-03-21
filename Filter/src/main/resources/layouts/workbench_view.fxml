@@ -26,9 +26,9 @@
             <Insets top="$INNER_SPACING" right="$INNER_SPACING" bottom="$INNER_SPACING" left="$INNER_SPACING" />
         </padding>
 
-        <StackPane styleClass="image-block" HBox.hgrow="ALWAYS">
-            <ImageView fx:id="mainImage" pickOnBounds="true" />
-            <AnchorPane fx:id="selectionBoxWrapper">
+        <StackPane styleClass="image-block" HBox.hgrow="ALWAYS" alignment="TOP_LEFT">
+            <ImageView fx:id="mainImage" pickOnBounds="true"  />
+            <AnchorPane fx:id="selectionBoxWrapper" >
                 <BorderPane fx:id="selectionBox" styleClass="selection-box" />
             </AnchorPane>
         </StackPane>

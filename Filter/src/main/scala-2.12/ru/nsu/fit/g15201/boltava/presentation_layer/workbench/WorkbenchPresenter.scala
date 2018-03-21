@@ -22,8 +22,8 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
   override def onImagePartSelected(topLeft: DoublePoint, bottomRight: DoublePoint): Unit = {
     val image = ImageHolder.getMainImage
     if (image.isDefined) {
-      val top = IntPoint(topLeft.x.toInt, topLeft.y.toInt) * scaleFactor.toInt
-      val bottom: IntPoint = IntPoint(bottomRight.x.toInt, bottomRight.y.toInt) * scaleFactor.toInt
+      val top = IntPoint(topLeft*scaleFactor, ceil = true)
+      val bottom = IntPoint(bottomRight*scaleFactor, ceil = true)
       if (CropFilter.canCrop(top, bottom, image.get)) {
         val cropped = CropFilter(top, bottom).transform(image.get)
         ImageHolder.setCroppedImage(cropped)
@@ -40,7 +40,10 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
   override def onMainImageChanged(newImage: RawImage): Unit = {
     val image = fillDisplayImage(scaleToFit(newImage))
     setScaleFactor(newImage)
-    view.setSelectionBoxParameters(imageBoxDimensions.width/scaleFactor.toInt,imageBoxDimensions.height/scaleFactor.toInt)
+    view.setSelectionBoxParameters(
+      (imageBoxDimensions.width/scaleFactor).toInt,
+      (imageBoxDimensions.height/scaleFactor).toInt
+    )
     view.setMainImage(image)
   }
 
@@ -69,7 +72,6 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
 
   private def scaleToFit(image: RawImage)(implicit ev: RawImage => Transformable): RawImage = {
     val scaled = image.transform(UniformDownscale(imageBoxDimensions)).get
-    ImageHolder.setCroppedImage(scaled)
     scaled
   }
 
