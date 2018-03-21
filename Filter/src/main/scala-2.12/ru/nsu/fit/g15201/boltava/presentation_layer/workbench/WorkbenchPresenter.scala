@@ -1,7 +1,7 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.workbench
 
 import ru.nsu.fit.g15201.boltava.domain_layer.filter._
-import ru.nsu.fit.g15201.boltava.domain_layer.geometry.{Dimensions, DoublePoint, IntPoint}
+import ru.nsu.fit.g15201.boltava.domain_layer.geometry.{DoubleDimensions, DoublePoint, IntDimensions, IntPoint}
 import ru.nsu.fit.g15201.boltava.domain_layer.storage.{IImageObserver, ImageHolder}
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchPresenter, IWorkbenchView}
 import scalafx.scene.image.{Image, PixelFormat, WritableImage}
@@ -10,7 +10,7 @@ import scalafx.stage.Stage
 
 class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IWorkbenchPresenter with IImageObserver {
 
-  private val imageBoxDimensions = Dimensions(500, 500)
+  private val imageBoxDimensions = IntDimensions(500, 500)
   private var scaleFactor = 1d
 
   {
@@ -26,7 +26,7 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
       val bottom = IntPoint(bottomRight*scaleFactor, ceil = true)
       if (CropFilter.canCrop(top, bottom, image.get)) {
         val cropped = CropFilter(top, bottom).transform(image.get)
-        ImageHolder.setCroppedImage(cropped)
+        ImageHolder.setCroppedImage(scaleToFit(cropped))
       }
     }
   }
@@ -39,7 +39,7 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
 
   override def onMainImageChanged(newImage: RawImage): Unit = {
     val image = fillDisplayImage(scaleToFit(newImage))
-    setScaleFactor(newImage)
+    scaleFactor = getScaleFactor(newImage)
     view.setSelectionBoxParameters(
       (imageBoxDimensions.width/scaleFactor).toInt,
       (imageBoxDimensions.height/scaleFactor).toInt
@@ -48,6 +48,7 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
   }
 
   override def onCroppedImageChanged(newImage: RawImage): Unit = {
+    view.setCroppedImageScaleFactor(getScaleFactor(newImage))
     view.setCroppedImage(fillDisplayImage(newImage))
   }
 
@@ -66,8 +67,8 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
     displayImage
   }
 
-  private def setScaleFactor(image: RawImage): Unit = {
-    scaleFactor = (image.width.toDouble / imageBoxDimensions.width).max(image.height.toDouble/imageBoxDimensions.height)
+  private def getScaleFactor(image: RawImage): Double = {
+    (image.width.toDouble / imageBoxDimensions.width).max(image.height.toDouble/imageBoxDimensions.height)
   }
 
   private def scaleToFit(image: RawImage)(implicit ev: RawImage => Transformable): RawImage = {
@@ -81,4 +82,9 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
     view.setCroppedImage(empty)
     view.setFilteredImage(empty)
   }
+
+  override def onSelectionBoxSizeChanged(dimensions: DoubleDimensions): Unit = {
+
+  }
+
 }
