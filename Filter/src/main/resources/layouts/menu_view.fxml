@@ -19,6 +19,11 @@
             <MenuItem text="Negative" onAction="#onNegativeChosen" />
             <MenuItem text="Gray Scale" onAction="#onGrayScaleChosen" />
             <MenuItem text="Edge Detection" onAction="#onEdgeDetectionChosen" />
+            <MenuItem text="Emboss Filter" onAction="#onEmbossChosen" />
+            <MenuItem text="Sharpen" onAction="#onSharpenChosen" />
+            <MenuItem text="Median Filter" onAction="#onMedianChosen" />
+            <MenuItem text="Contours" onAction="#onContourFilterChosen" />
+            <MenuItem text="Watercolor" onAction="#onWaterColorFilterChosen" />
         </Menu>
         <Menu text="Transformations" >
             <MenuItem text="Double Upscale" onAction="#onDoubleUpscale" />

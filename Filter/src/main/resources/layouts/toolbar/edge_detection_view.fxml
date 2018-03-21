@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.toolbar_activities.edge_detection_filter.EdgeDetectionPresenter"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <VBox fx:id="choiceItemsContainer"/>
+
+    <HBox>
+        <ButtonBar>
+            <buttons>
+                <Button text="Apply" ButtonBar.buttonData="APPLY" onMouseClicked="#onApply"/>
+                <Button text="OK" ButtonBar.buttonData="OK_DONE" onMouseClicked="#onOk"/>
+            </buttons>
+        </ButtonBar>
+    </HBox>
+
+</AnchorPane>
