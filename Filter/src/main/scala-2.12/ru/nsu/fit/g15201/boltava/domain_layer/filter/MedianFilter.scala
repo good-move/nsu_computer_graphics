@@ -43,14 +43,6 @@ class MedianFilter(neighborsGridSize: Int) extends Transformer {
     )
   }
 
-  def withTime[R](body: => R): R = {
-    val startTime = System.nanoTime()
-    val result = body
-    val endTime = System.nanoTime()
-    println(s"Execution time: ${endTime - startTime}ns")
-    result
-  }
-
 }
 
 
