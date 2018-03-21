@@ -20,6 +20,7 @@ object Contract {
     def setMainImage(image: Image)
     def setCroppedImage(image: Image)
     def setFilteredImage(image: Image)
+    def setSelectionBoxParameters(minWidth: Int, minHeight: Int)
 
   }
 

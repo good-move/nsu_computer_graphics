@@ -9,6 +9,8 @@
 <?import javafx.scene.layout.VBox?>
 
 
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.AnchorPane?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.workbench.WorkbenchView"
       styleClass="xob"
@@ -24,9 +26,12 @@
             <Insets top="$INNER_SPACING" right="$INNER_SPACING" bottom="$INNER_SPACING" left="$INNER_SPACING" />
         </padding>
 
-        <BorderPane styleClass="image-block" HBox.hgrow="ALWAYS">
+        <StackPane styleClass="image-block" HBox.hgrow="ALWAYS">
             <ImageView fx:id="mainImage" pickOnBounds="true" />
-        </BorderPane>
+            <AnchorPane fx:id="selectionBoxWrapper">
+                <BorderPane fx:id="selectionBox" styleClass="selection-box" />
+            </AnchorPane>
+        </StackPane>
         <BorderPane styleClass="image-block" HBox.hgrow="ALWAYS">
             <ImageView fx:id="croppedImage" pickOnBounds="true" />
         </BorderPane>

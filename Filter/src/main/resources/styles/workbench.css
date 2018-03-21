@@ -1,9 +1,15 @@
 .image-block {
-    -fx-min-width: 350px;
-    -fx-min-height: 350px;
-    -fx-max-width: 350px;
-    -fx-max-height: 350px;
+    -fx-min-width: 501px;
+    -fx-min-height: 501px;
+    -fx-max-width: 501px;
+    -fx-max-height: 501px;
     -fx-border-width: 1px;
     -fx-border-style: dashed;
+    -fx-border-color: #000;
+}
+
+.selection-box {
+    -fx-border-style: dashed;
+    -fx-border-width: 1px;
     -fx-border-color: #000;
 }

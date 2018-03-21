@@ -12,6 +12,14 @@ object CropFilter {
     new CropFilter(topLeft, IntPoint(topLeft.x + width, topLeft.y + height))
   }
 
+  def canCrop(topLeft: IntPoint, bottomRight: IntPoint, image: RawImage): Boolean = {
+    isPointInsideImage(image, topLeft) && isPointInsideImage(image, bottomRight)
+  }
+
+  private def isPointInsideImage(image: Image, point: IntPoint): Boolean = {
+    (0 <= point.x && point.x <= image.width) && (0 <= point.y && point.y <= image.height)
+  }
+
 }
 
 class CropFilter(private val topLeft: IntPoint,
@@ -19,15 +27,11 @@ class CropFilter(private val topLeft: IntPoint,
                 ) extends Transformer {
 
   override def transform(image: RawImage): RawImage = {
-    if (isPointInsideImage(image, topLeft) && isPointInsideImage(image, bottomRight)) {
+    if (CropFilter.isPointInsideImage(image, topLeft) && CropFilter.isPointInsideImage(image, bottomRight)) {
       _transform(image)
     } else {
       throw new IllegalStateException("Crop rectangle is outside image dimensions")
     }
-  }
-
-  private def isPointInsideImage(image: Image, point: IntPoint): Boolean = {
-    (0 <= point.x && point.x <= image.width) && (0 <= point.y && point.y <= image.height)
   }
 
   private def _transform(image: RawImage): RawImage = {
