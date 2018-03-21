@@ -10,7 +10,7 @@ import scalafx.stage.Stage
 
 class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IWorkbenchPresenter with IImageObserver {
 
-  private val mainImageDimensions = Dimensions(350, 350)
+  private val mainImageDimensions = Dimensions(500, 500)
 
   {
     view.setPresenter(this)
@@ -37,6 +37,7 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
   }
 
   private def fillDisplayImage(image: RawImage): Image = {
+    val startTime = System.nanoTime()
     val displayImage = new WritableImage(image.width, image.height)
     val pixelFormat = PixelFormat.getIntArgbInstance
     displayImage.pixelWriter.setPixels(
@@ -44,6 +45,9 @@ class WorkbenchPresenter(view: IWorkbenchView)(implicit stage: Stage) extends IW
       image.width, image.height, pixelFormat,
       image.content, 0, image.width
     )
+    val endTime = System.nanoTime()
+    println(s"Filling image. Time: ${endTime - startTime}")
+
     displayImage
   }
 

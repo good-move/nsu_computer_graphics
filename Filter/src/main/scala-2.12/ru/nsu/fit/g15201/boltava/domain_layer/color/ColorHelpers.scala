@@ -56,7 +56,7 @@ object ColorHelpers {
     val red = this.red(color)
     val green = this.green(color)
     val blue = this.blue(color)
-    val intensity = (0.299 * red + 0.578 * green + 0.114 * blue).ceil.toInt
+    val intensity = (0.299 * red + 0.578 * green + 0.114 * blue).floor.toInt
     intensity
   }
 

@@ -4,7 +4,7 @@ import java.io.File
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{FileChooserCallback, IMenuInteractor, IMenuPresenter}
-import scalafx.scene.control.{ButtonType, ChoiceDialog}
+import scalafx.scene.control.ChoiceDialog
 import scalafx.scene.image.Image
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{FileChooser, Stage}
@@ -62,8 +62,6 @@ class MenuPresenter(stage: Stage, interactor: IMenuInteractor) extends IMenuPres
     }
   }
 
-
-
   override def getStage: Stage = stage
 
   override def onExit(): Unit = {
@@ -72,22 +70,19 @@ class MenuPresenter(stage: Stage, interactor: IMenuInteractor) extends IMenuPres
   }
 
   override def onNegativeChosen(): Unit = {
-    if (!interactor.canApplyFilter) {
-      showNoImageChosenError()
-    } else {
-      interactor.applyNegativeFilter()
-    }
+    applyIfPossible(() => interactor.applyNegativeFilter())
   }
 
   override def onGrayScaleChosen(): Unit = {
-    if (!interactor.canApplyFilter) {
-      showNoImageChosenError()
-    } else {
-      interactor.applyGrayScaleFilter()
-    }
+    applyIfPossible(() => interactor.applyGrayScaleFilter())
   }
 
   override def onEdgeDetectionChosen(): Unit = {
+    if (!interactor.canApplyFilter) {
+      showNoImageChosenError()
+      return
+    }
+
     val choices = interactor.getKernelsList
 
     val dialog = new ChoiceDialog(defaultChoice = choices.head, choices = choices) {
@@ -106,11 +101,7 @@ class MenuPresenter(stage: Stage, interactor: IMenuInteractor) extends IMenuPres
   }
 
   override def onDoubleUpscale(): Unit = {
-    if (!interactor.canApplyFilter) {
-      showNoImageChosenError()
-    } else {
-      interactor.applyDoubleUpscale()
-    }
+    applyIfPossible(() => interactor.applyDoubleUpscale())
   }
 
   private def showNoImageChosenError(): Unit = {
@@ -119,6 +110,46 @@ class MenuPresenter(stage: Stage, interactor: IMenuInteractor) extends IMenuPres
       "Cannot apply filter",
       "Choose an image and select and area to modify before applying filters"
     )
+  }
+
+  def onEmbossChosen(): Unit = {
+    applyIfPossible(() => interactor.applyEmbossFilter())
+  }
+
+  def onSharpenChosen(): Unit = {
+    applyIfPossible(() => interactor.applySharpenFilter())
+  }
+
+  def onMedianChosen(): Unit = {
+    val medianFilterSettings = showMedianFilterSettings()
+    if (medianFilterSettings.isDefined) {
+      applyIfPossible(() => interactor.applyMedianFilter(medianFilterSettings.get))
+    }
+  }
+
+  def onContourFilterChosen(): Unit = {
+    applyIfPossible(() => interactor.applyContourFilter())
+  }
+
+  def onWaterColorFilterChosen(): Unit = {
+    val medianFilterSettings = showMedianFilterSettings()
+    if (medianFilterSettings.isDefined) {
+      applyIfPossible(() => interactor.applyWaterColorFilter(medianFilterSettings.get))
+    }
+  }
+
+  def applyIfPossible(function: () => Unit): Unit = {
+    if (interactor.canApplyFilter) {
+      function()
+    } else {
+      showNoImageChosenError()
+    }
+  }
+
+  private def showMedianFilterSettings(): Option[Int] = {
+    val neighborsCount = Array.range(3,15).map(a => a*a)
+    val dialog = new ChoiceDialog[Int](neighborsCount.head, neighborsCount)
+    dialog.showAndWait()
   }
 
 }

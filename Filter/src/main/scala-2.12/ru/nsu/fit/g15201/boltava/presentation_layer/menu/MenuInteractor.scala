@@ -61,7 +61,7 @@ class MenuInteractor extends IMenuInteractor {
   def setFilteredImage(transformer: Transformer)(implicit ev: RawImage=>Transformable): Unit = {
     val image = ImageHolder.getCroppedImage
     if (image.isDefined) {
-      ImageHolder.setFilteredImage(image.get.transform(transformer).get)
+      ImageHolder.setFilteredImage(Transformable(image.get).transform(transformer).get)
     } else {
       throw new IllegalStateException("Cannot apply filter: cropped image is not set")
     }
@@ -83,5 +83,28 @@ class MenuInteractor extends IMenuInteractor {
   private def apply(kernel: EdgeDetectionKernel): Unit = {
     ImageHolder.setFilteredImage(EdgeSelectionFilter(kernel).transform(ImageHolder.getCroppedImage.get))
   }
+
+  override def applyEmbossFilter(): Unit = {
+    setFilteredImage(EmbossFilter)
+  }
+
+  override def applySharpenFilter(): Unit = {
+    setFilteredImage(SharpenFilter)
+  }
+
+  override def applyMedianFilter(neighborsCount: Int): Unit = {
+    val neighborsGridSize = Math.sqrt(neighborsCount).toInt
+    setFilteredImage(MedianFilter(neighborsGridSize))
+  }
+
+  override def applyContourFilter(): Unit = {
+    setFilteredImage(ContourFilter)
+  }
+
+  override def applyWaterColorFilter(neighborsCount: Int): Unit = {
+    val neighborsGridSize = Math.sqrt(neighborsCount).toInt
+    setFilteredImage(WatercolorFilter(neighborsGridSize))
+  }
+
 }
 

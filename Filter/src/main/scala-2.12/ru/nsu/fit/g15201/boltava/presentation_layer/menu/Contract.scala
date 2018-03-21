@@ -33,6 +33,11 @@ object Contract {
     def applyDoubleUpscale(): Unit
     def applyGrayScaleFilter(): Unit
     def applyNegativeFilter(): Unit
+    def applyEmbossFilter(): Unit
+    def applySharpenFilter(): Unit
+    def applyMedianFilter(neighborsCount: Int): Unit
+    def applyContourFilter(): Unit
+    def applyWaterColorFilter(neighborsCount: Int): Unit
 
     def getKernelsList: Seq[String]
     def applyEdgeDetectionKernel(kernel: String): Unit

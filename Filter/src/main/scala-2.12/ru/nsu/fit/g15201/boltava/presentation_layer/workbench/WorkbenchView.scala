@@ -1,8 +1,7 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.workbench
 
-import ru.nsu.fit.g15201.boltava.domain_layer.filter.RawImage
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchPresenter, IWorkbenchView}
-import scalafx.scene.image.{Image, ImageView, WritableImage}
+import scalafx.scene.image.{Image, ImageView}
 import scalafxml.core.macros.sfxml
 
 @sfxml
