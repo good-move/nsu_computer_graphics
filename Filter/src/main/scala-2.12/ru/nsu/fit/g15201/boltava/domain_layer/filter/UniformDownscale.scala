@@ -1,19 +1,19 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.filter
 
-import ru.nsu.fit.g15201.boltava.domain_layer.color.ColorHelpers
-import ru.nsu.fit.g15201.boltava.domain_layer.geometry.Dimensions
+import ru.nsu.fit.g15201.boltava.domain_layer.geometry.IntDimensions
+import ru.nsu.fit.g15201.boltava.domain_layer.util.Utils
 
 import scala.annotation.tailrec
 
 
 object UniformDownscale {
 
-  def apply(dimensions: Dimensions): Transformer = new Downscale(dimensions)
+  def apply(dimensions: IntDimensions): Transformer = new Downscale(dimensions)
 
 }
 
 
-sealed class Downscale(val dimensions: Dimensions) extends Transformer {
+sealed class Downscale(val dimensions: IntDimensions) extends Transformer {
 
   private val log10_2 = Math.log10(2.0)
 
@@ -21,10 +21,16 @@ sealed class Downscale(val dimensions: Dimensions) extends Transformer {
 
   override def transform(image: RawImage): RawImage = {
     val scale = (image.width.toDouble / dimensions.width).max(image.height.toDouble/dimensions.height)
-    downscale(image, scale)
+    if (scale > 1) {
+//      Utils.withTime {downscale(image, scale)}
+//      Utils.withTime {fastDownscale(image, scale)}
+      fastDownscale(image, scale)
+    } else {
+      image
+    }
   }
 
-  def downscale(image: RawImage, factor: Double): RawImage = {
+  private def downscale(image: RawImage, factor: Double): RawImage = {
     val content = image.content
     val width = (image.width / factor).toInt
     val height = (image.height / factor).toInt
@@ -48,6 +54,47 @@ sealed class Downscale(val dimensions: Dimensions) extends Transformer {
       width,
       height,
       sampledImage.toArray
+    )
+  }
+
+  private def fastDownscale(image: RawImage, factor: Double): RawImage = {
+    val content = image.content
+    val width = (image.width / factor).toInt
+    val height = (image.height / factor).toInt
+    val sampleSize = factor.toInt
+
+    val sampledImage = Array.ofDim[Int](width*height)
+    val sampleSource = Array.ofDim[Int](sampleSize*sampleSize)
+
+    var currentDestinationRow = 0
+    var currentSourceRow = 0.0
+    for (_ <- 0 until height) {
+      var currentCol = 0.0
+      for (col <- 0 until width) {
+        val offset = currentSourceRow.toInt * image.width + currentCol.toInt
+
+        var sampleSourceOffset = 0
+        var rowOffset = 0
+        for (_ <- 0 until sampleSize) {
+          for (colOffset <- 0 until sampleSize) {
+            sampleSource(sampleSourceOffset) = content(offset + rowOffset + colOffset)
+            sampleSourceOffset += 1
+          }
+          rowOffset += image.width
+        }
+
+        sampledImage(currentDestinationRow + col) = UniformScaling.averageFilter(sampleSource)
+
+        currentCol += factor
+      }
+      currentSourceRow += factor
+      currentDestinationRow += width
+    }
+
+    RawImage(
+      width,
+      height,
+      sampledImage
     )
   }
 
@@ -95,44 +142,6 @@ sealed class Downscale(val dimensions: Dimensions) extends Transformer {
     if (iterations < 1) image
     else pyramidDownscale(halfDownscale(image), iterations-1)
   }
-
-  private def downscaleWithAllPixels(image: RawImage, factor: Double): RawImage = {
-    val width = (image.width / factor).toInt
-    val height = (image.height / factor).toInt
-    val step = factor.toInt
-    val widthRemainder = image.width % (width*step)
-    val heightRemainder = image.height % (height*step)
-
-    val content = Array.ofDim[Int](width * height)
-
-    val columnsProps = Array.ofDim[(Int, Int)](width)
-    columnsProps(0) = (0, step + {if (0 < widthRemainder) 1 else 0})
-    for (i <- 1 until width) {
-      columnsProps(i) = (columnsProps(i-1)._1 + columnsProps(i-1)._2, step + {if (i < widthRemainder) 1 else 0})
-    }
-
-    val rowsProps = Array.ofDim[(Int, Int)](height)
-    rowsProps(0) = (0, step + {if (0 < heightRemainder) 1 else 0})
-    for (i <- 1 until height) {
-      rowsProps(i) = (rowsProps(i-1)._1 + rowsProps(i-1)._2, step + {if (i < heightRemainder) 1 else 0})
-    }
-    println(columnsProps)
-    println(rowsProps)
-
-    for {
-      row <- 0 until height
-      col <- 0 until width
-    } content(row*width + col) = samplePixel(image, rowsProps(row), columnsProps(col) )
-
-    RawImage(
-      width,
-      height,
-      content
-    )
-  }
-
-
-
 
 }
 
