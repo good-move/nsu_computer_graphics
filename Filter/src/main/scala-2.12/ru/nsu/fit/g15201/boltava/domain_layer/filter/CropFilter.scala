@@ -1,6 +1,7 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.filter
 
 import ru.nsu.fit.g15201.boltava.domain_layer.geometry.IntPoint
+import ru.nsu.fit.g15201.boltava.domain_layer.util.Utils
 
 object CropFilter {
 
@@ -28,10 +29,36 @@ class CropFilter(private val topLeft: IntPoint,
 
   override def transform(image: RawImage): RawImage = {
     if (CropFilter.isPointInsideImage(image, topLeft) && CropFilter.isPointInsideImage(image, bottomRight)) {
-      _transform(image)
+//      Utils.withTime {_transform(image) }
+//      Utils.withTime {_fast_transform(image) }
+      _fast_transform(image)
+//      _transform(image)
     } else {
       throw new IllegalStateException("Crop rectangle is outside image dimensions")
     }
+  }
+
+  private def _fast_transform(image: RawImage): RawImage = {
+    val height = bottomRight.y - topLeft.y
+    val width = bottomRight.x - topLeft.x
+
+    val content = Array.ofDim[Int](height * width)
+    var sourceRowOffset = topLeft.y * image.width
+    var destRowOffset = 0
+
+    for (_ <- topLeft.y until bottomRight.y) {
+      for (col <- topLeft.x until bottomRight.x) {
+        content(destRowOffset + col - topLeft.x) = image.content(sourceRowOffset + col)
+      }
+      sourceRowOffset += image.width
+      destRowOffset += width
+    }
+
+    RawImage(
+      width,
+      height,
+      content
+    )
   }
 
   private def _transform(image: RawImage): RawImage = {
@@ -46,5 +73,6 @@ class CropFilter(private val topLeft: IntPoint,
       content.toArray
     )
   }
+
 
 }
