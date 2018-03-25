@@ -38,6 +38,7 @@ object Contract {
     def applyMedianFilter(neighborsCount: Int): Unit
     def applyContourFilter(): Unit
     def applyWaterColorFilter(neighborsCount: Int): Unit
+    def applyImageRotation(angle: Int): Unit
 
     def getKernelsList: Seq[String]
     def applyEdgeDetectionKernel(kernel: String): Unit

@@ -4,8 +4,9 @@ import java.io.File
 
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{FileChooserCallback, IMenuInteractor, IMenuPresenter}
-import scalafx.scene.control.ChoiceDialog
+import scalafx.scene.control.{ChoiceDialog, Slider, TextField}
 import scalafx.scene.image.Image
+import scalafx.scene.layout.VBox
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{FileChooser, Stage}
 import scalafxml.core.macros.sfxml
@@ -149,6 +150,41 @@ class MenuPresenter(stage: Stage, interactor: IMenuInteractor) extends IMenuPres
   private def showMedianFilterSettings(): Option[Int] = {
     val neighborsCount = Array.range(3,15).map(a => a*a)
     val dialog = new ChoiceDialog[Int](neighborsCount.head, neighborsCount)
+    dialog.showAndWait()
+  }
+
+  def onRotateImage(): Unit = {
+    if (!interactor.canApplyFilter) {
+      showNoImageChosenError()
+      return
+    }
+
+    val slider = new Slider(-180, 180, 0)
+    val textBox = new TextField()
+
+    slider.showTickLabels = true
+    slider.blockIncrement = 1
+    slider.majorTickUnit = 1.0
+    slider.value.onChange { (_, _, newValue) =>
+      val rotationAngle = newValue.asInstanceOf[Double].toInt
+      textBox.text = rotationAngle.toString
+      interactor.applyImageRotation(rotationAngle)
+    }
+
+    textBox.text.onChange { (_,_, newValue) =>
+      val startsWithMinus = newValue.trim.headOption.getOrElse("") == '-'
+      val filtered = newValue.trim.filter(char => char.isDigit)
+      val finalText = if (startsWithMinus) s"-$filtered" else filtered
+      textBox.text = finalText
+      if (filtered.nonEmpty) {
+        slider.value = finalText.toInt
+      }
+    }
+
+    val box = new VBox(children = Seq(slider, textBox):_*)
+
+    val dialog = new ChoiceDialog()
+    dialog.dialogPane.value.setContent(box)
     dialog.showAndWait()
   }
 

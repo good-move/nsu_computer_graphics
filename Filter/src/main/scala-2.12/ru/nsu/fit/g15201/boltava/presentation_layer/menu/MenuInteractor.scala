@@ -106,5 +106,8 @@ class MenuInteractor extends IMenuInteractor {
     setFilteredImage(WatercolorFilter(neighborsGridSize))
   }
 
+  override def applyImageRotation(angle: Int): Unit = {
+    setFilteredImage(RotationFilter(angle))
+  }
 }
 

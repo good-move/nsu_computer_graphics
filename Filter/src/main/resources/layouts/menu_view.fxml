@@ -27,6 +27,7 @@
         </Menu>
         <Menu text="Transformations" >
             <MenuItem text="Double Upscale" onAction="#onDoubleUpscale" />
+            <MenuItem text="Rotation" onAction="#onRotateImage" />
         </Menu>
     </Menu>
 
