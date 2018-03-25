@@ -55,5 +55,10 @@ object Point {
 
   implicit def toIntPoint(tuple: (Int, Int)): IntPoint = IntPoint(tuple._1, tuple._2)
   implicit def toDoublePoint(tuple: (Double, Double)): DoublePoint = DoublePoint(tuple._1, tuple._2)
+  implicit def toDoublePointFromInt(tuple: (Int, Int)): DoublePoint = DoublePoint(tuple._1, tuple._2)
 
+}
+
+object DoublePoint {
+  def apply(t: (Int, Int)): DoublePoint = DoublePoint(t._1, t._2)
 }

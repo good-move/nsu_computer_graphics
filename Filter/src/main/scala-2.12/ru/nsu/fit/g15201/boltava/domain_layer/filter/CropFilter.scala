@@ -1,7 +1,7 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.filter
 
 import ru.nsu.fit.g15201.boltava.domain_layer.geometry.IntPoint
-import ru.nsu.fit.g15201.boltava.domain_layer.util.Utils
+
 
 object CropFilter {
 
