@@ -185,6 +185,9 @@ class MenuPresenter(stage: Stage, interactor: IMenuInteractor) extends IMenuPres
 
     val dialog = new ChoiceDialog()
     dialog.dialogPane.value.setContent(box)
+    dialog.headerText = "Choose rotation angle"
+    dialog.graphic = null
+    dialog.title = "Rotation"
     dialog.showAndWait()
   }
 
