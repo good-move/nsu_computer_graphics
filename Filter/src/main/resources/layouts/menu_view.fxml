@@ -28,6 +28,7 @@
         <Menu text="Transformations" >
             <MenuItem text="Double Upscale" onAction="#onDoubleUpscale" />
             <MenuItem text="Rotation" onAction="#onRotateImage" />
+            <MenuItem text="Gamma Correction" onAction="#onGammaCorrectionChosen" />
         </Menu>
     </Menu>
 

@@ -39,6 +39,7 @@ object Contract {
     def applyContourFilter(): Unit
     def applyWaterColorFilter(neighborsCount: Int): Unit
     def applyImageRotation(angle: Int): Unit
+    def applyGammaCorrection(gamma: Double): Unit
 
     def getKernelsList: Seq[String]
     def applyEdgeDetectionKernel(kernel: String): Unit

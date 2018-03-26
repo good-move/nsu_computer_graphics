@@ -188,4 +188,45 @@ class MenuPresenter(stage: Stage, interactor: IMenuInteractor) extends IMenuPres
     dialog.showAndWait()
   }
 
+  def onGammaCorrectionChosen(): Unit = {
+    if (!interactor.canApplyFilter) {
+      showNoImageChosenError()
+      return
+    }
+
+    val slider = new Slider(0, 5, 1)
+    val textBox = new TextField()
+
+    slider.showTickLabels = true
+    slider.blockIncrement = 1
+    slider.majorTickUnit = .5
+    slider.value.onChange { (_, _, newValue) =>
+      val gamma = newValue.asInstanceOf[Double]
+      textBox.text = gamma.toString
+      interactor.applyGammaCorrection(gamma)
+    }
+
+    textBox.text.onChange { (_,_, newValue) =>
+      val dotPosition = newValue.trim.indexOf('.')
+      val filtered = newValue.trim.filter(char => char.isDigit)
+      val finalText = if (dotPosition >= 0) {
+        val (first, second) = filtered.splitAt(dotPosition)
+        s"$first.$second"
+      } else filtered
+      textBox.text = finalText
+      if (filtered.nonEmpty) {
+        slider.value = finalText.toDouble
+      }
+    }
+
+    val box = new VBox(children = Seq(slider, textBox):_*)
+
+    val dialog = new ChoiceDialog()
+    dialog.dialogPane.value.setContent(box)
+    dialog.headerText = "Choose gamma correction value"
+    dialog.graphic = null
+    dialog.title = "Gamma correction"
+    dialog.showAndWait()
+  }
+
 }

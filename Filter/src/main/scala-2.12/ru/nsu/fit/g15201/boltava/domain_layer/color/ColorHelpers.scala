@@ -60,4 +60,6 @@ object ColorHelpers {
     intensity
   }
 
+  def clamp(colorValue: Int): Int = colorValue.max(0).min(255)
+
 }

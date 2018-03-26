@@ -109,5 +109,9 @@ class MenuInteractor extends IMenuInteractor {
   override def applyImageRotation(angle: Int): Unit = {
     setFilteredImage(RotationFilter(angle))
   }
+
+  override def applyGammaCorrection(gamma: Double): Unit = {
+    setFilteredImage(GammaCorrection(gamma))
+  }
 }
 
