@@ -25,11 +25,11 @@ object ConfigReader {
     try {
       val (xGridSize, yGridSize) = readGridSize(reader)
       val legendColors = readLegendColors(reader)
-      val colorLevels = legendColors.length
+      val isoLevels = legendColors.length - 1
       val isolineColor = readIsolineColor(reader)
       Settings(
         xGridSize, yGridSize,
-        colorLevels,
+        isoLevels,
         isolineColor,
         legendColors
       )
@@ -58,7 +58,7 @@ object ConfigReader {
     }
 
     val list = ListBuffer[Color]()
-    for (_ <- 0 until colorLevels.get) {
+    for (_ <- 0 until colorLevels.get + 1) {
       val legendColor = reader.readLine.filterComments.split(" ").toList.toIntList.filterRight
       legendColor match {
         case red :: green :: blue :: Nil => list += new Color(red, green, blue)
