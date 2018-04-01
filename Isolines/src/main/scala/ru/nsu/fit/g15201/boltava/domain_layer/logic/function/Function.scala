@@ -1,15 +1,12 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.logic.function
 
-trait Function[T <: Domain] {
+trait Function {
 
-  def domain: T
+  def mathDomain: Domain2D
+  def domain: Option[FiniteDomain2D]
+  def domain_=(domain: FiniteDomain2D): Unit
   def apply(x: Double, y: Double): Double
 
 }
 
-trait Function2D extends Function[Domain2D] {
-
-  def domain: Domain2D
-  def apply(x: Double, y: Double): Double
-
-}
+trait IFunction2D extends Function
