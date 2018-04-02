@@ -17,8 +17,6 @@ object Contract {
     def redrawIntersectionPoints(segments: Seq[Segment])
     def redrawIsolines(segments: Seq[Segment])
 
-    def onClick()
-
     def setIsolineColor(color: Color)
     def setDimensions(dimensions: Dimensions)
 

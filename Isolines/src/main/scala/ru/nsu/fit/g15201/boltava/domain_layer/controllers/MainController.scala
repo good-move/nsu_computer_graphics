@@ -15,7 +15,7 @@ import scala.util.{Failure, Success, Try}
 
 class MainController {
 
-  private val function: Function2D = new EllipticHyperboloid
+  private val function: Function2D = new SinCosProduct
   private var cellGrid: Option[CellGrid] = None
   private var isoLevels: Option[Seq[Double]] = None
   private var currentFieldDimensions = Dimensions(500, 500)
@@ -37,15 +37,17 @@ class MainController {
     private var presenter: Option[IWorkbenchPresenter] = None
 
     override def functionValue(point: Point2D): Double = {
-      function(point.x, point.y)
+      val domainPoint = CoordinatesMapper.toDomain(point)
+      function(domainPoint.x, domainPoint.y)
     }
 
     override def createIsoline(level: IsoLevel): Unit = {
       for (cell <- cellGrid.get.grid) {
         IsolinesController.buildRawIsolineForLevel(cell, level.value)
       }
+      IsolinesController.mapToFieldIsolines(CoordinatesMapper)
       // TODO: optimize to redraw only the new isoline
-      presenter.get.redrawIsolines(IsolinesController.mappedIsolines)
+      updateField()
     }
 
     override def handleWindowResize(fieldDimensions: Dimensions): Unit = {
@@ -149,7 +151,7 @@ class MainController {
       function.domain = FiniteDomain2D(-10, 10, -10, 10)
       CoordinatesMapper.setMapping(currentFieldDimensions, function.domain.get)
       cellGrid = Some(MeshGenerator.generate(currentFieldDimensions, _settings.get, function, CoordinatesMapper))
-      isoLevels = Some(IsolinesController.calculateIsoLevels(1, Math.sqrt(201), _settings.get.levels))
+      isoLevels = Some(IsolinesController.calculateIsoLevels(-1, 1, _settings.get.levels))
       println(s"IsoLevels: $isoLevels")
       IsolinesController.clearAll()
       cellGrid.get.grid.foreach { cell =>

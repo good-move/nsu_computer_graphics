@@ -1,31 +1,37 @@
 package ru.nsu.fit.g15201.boltava.presentation_layer.workbench
 
+import ru.nsu.fit.g15201.boltava.domain_layer.mesh.IsoLevel
 import ru.nsu.fit.g15201.boltava.domain_layer.primitives._
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchInteractor, IWorkbenchPresenter}
 import scalafx.scene.canvas.Canvas
+import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.StackPane
 import scalafx.scene.paint
 import scalafx.stage.Stage
 import scalafxml.core.macros.sfxml
+import scalafx.Includes._
 
 // TODO: Add color map
 // TODO: Update isolines only when layer is visible
-// TODO: Update grid lines when window gets resized
 
 // Create `requireRedraw()` method???
 
 @sfxml
 class WorkbenchPresenter(wrapperPane: StackPane,
                          gridLayer: Canvas,
-                         intersectionsLayer: Canvas,
                          isolinesLayer: Canvas,
+                         intersectionsLayer: Canvas,
                          interactor: IWorkbenchInteractor,
                          stage: Stage) extends IWorkbenchPresenter {
 
   private var isolineColor = paint.Color.Red
 
   {
+    intersectionsLayer.onMouseClicked = (event: MouseEvent) => onClick(event)
+    isolinesLayer.onMouseClicked = (event: MouseEvent) => onClick(event)
+    gridLayer.onMouseClicked = (event: MouseEvent) => onClick(event)
+
     interactor.setPresenter(this)
     makeAllLayersInvisible()
     bindLayersDimensions()
@@ -99,8 +105,9 @@ class WorkbenchPresenter(wrapperPane: StackPane,
     }
   }
 
-  override def onClick(): Unit = {
-    // TODO: create new isoline
+  def onClick(mouseEvent: MouseEvent): Unit = {
+    val isolineLevel = interactor.functionValue(Point2D(mouseEvent.x, mouseEvent.y))
+    interactor.createIsoline(IsoLevel(isolineLevel))
   }
 
   override def setIsolineColor(color: Color): Unit = {
