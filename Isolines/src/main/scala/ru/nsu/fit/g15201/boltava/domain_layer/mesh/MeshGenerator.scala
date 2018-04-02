@@ -30,8 +30,8 @@ object MeshGenerator {
       val functionDy = function.domain.get.yRange.size.value / height
 
       for {
-        x <- 0.0 to width + cellWidth by cellWidth
         y <- 0.0 until height + cellHeight by cellHeight
+        x <- 0.0 until width + cellWidth by cellWidth
       } yield {
         val functionX = x*functionDx + domainXOffset
         val functionY = y*functionDy + domainYOffset
@@ -54,7 +54,7 @@ object MeshGenerator {
       )
     }
 
-    def apply(xIndex: Int, yIndex: Int): Cell = grid(yIndex * cellsY + xIndex)
+    def apply(xIndex: Int, yIndex: Int): Cell = grid(yIndex * cellsX + xIndex)
 
   }
 

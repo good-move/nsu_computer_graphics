@@ -25,7 +25,7 @@ class IsolineDetector {
   def buildIsolinesForLevel(cell: Cell, isoLevel: Double): Unit = {
 
     def triggerActive(controlNode: ControlNode): Unit = {
-      controlNode.aboveIsoLevel = controlNode.position.z > isoLevel
+      controlNode.aboveIsoLevel = controlNode.position.z >= isoLevel
     }
 
     triggerActive(cell.topLeft)
@@ -54,10 +54,10 @@ class IsolineDetector {
   }
 
   private def _buildIsolines(cell: Cell)(implicit isoLevel: Double): Unit = {
-    val top = findIntersection(cell.topLeft, cell.topRight, IntersectionAxis.Oy)
-    val right = findIntersection(cell.topRight, cell.bottomRight, IntersectionAxis.Ox)
-    val bottom = findIntersection(cell.bottomRight, cell.bottomLeft, IntersectionAxis.Oy)
-    val left = findIntersection(cell.bottomLeft, cell.topLeft, IntersectionAxis.Ox)
+    val top = findIntersection(cell.topLeft, cell.topRight, IntersectionAxis.Ox)
+    val right = findIntersection(cell.topRight, cell.bottomRight, IntersectionAxis.Oy)
+    val bottom = findIntersection(cell.bottomRight, cell.bottomLeft, IntersectionAxis.Ox)
+    val left = findIntersection(cell.topLeft, cell.bottomLeft, IntersectionAxis.Oy)
     val avg = (cell.topLeft.position.z + cell.topRight.position.z + cell.bottomRight.position.z + cell.bottomLeft.position.z)/4
 
     cell.configuration match {
@@ -82,7 +82,7 @@ class IsolineDetector {
       case 3 | 12 =>
         addSegment(cell, isoLevel, left, right)
       case 5 | 10 =>
-        if (avg < isoLevel) cell.configuration = ~cell.configuration
+        if (avg < isoLevel) cell.configuration = ~cell.configuration & 0x0000000f
         cell.configuration match {
           case 5 =>
             addSegment(cell, isoLevel, bottom, right)
@@ -113,16 +113,29 @@ class IsolineDetector {
       case IntersectionAxis.Ox => (node1.position.x - node2.position.x).abs
       case IntersectionAxis.Oy => (node1.position.y - node2.position.y).abs
     }
-    val valueDifference = (node1.position.z - node2.position.z).abs
-    val isoDifference = isoLevel - node1.position.z.min(node2.position.z)
+
+    val (above, below) =
+      if (node1.position.z > isoLevel) (node1, node2)
+      else (node2, node1)
+
+    val valueDifference = above.position.z - below.position.z
+    val isoDifference = isoLevel - below.position.z
 
     val interpolatedValue = projectedDifference * isoDifference / valueDifference
     val minX = node1.position.x.min(node2.position.x)
+    val maxX = node1.position.x.max(node2.position.x)
     val minY = node1.position.y.min(node2.position.y)
+    val maxY = node1.position.y.max(node2.position.y)
 
     intersectionAxis match {
-      case IntersectionAxis.Ox => Point2D(interpolatedValue + minX, node1.position.y)
-      case IntersectionAxis.Oy => Point2D(node1.position.x, interpolatedValue + minY)
+      case IntersectionAxis.Ox if minX == above.position.x =>
+        Point2D(maxX - interpolatedValue, node1.position.y)
+      case IntersectionAxis.Ox if minX == below.position.x =>
+        Point2D(interpolatedValue + minX, node1.position.y)
+      case IntersectionAxis.Oy if minY == above.position.y =>
+        Point2D(node1.position.x, maxY - interpolatedValue)
+      case IntersectionAxis.Oy if minY == below.position.y =>
+        Point2D(node1.position.x, interpolatedValue + minY)
     }
   }
 
