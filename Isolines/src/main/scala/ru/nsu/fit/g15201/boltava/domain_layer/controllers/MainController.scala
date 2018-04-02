@@ -4,7 +4,7 @@ import ru.nsu.fit.g15201.boltava.domain_layer.data.FileExtension
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.function.{EllipticHyperboloid, FiniteDomain2D, Function2D, SinCosProduct}
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{ConfigReader, Settings}
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.MeshGenerator.CellGrid
-import ru.nsu.fit.g15201.boltava.domain_layer.mesh.{IsoLevel, IsolineDetector, MeshGenerator}
+import ru.nsu.fit.g15201.boltava.domain_layer.mesh.{CoordinatesMapper, IsoLevel, IsolinesController, MeshGenerator}
 import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Dimensions, Point2D}
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, IMenuPresenter}
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract
@@ -42,23 +42,20 @@ class MainController {
 
     override def createIsoline(level: IsoLevel): Unit = {
       for (cell <- cellGrid.get.grid) {
-        IsolineDetector.buildIsolinesForLevel(cell, level.value)
+        IsolinesController.buildRawIsolineForLevel(cell, level.value)
       }
       // TODO: optimize to redraw only the new isoline
-      presenter.get.redrawIsolines(IsolineDetector.isolines)
+      presenter.get.redrawIsolines(IsolinesController.mappedIsolines)
     }
 
     override def handleWindowResize(fieldDimensions: Dimensions): Unit = {
       if (modelInitialized) {
         currentFieldDimensions = fieldDimensions
-        cellGrid = Some(MeshGenerator.generate(fieldDimensions, menuInteractor.settings.get, function))
-        IsolineDetector.clearIsolines()
-        cellGrid.get.grid.foreach { cell =>
-          IsolineDetector.buildIsolines(cell, isoLevels.get)
-        }
-        presenter.get.redrawIsolines(IsolineDetector.isolines)
-        presenter.get.redrawGrid(cellGrid.get.cellWidth, cellGrid.get.cellHeight)
-        presenter.get.redrawIntersectionPoints(IsolineDetector.isolines)
+        cellGrid = Some(MeshGenerator.generate(fieldDimensions, menuInteractor.settings.get, function, CoordinatesMapper))
+        CoordinatesMapper.setMapping(fieldDimensions, function.domain.get)
+        IsolinesController.clearMapped()
+        IsolinesController.mapToFieldIsolines(CoordinatesMapper)
+        updateField()
       }
     }
 
@@ -76,6 +73,12 @@ class MainController {
 
     override def onIsolinesVisibilityChanged(visible: Boolean): Unit = {
       presenter.get.setShowIsolines(visible)
+    }
+
+    def updateField(): Unit = {
+      presenter.get.redrawIsolines(IsolinesController.mappedIsolines)
+      presenter.get.redrawGrid(cellGrid.get.cellWidth, cellGrid.get.cellHeight)
+      presenter.get.redrawIntersectionPoints(IsolinesController.mappedIsolines)
     }
 
   }
@@ -144,15 +147,16 @@ class MainController {
 
     private def reloadApp(): Unit = {
       function.domain = FiniteDomain2D(-10, 10, -10, 10)
-      cellGrid = Some(MeshGenerator.generate(currentFieldDimensions, _settings.get, function))
-      isoLevels = Some(IsolineDetector.calculateIsoLevels(1, Math.sqrt(201), _settings.get.levels))
-
+      CoordinatesMapper.setMapping(currentFieldDimensions, function.domain.get)
+      cellGrid = Some(MeshGenerator.generate(currentFieldDimensions, _settings.get, function, CoordinatesMapper))
+      isoLevels = Some(IsolinesController.calculateIsoLevels(1, Math.sqrt(201), _settings.get.levels))
       println(s"IsoLevels: $isoLevels")
-      IsolineDetector.clearIsolines()
+      IsolinesController.clearAll()
       cellGrid.get.grid.foreach { cell =>
-        IsolineDetector.buildIsolines(cell, isoLevels.get)
+        IsolinesController.buildRawIsolines(cell, isoLevels.get)
       }
-      workbenchInteractor.handleWindowResize(currentFieldDimensions)
+      IsolinesController.mapToFieldIsolines(CoordinatesMapper)
+      workbenchInteractor.updateField()
     }
 
     override def subscribe(visibilityObserver: ILayerVisibilityObserver): Unit = {

@@ -5,13 +5,29 @@ import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Point2D, Segment}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-object IsolineDetector {
+object IsolinesController {
 
-  def clearIsolines(): Unit = isolinesStorage.clear()
 
-  private val isolinesStorage = new IsolinesStorage()
+  //  Stores isolines in function domain coordinates
+  private val rawIsolinesStorage = new IsolinesStorage()
 
-  def isolines: Seq[Segment] = isolinesStorage.list
+  //  Stores isolines in UI canvas coordinates
+  private val mappedIsolinesStorage = new IsolinesStorage()
+
+
+
+  def clearAll(): Unit = {
+    clearRaw()
+    clearMapped()
+  }
+
+  def clearRaw(): Unit = rawIsolinesStorage.clear()
+
+  def clearMapped(): Unit = mappedIsolinesStorage.clear()
+
+  def mappedIsolines: Seq[Segment] = mappedIsolinesStorage.list
+
+  def rawIsolines: Seq[Segment] = rawIsolinesStorage.list
 
   def calculateIsoLevels(min: Double, max: Double, levelCount: Int): Seq[Double] = {
     val step = (max-min).abs / (levelCount+1)
@@ -20,11 +36,21 @@ object IsolineDetector {
     } yield level
   }
 
-  def buildIsolines(cell: Cell, isoLevels: Seq[Double]): Unit = {
-    isoLevels.foreach(level => buildIsolinesForLevel(cell, level))
+  def buildRawIsolines(cell: Cell, isoLevels: Seq[Double]): Unit = {
+    isoLevels.foreach(level => buildRawIsolineForLevel(cell, level))
   }
 
-  def buildIsolinesForLevel(cell: Cell, isoLevel: Double): Unit = {
+  def mapToFieldIsolines(mapper: ICoordinatesMapper): Unit = {
+    rawIsolinesStorage.map.foreach { case (level, segments) =>
+      for (segment <- segments) {
+        val start = mapper.toField(segment.start)
+        val end = mapper.toField(segment.end)
+        mappedIsolinesStorage.put(IsoLevel(level), Segment(start, end))
+      }
+    }
+  }
+
+  def buildRawIsolineForLevel(cell: Cell, isoLevel: Double): Unit = {
 
     def triggerActive(controlNode: ControlNode): Unit = {
       controlNode.aboveIsoLevel = controlNode.position.z >= isoLevel
@@ -143,7 +169,7 @@ object IsolineDetector {
 
   private def addSegment(cell: Cell, isoLevel: Double, point1: Point2D, point2: Point2D): Unit = {
     val segment = Segment(point1, point2)
-    isolinesStorage.put(IsoLevel(isoLevel), segment)
+    rawIsolinesStorage.put(IsoLevel(isoLevel), segment)
   }
 
 }
