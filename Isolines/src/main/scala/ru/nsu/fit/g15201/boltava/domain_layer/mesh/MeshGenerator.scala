@@ -39,8 +39,6 @@ object MeshGenerator {
       }
     }
 
-    println(controlNodes.length)
-
     val grid: Seq[Cell] = for {
       y <- 0 until cellsY
       x <- 0 until cellsX

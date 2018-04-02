@@ -6,6 +6,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class IsolineDetector {
+  def clearIsolines(): Unit = isolinesStorage.clear()
+
 
   private val isolinesStorage = new IsolinesStorage()
 
@@ -141,7 +143,7 @@ class IsolineDetector {
 
   private def addSegment(cell: Cell, isoLevel: Double, point1: Point2D, point2: Point2D): Unit = {
     val segment = Segment(point1, point2)
-    isolinesStorage.put(cell, IsoLevel(isoLevel), segment)
+    isolinesStorage.put(IsoLevel(isoLevel), segment)
   }
 
 }
@@ -150,32 +152,20 @@ class IsolineDetector {
 case class IsoLevel(value: Double) extends AnyVal
 
 
-class IsolinesStorage {
+private class IsolinesStorage {
 
-  private val map = mutable.HashMap.empty[Cell, Container]
+  val map = mutable.HashMap.empty[Double, ListBuffer[Segment]]
 
-  private class Container {
+  def get(level: IsoLevel): Option[Seq[Segment]] = map.get(level.value)
 
-    val map = mutable.HashMap.empty[Double, ListBuffer[Segment]]
-
-  }
-
-  def get(cell: Cell, level: IsoLevel): Option[Seq[Segment]] = {
-    map.get(cell) match {
-      case Some(container) => container.map.get(level.value)
-      case _ => None
-    }
-  }
-
-  def put(cell: Cell, level: IsoLevel, segment: Segment): Unit = {
-    map.getOrElseUpdate(cell, new Container)
-      .map
+  def put(level: IsoLevel, segment: Segment): Unit = {
+    map
       .getOrElseUpdate(level.value, ListBuffer.empty[Segment])
       .append(segment)
   }
 
-  def list: Seq[Segment] = {
-    map.values.flatMap(container => container.map.values).flatten.toSeq
-  }
+  def list: Seq[Segment] = map.values.flatten.toSeq
+
+  def clear(): Unit = map.clear()
 
 }
