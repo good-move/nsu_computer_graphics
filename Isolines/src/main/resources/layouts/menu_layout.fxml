@@ -1,0 +1,28 @@
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+
+
+<MenuBar
+        fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.menu.MenuPresenter"
+        xmlns:fx="http://javafx.com/fxml">
+
+    <Menu text="File">
+        <MenuItem text="Open" onAction="#onOpenModel" />
+        <MenuItem text="Exit" onAction="#onExit" />
+    </Menu>
+
+    <Menu text="View">
+        <MenuItem text="Grid" onAction="#onToggleShowGrid" />
+        <MenuItem text="Isolines" onAction="#onToggleShowIsolines" />
+        <MenuItem text="Intersection dots" onAction="#onToggleIntersectionDots" />
+        <MenuItem text="Enable interpolation" onAction="#onToggleColorInterpolation" />
+    </Menu>
+
+    <Menu text="Help"
+    >
+        <MenuItem text="About" onAction="#onShowAbout"/>
+        <MenuItem text="Help" onAction="#onShowHelp" />
+    </Menu>
+
+</MenuBar>
