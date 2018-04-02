@@ -23,6 +23,6 @@ object WorkbenchComponent {
   def apply(interactor: IWorkbenchInteractor)(implicit stage: Stage): WorkbenchComponent = new WorkbenchComponent(interactor)
 
   private val viewSource = Path("src/main/resources/layouts/workbench_layout.fxml").toURL
-  private val cssSource = Path("").toURL
+  private val cssSource = Path("src/main/resources/styles/workbench.css").toURL
 
 }
