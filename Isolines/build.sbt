@@ -1,8 +1,11 @@
 name := "Isolines"
 version := "0.1"
-scalaVersion := "2.12.5"
+scalaVersion := "2.12.4"
 
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8")
+unmanagedJars in Compile += Attributed.blank(
+  file(System.getenv("JAVA_HOME") + "/jre/lib/ext/jfxrt.jar")
+)
+
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 libraryDependencies ++= Seq(
