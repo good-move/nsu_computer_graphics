@@ -13,8 +13,8 @@ object MeshGenerator {
   }
 
   class CellGrid(nodesX: Int, nodesY: Int, cellDimensions: Dimensions, function: IFunction2D) {
-    private val cellWidth: Double = cellDimensions.width
-    private val cellHeight: Double = cellDimensions.height
+    val cellWidth: Double = cellDimensions.width
+    val cellHeight: Double = cellDimensions.height
 
     val cellsX: Int = nodesX-1
     val cellsY: Int = nodesY-1

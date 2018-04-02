@@ -5,9 +5,9 @@ import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Point2D, Segment}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class IsolineDetector {
-  def clearIsolines(): Unit = isolinesStorage.clear()
+object IsolineDetector {
 
+  def clearIsolines(): Unit = isolinesStorage.clear()
 
   private val isolinesStorage = new IsolinesStorage()
 
