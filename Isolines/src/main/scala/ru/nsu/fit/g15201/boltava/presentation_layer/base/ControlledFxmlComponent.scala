@@ -2,9 +2,7 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.base
 
 import java.net.URL
 
-import scalafx.Includes._
-import scalafx.scene.Parent
-import scalafxml.core.{ControllerDependencyResolver, FXMLLoader, NoDependencyResolver}
+import scalafxml.core.ControllerDependencyResolver
 
 abstract class ControlledFxmlComponent[P <: IBasePresenter](viewSource: URL,
                                                             cssSource: Option[URL] = None,

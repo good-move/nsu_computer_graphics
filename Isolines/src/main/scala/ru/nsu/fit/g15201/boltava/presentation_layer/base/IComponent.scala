@@ -6,4 +6,4 @@ trait IComponent {
 
   def root: Parent
 
-}}
+}
