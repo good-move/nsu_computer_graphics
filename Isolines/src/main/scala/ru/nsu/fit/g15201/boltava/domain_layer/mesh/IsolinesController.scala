@@ -86,7 +86,8 @@ object IsolinesController {
     val right = findIntersection(cell.topRight, cell.bottomRight, IntersectionAxis.Oy)
     val bottom = findIntersection(cell.bottomRight, cell.bottomLeft, IntersectionAxis.Ox)
     val left = findIntersection(cell.topLeft, cell.bottomLeft, IntersectionAxis.Oy)
-    val avg = (cell.topLeft.position.z + cell.topRight.position.z + cell.bottomRight.position.z + cell.bottomLeft.position.z)/4
+    val avg = (cell.topLeft.position.z + cell.topRight.position.z +
+      cell.bottomRight.position.z + cell.bottomLeft.position.z) / 4
 
     cell.configuration match {
         // all nodes inactive => all corner values are below isoLevel => no intersections
@@ -95,13 +96,13 @@ object IsolinesController {
       case 0 | 15 =>
 
         // cases with one or three active node(s)
-      case 1 =>
+      case 1 | 14 =>
         addSegment(cell, isoLevel, left, bottom)
-      case 2 =>
+      case 2 | 13 =>
         addSegment(cell, isoLevel, bottom, right)
-      case 4 =>
+      case 4 | 11 =>
         addSegment(cell, isoLevel, right, top)
-      case 8 =>
+      case 8 | 7 =>
         addSegment(cell, isoLevel, top, left)
 
         // cases with two active nodes
@@ -119,15 +120,6 @@ object IsolinesController {
             addSegment(cell, isoLevel, bottom, left)
             addSegment(cell, isoLevel, top, right)
         }
-//      // cases with three active nodes
-      case 7 =>
-        addSegment(cell, isoLevel, top, left)
-      case 11 =>
-        addSegment(cell, isoLevel, top, right)
-      case 13 =>
-        addSegment(cell, isoLevel, bottom, right)
-      case 14 =>
-        addSegment(cell, isoLevel, bottom, left)
     }
   }
 
