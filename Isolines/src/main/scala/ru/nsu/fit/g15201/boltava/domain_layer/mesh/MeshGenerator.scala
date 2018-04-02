@@ -7,8 +7,11 @@ import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Dimensions, Point3D}
 object MeshGenerator {
 
   def generate(fieldDimensions: Dimensions, settings: Settings, function: IFunction2D): CellGrid = {
+    CoordinatesMapper.setMapping(fieldDimensions, function.domain.get)
+
     val cellWidth = fieldDimensions.width / (settings.xNodes-1)
     val cellHeight = fieldDimensions.height / (settings.yNodes-1)
+
     new CellGrid(settings.xNodes, settings.yNodes, Dimensions(cellWidth, cellHeight), function)
   }
 
@@ -23,18 +26,13 @@ object MeshGenerator {
     val height: Double = cellHeight * cellsY
 
     val controlNodes: Seq[ControlNode] = {
-      val domainXOffset = function.domain.get.xRange.lower.value
-      val domainYOffset = function.domain.get.yRange.lower.value
-
-      val functionDx = function.domain.get.xRange.size.value / width
-      val functionDy = function.domain.get.yRange.size.value / height
-
       for {
         y <- 0.0 until height + cellHeight by cellHeight
         x <- 0.0 until width + cellWidth by cellWidth
       } yield {
-        val functionX = x*functionDx + domainXOffset
-        val functionY = y*functionDy + domainYOffset
+        val domainPoint = CoordinatesMapper.toDomain(x, y)
+        val functionX = domainPoint.x
+        val functionY = domainPoint.y
         ControlNode(Point3D(x, y, function(functionX, functionY)))
       }
     }
