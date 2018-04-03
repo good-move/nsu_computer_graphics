@@ -3,7 +3,7 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.workbench
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.IsoLevel
 import ru.nsu.fit.g15201.boltava.domain_layer.primitives._
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
-import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchInteractor, IWorkbenchPresenter}
+import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{ColorMapMode, IWorkbenchInteractor, IWorkbenchPresenter}
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.StackPane
@@ -26,7 +26,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
                          interactor: IWorkbenchInteractor,
                          stage: Stage) extends IWorkbenchPresenter {
 
-  private var isolineColor = paint.Color.Red
+  private var isolineColor = paint.Color.Black
 
   {
     colorMapLayer.onMouseClicked = (event: MouseEvent) => onClick(event)
@@ -60,18 +60,23 @@ class WorkbenchPresenter(wrapperPane: StackPane,
 
   // ******************* Layers Redrawing *******************
 
-  override def redrawColorMap(): Unit = {
+  override def redrawColorMap(colorMapMode: ColorMapMode.Value): Unit = {
     val gc = colorMapLayer.graphicsContext2D
     val writer = gc.pixelWriter
     val width = colorMapLayer.width.value
     val height = colorMapLayer.height.value
+
+    val colorForValue = colorMapMode match {
+      case ColorMapMode.Discrete => (z: Double) => interactor.colorForValue(z)
+      case ColorMapMode.Interpolated => (z: Double) => interactor.interpolatedColorForValue(z)
+    }
 
     for {
       x <- 0 until width.toInt
       y <- 0 until height.toInt
     } {
       val z = interactor.functionValue(x+0.5, y+0.5)
-      val color = interactor.colorForValue(z)
+      val color = colorForValue(z)
       writer.setArgb(x, y, color.color)
     }
   }

@@ -5,10 +5,10 @@ import ru.nsu.fit.g15201.boltava.domain_layer.logic.function.{EllipticHyperboloi
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{ConfigReader, Settings}
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.MeshGenerator.CellGrid
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.{CoordinatesMapper, IsoLevel, IsolinesController, MeshGenerator}
-import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Color, Dimensions, Point2D}
+import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Color, ColorHelpers, Dimensions, Point2D}
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, IMenuPresenter}
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract
-import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchInteractor, IWorkbenchPresenter}
+import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{ColorMapMode, IWorkbenchInteractor, IWorkbenchPresenter}
 
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
@@ -27,8 +27,15 @@ class MainController {
 
   private var modelInitialized = false
 
+  private val fMin = 1d
+  private val fMax = Math.sqrt(201)
+
+
   val workbenchInteractor = new WorkbenchInteractor
   val menuInteractor = new MenuInteractor
+
+  var colorMapMode = ColorMapMode.Discrete
+
 
   {
     menuInteractor.subscribe(workbenchInteractor)
@@ -94,7 +101,7 @@ class MainController {
 
     override def onColorMapVisibilityChanged(visible: Boolean): Unit = {
       if (colorMapVisible)
-        presenter.get.redrawColorMap()
+        presenter.get.redrawColorMap(colorMapMode)
       presenter.get.setShowColorMap(visible)
     }
 
@@ -109,12 +116,12 @@ class MainController {
         presenter.get.redrawIntersectionPoints(IsolinesController.mappedIsolines)
 
       if (colorMapVisible)
-        presenter.get.redrawColorMap()
+        presenter.get.redrawColorMap(colorMapMode)
 
     }
 
     def drawColorMap(): Unit = {
-      presenter.get.redrawColorMap()
+      presenter.get.redrawColorMap(colorMapMode)
     }
 
     override def colorForValue(functionValue: Double): Color = {
@@ -124,6 +131,55 @@ class MainController {
         case number if number == -1 => settings.legendColors.last
       }
       targetColor
+    }
+
+    override def interpolatedColorForValue(functionValue: Double): Color = {
+      val settings = menuInteractor.settings.get
+      val levels = isoLevels.get
+      val step = (levels(1) - levels(0)) / 2
+
+      def interpolateArgbColor(functionValue: Double, lower: Double, upper: Double, colors: (Color, Color)): Color = {
+        val (a1, r1, g1, b1) = ColorHelpers.colorFragments(colors._1.color)
+        val (a2, r2, g2, b2) = ColorHelpers.colorFragments(colors._2.color)
+
+        val diff = upper - lower
+        val lowerC = (functionValue - lower) / diff
+        val upperC = (upper - functionValue) / diff
+
+        def interpolate(lowerColor: Int, upperColor: Int): Int = (lowerC * upperColor + upperC * lowerColor).toInt
+
+        val alpha = interpolate(a1, a2)
+        val red = interpolate(r1, r2)
+        val green = interpolate(g1, g2)
+        val blue = interpolate(b1, b2)
+        Color(ColorHelpers.intArgb(alpha, red, green, blue))
+      }
+
+
+      def f(level: Double): Color = {
+        val index = isoLevels.get.indexOf(level) match {
+          case number if number != -1 => number
+          case _ => settings.legendColors.length-1
+        }
+        if (functionValue <= level - step) {
+          val colors = (
+            settings.legendColors((index - 1).max(0)),
+            settings.legendColors(index)
+          )
+          interpolateArgbColor(functionValue, (level - 3 * step).max(fMin), level - step, colors)
+        } else {
+          val colors = (
+            settings.legendColors(index),
+            settings.legendColors((index + 1).min(settings.legendColors.length - 1))
+          )
+          interpolateArgbColor(functionValue, level - step, (level + step).min(fMax), colors)
+        }
+      }
+
+      isoLevels.get.find(level => functionValue < level) match {
+        case Some(level) => f(level)
+        case None => f(fMax)
+      }
     }
 
   }
@@ -211,12 +267,14 @@ class MainController {
 
     override def showDiscreteColorMap(): Unit = {
       if (colorMapVisible) {
+        colorMapMode = ColorMapMode.Discrete
         workbenchInteractor.drawColorMap()
       }
     }
 
     override def showInterpolatedColorMap(): Unit = {
       if (colorMapVisible) {
+        colorMapMode = ColorMapMode.Interpolated
         workbenchInteractor.drawColorMap()
       }
     }
