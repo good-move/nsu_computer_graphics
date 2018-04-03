@@ -13,9 +13,14 @@ trait IntersectionPointsVisibilityObserver {
   def onIntersectionPointsVisibilityChanged(visible: Boolean)
 }
 
+trait ColorMapVisibilityObserver {
+  def onColorMapVisibilityChanged(visible: Boolean)
+}
+
 
 trait ILayerVisibilityObserver
   extends GridVisibilityObserver
   with IsolinesVisibilityObserver
   with IntersectionPointsVisibilityObserver
+  with ColorMapVisibilityObserver
 

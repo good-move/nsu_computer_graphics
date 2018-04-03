@@ -14,7 +14,6 @@ object Contract {
     def onToggleShowGrid()
     def onToggleShowIsolines()
     def onToggleIntersectionDots()
-    def onToggleColorInterpolation()
     def onShowAbout()
     def onShowHelp()
 
@@ -30,7 +29,9 @@ object Contract {
     def toggleIsolinesDisplay()
     def toggleGridDisplay()
     def toggleIntersectionsDisplay()
-    def toggleInterpolationDisplay()
+    def toggleColorMapDisplay()
+    def showDiscreteColorMap()
+    def showInterpolatedColorMap()
 
   }
 

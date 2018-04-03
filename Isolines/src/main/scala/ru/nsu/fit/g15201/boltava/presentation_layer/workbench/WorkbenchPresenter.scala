@@ -19,6 +19,7 @@ import scalafx.Includes._
 
 @sfxml
 class WorkbenchPresenter(wrapperPane: StackPane,
+                         colorMapLayer: Canvas,
                          gridLayer: Canvas,
                          isolinesLayer: Canvas,
                          intersectionsLayer: Canvas,
@@ -28,6 +29,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
   private var isolineColor = paint.Color.Red
 
   {
+    colorMapLayer.onMouseClicked = (event: MouseEvent) => onClick(event)
     intersectionsLayer.onMouseClicked = (event: MouseEvent) => onClick(event)
     isolinesLayer.onMouseClicked = (event: MouseEvent) => onClick(event)
     gridLayer.onMouseClicked = (event: MouseEvent) => onClick(event)
@@ -37,6 +39,8 @@ class WorkbenchPresenter(wrapperPane: StackPane,
     bindLayersDimensions()
     createOnChangeHandlers()
   }
+
+  // ******************* Visibility controls *******************
 
   override def setShowGrid(visible: Boolean): Unit = {
     gridLayer.visible = visible
@@ -48,6 +52,28 @@ class WorkbenchPresenter(wrapperPane: StackPane,
 
   override def setShowIsolines(visible: Boolean): Unit = {
     isolinesLayer.visible = visible
+  }
+
+  override def setShowColorMap(visible: Boolean): Unit = {
+    colorMapLayer.visible = visible
+  }
+
+  // ******************* Layers Redrawing *******************
+
+  override def redrawColorMap(): Unit = {
+    val gc = colorMapLayer.graphicsContext2D
+    val writer = gc.pixelWriter
+    val width = colorMapLayer.width.value
+    val height = colorMapLayer.height.value
+
+    for {
+      x <- 0 until width.toInt
+      y <- 0 until height.toInt
+    } {
+      val z = interactor.functionValue(x+0.5, y+0.5)
+      val color = interactor.colorForValue(z)
+      writer.setArgb(x, y, color.color)
+    }
   }
 
   override def redrawGrid(xStep: Double, yStep: Double): Unit = {
@@ -124,6 +150,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
     bindToWrapperDimensions(gridLayer)
     bindToWrapperDimensions(intersectionsLayer)
     bindToWrapperDimensions(isolinesLayer)
+    bindToWrapperDimensions(colorMapLayer)
   }
 
   def createOnChangeHandlers(): Unit = {
@@ -151,6 +178,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
     gridLayer.visible = false
     isolinesLayer.visible = false
     intersectionsLayer.visible = false
+    colorMapLayer.visible = false
   }
 
   override def showError(title: String, message: String): Unit = {

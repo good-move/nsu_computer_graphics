@@ -1,11 +1,11 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.controllers
 
 import ru.nsu.fit.g15201.boltava.domain_layer.data.FileExtension
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.function.{EllipticHyperboloid, FiniteDomain2D, Function2D, SinCosProduct}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.function.{EllipticHyperboloid, FiniteDomain2D, Function2D}
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{ConfigReader, Settings}
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.MeshGenerator.CellGrid
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.{CoordinatesMapper, IsoLevel, IsolinesController, MeshGenerator}
-import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Dimensions, Point2D}
+import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Color, Dimensions, Point2D}
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, IMenuPresenter}
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{IWorkbenchInteractor, IWorkbenchPresenter}
@@ -15,10 +15,15 @@ import scala.util.{Failure, Success, Try}
 
 class MainController {
 
-  private val function: Function2D = new SinCosProduct
+  private val function: Function2D = new EllipticHyperboloid
   private var cellGrid: Option[CellGrid] = None
   private var isoLevels: Option[Seq[Double]] = None
   private var currentFieldDimensions = Dimensions(500, 500)
+
+  private var gridVisible = false
+  private var isolinesVisible = false
+  private var intersectionsVisible = false
+  private var colorMapVisible = false
 
   private var modelInitialized = false
 
@@ -36,8 +41,12 @@ class MainController {
 
     private var presenter: Option[IWorkbenchPresenter] = None
 
-    override def functionValue(point: Point2D): Double = {
-      val domainPoint = CoordinatesMapper.toDomain(point)
+    override def functionValue(fieldPoint: Point2D): Double = {
+      functionValue(fieldPoint.x, fieldPoint.y)
+    }
+
+    override def functionValue(fieldX: Double, fieldY: Double): Double = {
+      val domainPoint = CoordinatesMapper.toDomain(fieldX, fieldY)
       function(domainPoint.x, domainPoint.y)
     }
 
@@ -66,21 +75,55 @@ class MainController {
     }
 
     override def onGridVisibilityChanged(visible: Boolean): Unit = {
+      if (visible)
+        presenter.get.redrawGrid(cellGrid.get.cellWidth, cellGrid.get.cellHeight)
       presenter.get.setShowGrid(visible)
     }
 
     override def onIntersectionPointsVisibilityChanged(visible: Boolean): Unit = {
+      if (visible)
+        presenter.get.redrawIntersectionPoints(IsolinesController.mappedIsolines)
       presenter.get.setShowIntersectionPoints(visible)
     }
 
     override def onIsolinesVisibilityChanged(visible: Boolean): Unit = {
+      if (visible)
+        presenter.get.redrawIsolines(IsolinesController.mappedIsolines)
       presenter.get.setShowIsolines(visible)
     }
 
+    override def onColorMapVisibilityChanged(visible: Boolean): Unit = {
+      if (colorMapVisible)
+        presenter.get.redrawColorMap()
+      presenter.get.setShowColorMap(visible)
+    }
+
     def updateField(): Unit = {
-      presenter.get.redrawIsolines(IsolinesController.mappedIsolines)
-      presenter.get.redrawGrid(cellGrid.get.cellWidth, cellGrid.get.cellHeight)
-      presenter.get.redrawIntersectionPoints(IsolinesController.mappedIsolines)
+      if (isolinesVisible)
+        presenter.get.redrawIsolines(IsolinesController.mappedIsolines)
+
+      if (gridVisible)
+        presenter.get.redrawGrid(cellGrid.get.cellWidth, cellGrid.get.cellHeight)
+
+      if (intersectionsVisible)
+        presenter.get.redrawIntersectionPoints(IsolinesController.mappedIsolines)
+
+      if (colorMapVisible)
+        presenter.get.redrawColorMap()
+
+    }
+
+    def drawColorMap(): Unit = {
+      presenter.get.redrawColorMap()
+    }
+
+    override def colorForValue(functionValue: Double): Color = {
+      val settings = menuInteractor.settings.get
+      val targetColor = isoLevels.get.indexWhere(level => functionValue < level) match {
+        case number if number > -1 => settings.legendColors(number)
+        case number if number == -1 => settings.legendColors.last
+      }
+      targetColor
     }
 
   }
@@ -92,10 +135,6 @@ class MainController {
 
     private var _settings: Option[Settings] = None
     private var presenter: Option[IMenuPresenter] = None
-
-    private var gridVisible = false
-    private var isolinesVisible = false
-    private var intersectionsVisible = false
 
     private val subscribers = mutable.HashSet.empty[ILayerVisibilityObserver]
 
@@ -118,8 +157,9 @@ class MainController {
       subscribers.foreach(s => s.onIntersectionPointsVisibilityChanged(intersectionsVisible))
     }
 
-    override def toggleInterpolationDisplay(): Unit = {
-      println("toggleInterpolationDisplay() invoked")
+    override def toggleColorMapDisplay(): Unit = {
+      colorMapVisible = !colorMapVisible
+      subscribers.foreach(s => s.onColorMapVisibilityChanged(colorMapVisible))
     }
 
     override def beforeExit(): Unit = {
@@ -151,7 +191,7 @@ class MainController {
       function.domain = FiniteDomain2D(-10, 10, -10, 10)
       CoordinatesMapper.setMapping(currentFieldDimensions, function.domain.get)
       cellGrid = Some(MeshGenerator.generate(currentFieldDimensions, _settings.get, function, CoordinatesMapper))
-      isoLevels = Some(IsolinesController.calculateIsoLevels(-1, 1, _settings.get.levels))
+      isoLevels = Some(IsolinesController.calculateIsoLevels(1, Math.sqrt(201), _settings.get.levels))
       println(s"IsoLevels: $isoLevels")
       IsolinesController.clearAll()
       cellGrid.get.grid.foreach { cell =>
@@ -167,6 +207,18 @@ class MainController {
 
     override def unsubscribe(visibilityObserver: ILayerVisibilityObserver): Unit = {
       subscribers.remove(visibilityObserver)
+    }
+
+    override def showDiscreteColorMap(): Unit = {
+      if (colorMapVisible) {
+        workbenchInteractor.drawColorMap()
+      }
+    }
+
+    override def showInterpolatedColorMap(): Unit = {
+      if (colorMapVisible) {
+        workbenchInteractor.drawColorMap()
+      }
     }
 
   }

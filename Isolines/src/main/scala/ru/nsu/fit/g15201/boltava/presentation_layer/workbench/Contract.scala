@@ -9,6 +9,8 @@ object Contract {
 
   trait IWorkbenchPresenter extends IBasePresenter with IAlertInvoker {
 
+
+    def setShowColorMap(visible: Boolean): Unit
     def setShowGrid(show: Boolean)
     def setShowIntersectionPoints(show: Boolean)
     def setShowIsolines(show: Boolean)
@@ -16,6 +18,7 @@ object Contract {
     def redrawGrid(xStep: Double, yStep: Double)
     def redrawIntersectionPoints(segments: Seq[Segment])
     def redrawIsolines(segments: Seq[Segment])
+    def redrawColorMap()
 
     def setIsolineColor(color: Color)
     def setDimensions(dimensions: Dimensions)
@@ -24,7 +27,9 @@ object Contract {
 
   trait IWorkbenchInteractor extends IBaseInteractor[IWorkbenchPresenter] {
 
+    def colorForValue(functionValue: Double): Color
     def functionValue(point: Point2D): Double
+    def functionValue(x: Double, y: Double): Double
     def createIsoline(level: IsoLevel)
     def handleWindowResize(fieldDimensions: Dimensions)
 

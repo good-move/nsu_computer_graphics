@@ -54,10 +54,6 @@ class MenuPresenter(interactor: IMenuInteractor, stage: Stage) extends IMenuPres
     interactor.toggleIntersectionsDisplay()
   }
 
-  override def onToggleColorInterpolation(): Unit = {
-    interactor.toggleInterpolationDisplay()
-  }
-
   override def onShowAbout(): Unit = {
     AboutComponent().showInNewWindow()
   }
@@ -81,6 +77,18 @@ class MenuPresenter(interactor: IMenuInteractor, stage: Stage) extends IMenuPres
 
   override def showConfirmation(title: String, message: String): Unit = {
     AlertHelper.showConfirmation(stage, title, message)
+  }
+
+  def onToggleShowColorMap(): Unit = {
+    interactor.toggleColorMapDisplay()
+  }
+
+  def onShowDiscreteColorMap(): Unit = {
+    interactor.showDiscreteColorMap()
+  }
+
+  def onShowInterpolationColorMap(): Unit = {
+    interactor.showInterpolatedColorMap()
   }
 
 }

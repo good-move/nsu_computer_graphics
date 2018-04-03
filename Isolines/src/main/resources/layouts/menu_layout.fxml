@@ -16,7 +16,11 @@
         <MenuItem text="Grid" onAction="#onToggleShowGrid" />
         <MenuItem text="Isolines" onAction="#onToggleShowIsolines" />
         <MenuItem text="Intersection dots" onAction="#onToggleIntersectionDots" />
-        <MenuItem text="Enable interpolation" onAction="#onToggleColorInterpolation" />
+        <Menu text="Color map">
+            <MenuItem text="Disable" onAction="#onToggleShowColorMap" />
+            <MenuItem text="Discrete" onAction="#onShowDiscreteColorMap" />
+            <MenuItem text="Interpolation" onAction="#onShowInterpolationColorMap" />
+        </Menu>
     </Menu>
 
     <Menu text="Help"
