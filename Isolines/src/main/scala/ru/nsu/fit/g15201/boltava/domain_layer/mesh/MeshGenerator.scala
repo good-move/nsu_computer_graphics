@@ -6,11 +6,11 @@ import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Dimensions, Point3D}
 
 object MeshGenerator {
 
-  def generate(fieldDimensions: Dimensions, settings: Settings, function: IFunction2D, mapper: ICoordinatesMapper): CellGrid = {
-    val cellWidth = fieldDimensions.width / (settings.xNodes-1)
-    val cellHeight = fieldDimensions.height / (settings.yNodes-1)
+  def generate(fieldDimensions: Dimensions, xNodes: Int, yNodes: Int, function: IFunction2D, mapper: ICoordinatesMapper): CellGrid = {
+    val cellWidth = fieldDimensions.width / (xNodes-1)
+    val cellHeight = fieldDimensions.height / (yNodes-1)
 
-    new CellGrid(settings.xNodes, settings.yNodes, Dimensions(cellWidth, cellHeight), function, mapper)
+    new CellGrid(xNodes, yNodes, Dimensions(cellWidth, cellHeight), function, mapper)
   }
 
   class CellGrid(nodesX: Int, nodesY: Int, cellDimensions: Dimensions, function: IFunction2D, mapper: ICoordinatesMapper) {

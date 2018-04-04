@@ -26,8 +26,8 @@ object CoordinatesMapper extends ICoordinatesMapper {
   private var fieldDy: Double = 0
 
   override def setMapping(fieldDimensions: Dimensions, functionDomain: FiniteDomain2D): Unit = {
-    domainXOffset = functionDomain.xRange.lower.value
-    domainYOffset = functionDomain.yRange.lower.value
+    domainXOffset = functionDomain.xRange.start.value
+    domainYOffset = functionDomain.yRange.start.value
 
     functionDx = functionDomain.xRange.size.value / fieldDimensions.width
     functionDy = functionDomain.yRange.size.value / fieldDimensions.height
