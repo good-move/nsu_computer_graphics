@@ -13,6 +13,8 @@ import scalafxml.core.macros.sfxml
 import scalafx.Includes._
 import scalafx.scene.control.Label
 
+import scala.util.{Failure, Success, Try}
+
 
 @sfxml
 class WorkbenchPresenter(wrapperPane: StackPane,
@@ -136,8 +138,13 @@ class WorkbenchPresenter(wrapperPane: StackPane,
   }
 
   def onClick(mouseEvent: MouseEvent): Unit = {
-    val isolineLevel = interactor.functionValue(Point2D(mouseEvent.x, mouseEvent.y))
-    interactor.createIsoline(IsoLevel(isolineLevel))
+    Try(interactor.functionValue(Point2D(mouseEvent.x, mouseEvent.y))) match {
+      case Success(isolineLevel) =>
+        interactor.createIsoline(IsoLevel(isolineLevel))
+      case Failure(throwable) =>
+        AlertHelper.showError(stage, "Cannot compute function value", throwable.getMessage)
+    }
+
   }
 
   override def setIsolineColor(color: Color): Unit = {
@@ -152,8 +159,13 @@ class WorkbenchPresenter(wrapperPane: StackPane,
     wrapperPane.onMouseMoved =  (mouseEvent: MouseEvent) => {
       val statusBarText = interactor.domainPoint(mouseEvent.x, mouseEvent.y) match {
         case Some((x, y)) =>
-          val z = interactor.functionValue(mouseEvent.x, mouseEvent.y)
-          f"x: $x%.3f   y: $y%.3f   z: $z%.3f"
+          Try(interactor.functionValue(mouseEvent.x, mouseEvent.y)) match {
+            case Success(z) =>
+              f"x: $x%.3f   y: $y%.3f   z: $z%.3f"
+            case Failure(throwable) =>
+              AlertHelper.showError(stage, "Cannot compute function value", throwable.getMessage)
+              "Model not initialized"
+          }
         case None => "Model not initialized"
       }
       statusBarLabel.text = statusBarText
