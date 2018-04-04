@@ -18,8 +18,8 @@ case class Domain2D(xRange: Range, yRange: Range) extends IDomain2D {
 case class FiniteDomain2D(xRange: FiniteRange, yRange: FiniteRange) extends IDomain2D {
 
   override def contains(x: Double, y: Double): Boolean = {
-    xRange.lower <= FiniteValue(x) && FiniteValue(x) <= xRange.upper &&
-    yRange.lower <= FiniteValue(y) && FiniteValue(y) <= yRange.upper
+    xRange.start <= FiniteValue(x) && FiniteValue(x) <= xRange.end &&
+    yRange.start <= FiniteValue(y) && FiniteValue(y) <= yRange.end
   }
 
 }

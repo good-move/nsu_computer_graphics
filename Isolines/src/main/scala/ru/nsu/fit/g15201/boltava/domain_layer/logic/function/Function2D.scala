@@ -9,10 +9,10 @@ abstract class Function2D(protected val _mathDomain: Domain2D) extends IFunction
   override def domain: Option[FiniteDomain2D] = _domain
 
   override def domain_=(domain: FiniteDomain2D): Unit = {
-    if (domain.xRange.lower >= _mathDomain.xRange.lower &&
-      domain.xRange.upper <= _mathDomain.xRange.upper &&
-      domain.yRange.lower >= _mathDomain.yRange.lower &&
-      domain.yRange.upper <= _mathDomain.yRange.upper
+    if (domain.xRange.start >= _mathDomain.xRange.lower &&
+      domain.xRange.end <= _mathDomain.xRange.upper &&
+      domain.yRange.start >= _mathDomain.yRange.lower &&
+      domain.yRange.end <= _mathDomain.yRange.upper
     ) _domain = Some(domain)
     else throw DomainException("Local domain doesn't fit in function's global domain")
   }

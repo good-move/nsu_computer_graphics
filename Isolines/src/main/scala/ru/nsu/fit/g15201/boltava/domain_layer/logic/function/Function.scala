@@ -9,4 +9,9 @@ trait Function {
 
 }
 
-trait IFunction2D extends Function
+trait IFunction2D extends Function {
+
+  def max: Double
+  def min: Double
+
+}

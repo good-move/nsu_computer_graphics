@@ -99,6 +99,6 @@ case class Range(lower: RangeValue, upper: RangeValue) {
 
 }
 
-case class FiniteRange(lower: FiniteValue, upper: FiniteValue) {
-  def size: FiniteValue = FiniteValue((upper.value - lower.value).abs)
+case class FiniteRange(start: FiniteValue, end: FiniteValue) {
+  def size: FiniteValue = FiniteValue((end.value - start.value).abs)
 }
