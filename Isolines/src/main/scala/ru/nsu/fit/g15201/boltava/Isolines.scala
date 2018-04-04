@@ -38,7 +38,7 @@ object Isolines extends JFXApp {
 
   val scene = new Scene(wrapper)
   stage.minHeight = 500
-  stage.minWidth = 600
+  stage.minWidth = 735
 
   stage.scene = scene
   stage.show()

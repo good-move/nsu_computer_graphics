@@ -42,7 +42,7 @@ class SettingsPresenter(gridWidthField: TextField,
     applyParameters()
   }
 
-  def onOk(mouseEvent: MouseEvent): Unit = {
+  def onOk(): Unit = {
     applyParameters()
     close()
   }

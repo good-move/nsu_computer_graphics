@@ -4,15 +4,14 @@ import ru.nsu.fit.g15201.boltava.domain_layer.mesh.IsoLevel
 import ru.nsu.fit.g15201.boltava.domain_layer.primitives._
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{ColorMapMode, IWorkbenchInteractor, IWorkbenchPresenter}
+import scalafx.Includes._
 import scalafx.scene.canvas.Canvas
+import scalafx.scene.control.Label
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.layout.StackPane
 import scalafx.scene.paint
 import scalafx.stage.Stage
 import scalafxml.core.macros.sfxml
-import scalafx.Includes._
-import scalafx.geometry.VPos
-import scalafx.scene.control.Label
 
 import scala.util.{Failure, Success, Try}
 
@@ -41,6 +40,11 @@ class WorkbenchPresenter(wrapperPane: StackPane,
     bindLayersDimensions()
     createOnChangeHandlers()
     setStatusBarUpdater()
+
+    val fieldDimensions = Dimensions(wrapperPane.width.value, wrapperPane.height.value)
+    interactor.handleWindowResize(fieldDimensions)
+    interactor.handleLegendResize(legendCanvas.width.value)
+
   }
 
   // ******************* Visibility controls *******************

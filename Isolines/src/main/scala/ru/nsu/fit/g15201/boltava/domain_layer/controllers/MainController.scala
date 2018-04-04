@@ -21,7 +21,7 @@ class MainController {
   private var cellGrid: Option[CellGrid] = None
   private var isoLevels: Option[Seq[Double]] = None
   private val customIsoLevels: ListBuffer[Double] = ListBuffer.empty
-  private var currentFieldDimensions = Dimensions(500, 500)
+  private var currentFieldDimensions = Dimensions(735, 400)
 
   private var gridVisible = false
   private var isolinesVisible = false
@@ -338,6 +338,8 @@ class MainController {
 
     fMin = function.min
     fMax = function.max
+
+    legendSlope = (fMax - fMin) / currentFieldDimensions.width
 
     isoLevels = Some(IsolinesController.calculateIsoLevels(fMin, fMax, _settings.get.levels))
 
