@@ -9,8 +9,10 @@
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.settings.SettingsPresenter"
-          prefWidth="300.0"
-          prefHeight="250.0">
+          minWidth="350.0"
+          maxWidth="350.0"
+          minHeight="250.0"
+          maxHeight="250.0">
 
     <fx:define>
         <Double fx:id="PADDING" fx:value="5"/>
@@ -57,5 +59,11 @@
         <Label text="Upper Y bound"/>
         <TextField fx:id="upperYBound" />
     </VBox>
+
+    <HBox GridPane.columnIndex="1" GridPane.rowIndex="5" >
+        <Button text="Cancel" onMouseClicked="#onCancel" />
+        <Button text="Apply" onMouseClicked="#onApply" />
+        <Button text="OK" onMouseClicked="#onOk" />
+    </HBox>
 
 </GridPane>

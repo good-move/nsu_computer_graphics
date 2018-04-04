@@ -2,24 +2,25 @@ package ru.nsu.fit.g15201.boltava.domain_layer.controllers
 
 import ru.nsu.fit.g15201.boltava.domain_layer.data.FileExtension
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.function.{EllipticHyperboloid, FiniteDomain2D, Function2D}
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{ConfigReader, Settings}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{ConfigReader, FieldParameters, Settings}
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.MeshGenerator.CellGrid
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.{CoordinatesMapper, IsoLevel, IsolinesController, MeshGenerator}
 import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Color, ColorHelpers, Dimensions, Point2D}
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, IMenuPresenter}
-import ru.nsu.fit.g15201.boltava.presentation_layer.settings.Contract
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.Contract.{ISettingsInteractor, ISettingsPresenter}
-import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{ColorMapMode, IWorkbenchInteractor, IWorkbenchPresenter}
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Success, Try}
 
 class MainController {
 
+  private var _settings: Option[Settings] = None
   private val function: Function2D = new EllipticHyperboloid
   private var cellGrid: Option[CellGrid] = None
   private var isoLevels: Option[Seq[Double]] = None
+  private val customIsoLevels: ListBuffer[Double] = ListBuffer.empty
   private var currentFieldDimensions = Dimensions(500, 500)
 
   private var gridVisible = false
@@ -29,15 +30,16 @@ class MainController {
 
   private var modelInitialized = false
 
-  private val fMin = 1d
-  private val fMax = Math.sqrt(201)
+  private var fMin = 1d
+  private var fMax = Math.sqrt(201)
 
+  private var currentFieldParameters: Option[FieldParameters] = None
 
   val workbenchInteractor = new WorkbenchInteractor
   val menuInteractor = new MenuInteractor
   val settingsInteractor = new SettingsInteractor
 
-  var colorMapMode = ColorMapMode.Discrete
+  private var colorMapMode = ColorMapMode.Discrete
 
 
   {
@@ -61,6 +63,7 @@ class MainController {
     }
 
     override def createIsoline(level: IsoLevel): Unit = {
+      customIsoLevels += level.value
       for (cell <- cellGrid.get.grid) {
         IsolinesController.buildRawIsolineForLevel(cell, level.value)
       }
@@ -72,7 +75,7 @@ class MainController {
     override def handleWindowResize(fieldDimensions: Dimensions): Unit = {
       if (modelInitialized) {
         currentFieldDimensions = fieldDimensions
-        cellGrid = Some(MeshGenerator.generate(fieldDimensions, menuInteractor.settings.get, function, CoordinatesMapper))
+        cellGrid = Some(MeshGenerator.generate(fieldDimensions, currentFieldParameters.get.xNodes, currentFieldParameters.get.yNodes, function, CoordinatesMapper))
         CoordinatesMapper.setMapping(fieldDimensions, function.domain.get)
         IsolinesController.clearMapped()
         IsolinesController.mapToFieldIsolines(CoordinatesMapper)
@@ -139,7 +142,7 @@ class MainController {
     override def interpolatedColorForValue(functionValue: Double): Color = {
       val settings = menuInteractor.settings.get
       val levels = isoLevels.get
-      val step = (levels(1) - levels(0)) / 2
+      val step = (levels(1) - levels.head) / 2
 
       def interpolateArgbColor(functionValue: Double, lower: Double, upper: Double, colors: (Color, Color)): Color = {
         val (a1, r1, g1, b1) = ColorHelpers.colorFragments(colors._1.color)
@@ -192,7 +195,6 @@ class MainController {
 //  *********************** Menu Interactor ***********************
   class MenuInteractor extends IMenuInteractor with ILayerVisibilityProvider {
 
-    private var _settings: Option[Settings] = None
     private var presenter: Option[IMenuPresenter] = None
 
     private val subscribers = mutable.HashSet.empty[ILayerVisibilityObserver]
@@ -230,7 +232,11 @@ class MainController {
         case Success(newSettings) =>
           modelInitialized = true
           _settings = Some(newSettings)
-          reloadApp()
+          reloadWithParameters(FieldParameters(
+            newSettings.xNodes,
+            newSettings.yNodes,
+            -10, 10, -10, 10
+          ))
         case Failure(throwable) =>
           if (presenter.isDefined) {
             presenter.get.showError("Failed to open model", throwable.getMessage)
@@ -244,20 +250,6 @@ class MainController {
 
     override def setPresenter(presenter: IMenuPresenter): Unit = {
       this.presenter = Some(presenter)
-    }
-
-    private def reloadApp(): Unit = {
-      function.domain = FiniteDomain2D(-10, 10, -10, 10)
-      CoordinatesMapper.setMapping(currentFieldDimensions, function.domain.get)
-      cellGrid = Some(MeshGenerator.generate(currentFieldDimensions, _settings.get, function, CoordinatesMapper))
-      isoLevels = Some(IsolinesController.calculateIsoLevels(1, Math.sqrt(201), _settings.get.levels))
-      println(s"IsoLevels: $isoLevels")
-      IsolinesController.clearAll()
-      cellGrid.get.grid.foreach { cell =>
-        IsolinesController.buildRawIsolines(cell, isoLevels.get)
-      }
-      IsolinesController.mapToFieldIsolines(CoordinatesMapper)
-      workbenchInteractor.updateField()
     }
 
     override def subscribe(visibilityObserver: ILayerVisibilityObserver): Unit = {
@@ -284,6 +276,49 @@ class MainController {
 
   }
 
+  def reloadWithParameters(fieldParameters: FieldParameters): Unit = {
+    currentFieldParameters = Some(fieldParameters)
+
+    function.domain = FiniteDomain2D(
+      fieldParameters.lowerXBound,
+      fieldParameters.upperXBound,
+      fieldParameters.lowerYBound,
+      fieldParameters.upperYBound
+    )
+
+    CoordinatesMapper.setMapping(currentFieldDimensions, function.domain.get)
+
+    cellGrid = Some(
+      MeshGenerator.generate(
+        currentFieldDimensions,
+        fieldParameters.xNodes,
+        fieldParameters.yNodes,
+        function,
+        CoordinatesMapper
+      )
+    )
+
+    // TODO: update function min and max values
+    fMin = function.min
+    fMax = function.max
+
+    isoLevels = Some(IsolinesController.calculateIsoLevels(fMin, fMax, _settings.get.levels))
+
+    IsolinesController.clearAll()
+    cellGrid.get.grid.foreach { cell =>
+      IsolinesController.buildRawIsolines(cell, isoLevels.get)
+    }
+
+    cellGrid.get.grid.foreach { cell =>
+      IsolinesController.buildRawIsolines(cell, customIsoLevels.filter(level => fMin <= level && level <= fMax))
+    }
+
+    IsolinesController.mapToFieldIsolines(CoordinatesMapper)
+
+    workbenchInteractor.updateField()
+  }
+
+
 
 
   //  *********************** Settings Interactor ***********************
@@ -295,9 +330,12 @@ class MainController {
       this.presenter = Some(presenter)
     }
 
+    override def applyParameters(parameters: FieldParameters): Unit = {
+      reloadWithParameters(parameters.copy())
+    }
 
+    override def currentParameters: Option[FieldParameters] = currentFieldParameters
 
   }
-
 
 }

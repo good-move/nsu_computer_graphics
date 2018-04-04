@@ -113,8 +113,13 @@ class ToolbarPresenter(setDiscreteMode: ToggleButton,
   }
 
   override def onOpenSettings(): Unit = {
-    val settingsRoot = new SettingsComponent(settingsInteractor)(stage).root
-    val newStage = new Stage {scene = new Scene(settingsRoot)}
+    val settingsComponent = new SettingsComponent(settingsInteractor)(stage)
+    val newStage = new Stage {
+      title = "Settings"
+      scene = new Scene(settingsComponent.root)
+      resizable = false
+    }
+    settingsComponent.presenter.setOwnStage(newStage)
     newStage.show()
   }
 
