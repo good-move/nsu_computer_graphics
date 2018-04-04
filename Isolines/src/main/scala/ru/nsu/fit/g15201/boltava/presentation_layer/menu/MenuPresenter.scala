@@ -6,6 +6,7 @@ import ru.nsu.fit.g15201.boltava.domain_layer.data.FileExtension
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutComponent
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, IMenuPresenter}
+import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.ColorMapMode
 import scalafx.application.Platform
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{FileChooser, Stage}
@@ -89,6 +90,14 @@ class MenuPresenter(interactor: IMenuInteractor, stage: Stage) extends IMenuPres
 
   def onShowInterpolationColorMap(): Unit = {
     interactor.showInterpolatedColorMap()
+  }
+
+  override def onOpenSettings(): Unit = {
+    println("onOpenSettings() invoked")
+  }
+
+  override def setColorMapDisplayMode(colorMapMode: ColorMapMode.Value): Unit = {
+    // do nothing here
   }
 
 }

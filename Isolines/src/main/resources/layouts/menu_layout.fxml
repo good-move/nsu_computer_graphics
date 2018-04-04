@@ -3,12 +3,16 @@
 <?import javafx.scene.control.MenuItem?>
 
 
+<?import javafx.scene.control.SeparatorMenuItem?>
 <MenuBar
         fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.menu.MenuPresenter"
         xmlns:fx="http://javafx.com/fxml">
 
     <Menu text="File">
         <MenuItem text="Open" onAction="#onOpenModel" />
+
+        <SeparatorMenuItem />
+
         <MenuItem text="Exit" onAction="#onExit" />
     </Menu>
 
@@ -17,10 +21,14 @@
         <MenuItem text="Isolines" onAction="#onToggleShowIsolines" />
         <MenuItem text="Intersection dots" onAction="#onToggleIntersectionDots" />
         <Menu text="Color map">
-            <MenuItem text="Disable" onAction="#onToggleShowColorMap" />
+            <MenuItem text="Toggle Display" onAction="#onToggleShowColorMap" />
             <MenuItem text="Discrete" onAction="#onShowDiscreteColorMap" />
             <MenuItem text="Interpolation" onAction="#onShowInterpolationColorMap" />
         </Menu>
+
+        <SeparatorMenuItem />
+
+        <MenuItem text="Settings" onAction="#onOpenSettings" />
     </Menu>
 
     <Menu text="Help"
