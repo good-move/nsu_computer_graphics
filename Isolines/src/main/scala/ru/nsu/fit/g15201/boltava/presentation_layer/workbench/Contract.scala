@@ -19,6 +19,8 @@ object Contract {
     def redrawIntersectionPoints(segments: Seq[Segment])
     def redrawIsolines(segments: Seq[Segment])
     def redrawColorMap(colorMapMode: ColorMapMode.Value)
+    def redrawLegend(colorMapMode: ColorMapMode.Value)
+    def redrawLegendTicks(ticks: Seq[(Double, Double)])
 
     def setIsolineColor(color: Color)
     def setDimensions(dimensions: Dimensions)
@@ -27,16 +29,17 @@ object Contract {
 
   trait IWorkbenchInteractor extends IBaseInteractor[IWorkbenchPresenter] {
 
-
     def interpolatedColorForValue(functionValue: Double): Color
     def colorForValue(functionValue: Double): Color
 
     def functionValue(point: Point2D): Double
     def functionValue(x: Double, y: Double): Double
+    def legendFunctionValue(x: Double, y: Double): Double
     def domainPoint(x: Double, y: Double): Option[(Double, Double)]
 
     def createIsoline(level: IsoLevel)
     def handleWindowResize(fieldDimensions: Dimensions)
+    def handleLegendResize(value: Double)
 
   }
 

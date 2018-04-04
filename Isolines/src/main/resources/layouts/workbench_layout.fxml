@@ -7,6 +7,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
 <AnchorPane
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
@@ -30,6 +31,9 @@
             <Canvas fx:id="isolinesLayer"/>
             <Canvas fx:id="intersectionsLayer"/>
         </StackPane>
+        <AnchorPane prefHeight="50">
+            <Canvas fx:id="legendCanvas" height="40" AnchorPane.topAnchor="5"/>
+        </AnchorPane>
         <ToolBar minHeight="30" maxHeight="30">
             <Label fx:id="statusBarLabel" />
         </ToolBar>

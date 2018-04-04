@@ -11,6 +11,7 @@ import scalafx.scene.paint
 import scalafx.stage.Stage
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
+import scalafx.geometry.VPos
 import scalafx.scene.control.Label
 
 import scala.util.{Failure, Success, Try}
@@ -22,6 +23,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
                          gridLayer: Canvas,
                          isolinesLayer: Canvas,
                          intersectionsLayer: Canvas,
+                         legendCanvas: Canvas,
                          statusBarLabel: Label,
                          interactor: IWorkbenchInteractor,
                          stage: Stage) extends IWorkbenchPresenter {
@@ -62,10 +64,43 @@ class WorkbenchPresenter(wrapperPane: StackPane,
   // ******************* Layers Redrawing *******************
 
   override def redrawColorMap(colorMapMode: ColorMapMode.Value): Unit = {
-    val gc = colorMapLayer.graphicsContext2D
+    redrawCanvas(
+      colorMapLayer,
+      colorMapMode,
+      (x: Double, y: Double) => interactor.functionValue(x, y)
+    )
+
+  }
+
+  override def redrawLegend(colorMapMode: ColorMapMode.Value): Unit = {
+    redrawCanvas(
+      legendCanvas,
+      colorMapMode,
+      (x: Double, y: Double) => interactor.legendFunctionValue(x, y)
+    )
+  }
+
+  override def redrawLegendTicks(ticks: Seq[(Double, Double)]): Unit = {
+    val tickWidth = 4d
+    val height = legendCanvas.height.value
+    val gc = legendCanvas.graphicsContext2D
     val writer = gc.pixelWriter
-    val width = colorMapLayer.width.value
-    val height = colorMapLayer.height.value
+
+    gc.fill = paint.Color.Black
+
+    for ((tickPosition, tickValue) <- ticks) {
+      val x = tickPosition - tickWidth/2
+      val y = height / 2
+      gc.fillRect(x, 0, tickWidth, y)
+      gc.fillText(f"$tickValue%.4f", x, 0.8* height)
+    }
+  }
+
+  private def redrawCanvas(canvas: Canvas, colorMapMode: ColorMapMode.Value, functionValue: (Double, Double) => Double): Unit = {
+    val gc = canvas.graphicsContext2D
+    val writer = gc.pixelWriter
+    val width = canvas.width.value
+    val height = canvas.height.value
 
     val colorForValue = colorMapMode match {
       case ColorMapMode.Discrete => (z: Double) => interactor.colorForValue(z)
@@ -76,7 +111,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
       x <- 0 until width.toInt
       y <- 0 until height.toInt
     } {
-      val z = interactor.functionValue(x+0.5, y+0.5)
+      val z = functionValue(x+0.5, y+0.5)
       val color = colorForValue(z)
       writer.setArgb(x, y, color.color)
     }
@@ -182,6 +217,8 @@ class WorkbenchPresenter(wrapperPane: StackPane,
     bindToWrapperDimensions(intersectionsLayer)
     bindToWrapperDimensions(isolinesLayer)
     bindToWrapperDimensions(colorMapLayer)
+
+    legendCanvas.width <== wrapperPane.width
   }
 
   def createOnChangeHandlers(): Unit = {
@@ -189,6 +226,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
       if (height.doubleValue() > 0 && wrapperPane.width.value > 0) {
         val fieldDimensions = Dimensions(wrapperPane.width.value, height.doubleValue())
         interactor.handleWindowResize(fieldDimensions)
+        interactor.handleLegendResize(legendCanvas.width.value)
       }
     }
 
@@ -196,6 +234,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
       if (width.doubleValue() > 0 && wrapperPane.height.value > 0) {
         val fieldDimensions = Dimensions(width.doubleValue(), wrapperPane.height.value)
         interactor.handleWindowResize(fieldDimensions)
+        interactor.handleLegendResize(legendCanvas.width.value)
       }
     }
   }

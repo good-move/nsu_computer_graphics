@@ -1,7 +1,7 @@
 package ru.nsu.fit.g15201.boltava.domain_layer.controllers
 
 import ru.nsu.fit.g15201.boltava.domain_layer.data.FileExtension
-import ru.nsu.fit.g15201.boltava.domain_layer.logic.function.{EllipticHyperboloid, FiniteDomain2D, Function2D}
+import ru.nsu.fit.g15201.boltava.domain_layer.logic.function.{EllipticHyperboloid, FiniteDomain2D, Function2D, SinCosProduct}
 import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.{ConfigReader, FieldParameters, Settings}
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.MeshGenerator.CellGrid
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.{CoordinatesMapper, IsoLevel, IsolinesController, MeshGenerator}
@@ -32,6 +32,7 @@ class MainController {
 
   private var fMin = 1d
   private var fMax = Math.sqrt(201)
+  private var legendSlope = 1d
 
   private var currentFieldParameters: Option[FieldParameters] = None
 
@@ -106,8 +107,10 @@ class MainController {
     }
 
     override def onColorMapVisibilityChanged(visible: Boolean): Unit = {
-      if (colorMapVisible)
+      if (colorMapVisible) {
         presenter.get.redrawColorMap(colorMapMode)
+      }
+      redrawLegend()
       presenter.get.setShowColorMap(visible)
     }
 
@@ -121,13 +124,30 @@ class MainController {
       if (intersectionsVisible)
         presenter.get.redrawIntersectionPoints(IsolinesController.mappedIsolines)
 
-      if (colorMapVisible)
+      if (colorMapVisible) {
         presenter.get.redrawColorMap(colorMapMode)
+      }
 
+      redrawLegend()
+    }
+
+    private def redrawLegend(): Unit = {
+      if (modelInitialized) {
+        presenter.get.redrawLegend(colorMapMode)
+
+        val ticksParams = isoLevels.get.map { level =>
+          ((level - fMin) / legendSlope, level)
+        }
+
+        presenter.get.redrawLegendTicks(Seq((0, fMin)))
+        presenter.get.redrawLegendTicks(ticksParams)
+        presenter.get.redrawLegendTicks(Seq(((fMax - fMin) / legendSlope, fMax)))
+      }
     }
 
     def drawColorMap(): Unit = {
       presenter.get.redrawColorMap(colorMapMode)
+      redrawLegend()
     }
 
     override def colorForValue(functionValue: Double): Color = {
@@ -195,6 +215,15 @@ class MainController {
       } else {
         None
       }
+    }
+
+    override def legendFunctionValue(x: Double, y: Double): Double = {
+      legendSlope * x + fMin
+    }
+
+    override def handleLegendResize(legendWidth: Double): Unit = {
+      legendSlope = (fMax - fMin) / legendWidth
+      redrawLegend()
     }
 
   }
@@ -307,7 +336,6 @@ class MainController {
       )
     )
 
-    // TODO: update function min and max values
     fMin = function.min
     fMax = function.max
 
