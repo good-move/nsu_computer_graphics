@@ -7,6 +7,8 @@ import ru.nsu.fit.g15201.boltava.domain_layer.mesh.MeshGenerator.CellGrid
 import ru.nsu.fit.g15201.boltava.domain_layer.mesh.{CoordinatesMapper, IsoLevel, IsolinesController, MeshGenerator}
 import ru.nsu.fit.g15201.boltava.domain_layer.primitives.{Color, ColorHelpers, Dimensions, Point2D}
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, IMenuPresenter}
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.Contract
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.Contract.{ISettingsInteractor, ISettingsPresenter}
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.{ColorMapMode, IWorkbenchInteractor, IWorkbenchPresenter}
 
@@ -33,6 +35,7 @@ class MainController {
 
   val workbenchInteractor = new WorkbenchInteractor
   val menuInteractor = new MenuInteractor
+  val settingsInteractor = new SettingsInteractor
 
   var colorMapMode = ColorMapMode.Discrete
 
@@ -77,7 +80,7 @@ class MainController {
       }
     }
 
-    override def setPresenter(presenter: Contract.IWorkbenchPresenter): Unit = {
+    override def setPresenter(presenter: IWorkbenchPresenter): Unit = {
       this.presenter = Some(presenter)
     }
 
@@ -280,5 +283,21 @@ class MainController {
     }
 
   }
+
+
+
+  //  *********************** Settings Interactor ***********************
+  class SettingsInteractor extends ISettingsInteractor {
+
+    private var presenter: Option[ISettingsPresenter] = None
+
+    override def setPresenter(presenter: ISettingsPresenter): Unit = {
+      this.presenter = Some(presenter)
+    }
+
+
+
+  }
+
 
 }

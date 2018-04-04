@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import java.lang.Double?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.settings.SettingsPresenter"
+          prefWidth="300.0"
+          prefHeight="250.0">
+
+    <fx:define>
+        <Double fx:id="PADDING" fx:value="5"/>
+    </fx:define>
+
+    <HBox GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
+        <VBox>
+            <padding><Insets top="$PADDING" left="$PADDING" bottom="$PADDING" right="$PADDING"/></padding>
+            <Label text="Grid width"/>
+            <TextField fx:id="gridWidthField" />
+        </VBox>
+
+        <VBox>
+            <padding><Insets top="$PADDING" left="$PADDING" bottom="$PADDING" right="$PADDING"/></padding>
+            <Label text="Grid Height"/>
+            <TextField fx:id="gridHeightField" />
+        </VBox>
+    </HBox>
+
+    <Separator GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
+
+    <Label text="Function domain parameters" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="3">
+        <padding><Insets top="$PADDING" left="$PADDING" bottom="$PADDING" right="$PADDING"/></padding>
+        <Label text="Lower X bound"/>
+        <TextField fx:id="lowerXBound" />
+    </VBox>
+
+    <VBox GridPane.columnIndex="1" GridPane.rowIndex="3">
+        <padding><Insets top="$PADDING" left="$PADDING" bottom="$PADDING" right="$PADDING"/></padding>
+        <Label text="Upper X bound"/>
+        <TextField fx:id="upperXBound" />
+    </VBox>
+
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="4">
+        <padding><Insets top="$PADDING" left="$PADDING" bottom="$PADDING" right="$PADDING"/></padding>
+        <Label text="Lower Y bound"/>
+        <TextField fx:id="lowerYBound" />
+    </VBox>
+
+    <VBox GridPane.columnIndex="1" GridPane.rowIndex="4">
+        <padding><Insets top="$PADDING" left="$PADDING" bottom="$PADDING" right="$PADDING"/></padding>
+        <Label text="Upper Y bound"/>
+        <TextField fx:id="upperYBound" />
+    </VBox>
+
+</GridPane>

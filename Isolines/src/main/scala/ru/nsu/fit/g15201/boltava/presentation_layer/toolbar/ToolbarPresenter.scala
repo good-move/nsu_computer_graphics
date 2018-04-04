@@ -6,9 +6,12 @@ import ru.nsu.fit.g15201.boltava.domain_layer.data.FileExtension
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.about.AboutComponent
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.Contract.{IMenuInteractor, IMenuPresenter}
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.Contract.ISettingsInteractor
+import ru.nsu.fit.g15201.boltava.presentation_layer.settings.SettingsComponent
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.ColorMapMode
 import scalafx.application.Platform
+import scalafx.scene.Scene
 import scalafx.scene.control.ToggleButton
 import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{FileChooser, Stage}
@@ -18,6 +21,7 @@ import scalafxml.core.macros.sfxml
 class ToolbarPresenter(setDiscreteMode: ToggleButton,
                        setInterpolatedMode: ToggleButton,
                        interactor: IMenuInteractor,
+                       settingsInteractor: ISettingsInteractor,
                        stage: Stage) extends IMenuPresenter {
 
   override def setColorMapDisplayMode(colorMapMode: Contract.ColorMapMode.Value): Unit = {
@@ -109,9 +113,10 @@ class ToolbarPresenter(setDiscreteMode: ToggleButton,
   }
 
   override def onOpenSettings(): Unit = {
-    println("onOpenSettings() invoked")
+    val settingsRoot = new SettingsComponent(settingsInteractor)(stage).root
+    val newStage = new Stage {scene = new Scene(settingsRoot)}
+    newStage.show()
   }
-
 
   def onSetInterpolatedMode(): Unit = {
     interactor.showInterpolatedColorMap()

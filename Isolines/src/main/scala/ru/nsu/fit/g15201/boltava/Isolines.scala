@@ -13,12 +13,13 @@ import scalafx.scene.layout.{Priority, VBox}
 object Isolines extends JFXApp {
 
   stage = new PrimaryStage
+  implicit val implicitStage = stage
 
   val mainController = new MainController
 
-  val menuComponent = MenuComponent(mainController.menuInteractor)(stage)
-  val toolbarComponent = ToolbarComponent(mainController.menuInteractor)(stage)
-  val workbenchComponent = WorkbenchComponent(mainController.workbenchInteractor)(stage)
+  val menuComponent = MenuComponent(mainController.menuInteractor)
+  val toolbarComponent = ToolbarComponent(mainController.menuInteractor, mainController.settingsInteractor)
+  val workbenchComponent = WorkbenchComponent(mainController.workbenchInteractor)
 
   val menu = menuComponent.root
   menu.hgrow = Priority.Always
@@ -37,7 +38,7 @@ object Isolines extends JFXApp {
 
   val scene = new Scene(wrapper)
   stage.minHeight = 500
-  stage.minWidth = 500
+  stage.minWidth = 600
 
   stage.scene = scene
   stage.show()
