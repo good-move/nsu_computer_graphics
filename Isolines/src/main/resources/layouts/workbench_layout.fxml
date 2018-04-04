@@ -5,24 +5,33 @@
 <?import javafx.scene.canvas.Canvas?>
 
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Label?>
 <AnchorPane
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
         fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.workbench.WorkbenchPresenter"
 >
-    <StackPane
-            fx:id="wrapperPane"
-            styleClass="wrapper-pane"
+    <VBox
             AnchorPane.topAnchor="0.0"
             AnchorPane.bottomAnchor="0.0"
             AnchorPane.leftAnchor="0.0"
             AnchorPane.rightAnchor="0.0"
-            minWidth="400"
-            minHeight="400"
     >
-        <Canvas fx:id="colorMapLayer" />
-        <Canvas fx:id="gridLayer"/>
-        <Canvas fx:id="isolinesLayer"/>
-        <Canvas fx:id="intersectionsLayer"/>
-    </StackPane>
+        <StackPane
+                fx:id="wrapperPane"
+                styleClass="wrapper-pane"
+                minWidth="400"
+                minHeight="400"
+                VBox.vgrow="ALWAYS"
+        >
+            <Canvas fx:id="colorMapLayer" />
+            <Canvas fx:id="gridLayer"/>
+            <Canvas fx:id="isolinesLayer"/>
+            <Canvas fx:id="intersectionsLayer"/>
+        </StackPane>
+        <ToolBar minHeight="30" maxHeight="30">
+            <Label fx:id="statusBarLabel" />
+        </ToolBar>
+    </VBox>
 </AnchorPane>

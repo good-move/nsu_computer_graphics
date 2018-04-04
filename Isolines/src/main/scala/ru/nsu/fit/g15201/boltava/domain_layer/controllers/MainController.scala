@@ -188,6 +188,15 @@ class MainController {
       }
     }
 
+    override def domainPoint(x: Double, y: Double): Option[(Double, Double)] = {
+      if (modelInitialized) {
+        val point = CoordinatesMapper.toDomain(x, y)
+        Some((point.x, point.y))
+      } else {
+        None
+      }
+    }
+
   }
 
 

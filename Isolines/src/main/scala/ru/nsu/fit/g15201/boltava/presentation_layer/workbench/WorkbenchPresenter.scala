@@ -11,11 +11,8 @@ import scalafx.scene.paint
 import scalafx.stage.Stage
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
+import scalafx.scene.control.Label
 
-// TODO: Add color map
-// TODO: Update isolines only when layer is visible
-
-// Create `requireRedraw()` method???
 
 @sfxml
 class WorkbenchPresenter(wrapperPane: StackPane,
@@ -23,6 +20,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
                          gridLayer: Canvas,
                          isolinesLayer: Canvas,
                          intersectionsLayer: Canvas,
+                         statusBarLabel: Label,
                          interactor: IWorkbenchInteractor,
                          stage: Stage) extends IWorkbenchPresenter {
 
@@ -38,6 +36,7 @@ class WorkbenchPresenter(wrapperPane: StackPane,
     makeAllLayersInvisible()
     bindLayersDimensions()
     createOnChangeHandlers()
+    setStatusBarUpdater()
   }
 
   // ******************* Visibility controls *******************
@@ -144,6 +143,21 @@ class WorkbenchPresenter(wrapperPane: StackPane,
   override def setIsolineColor(color: Color): Unit = {
     val (alpha, red, green, blue) = ColorHelpers.colorFragments(color.color)
     isolineColor = paint.Color.color(red, green, blue, alpha)
+  }
+
+
+  // ************************ Handlers Binding ************************
+
+  def setStatusBarUpdater(): Unit = {
+    wrapperPane.onMouseMoved =  (mouseEvent: MouseEvent) => {
+      val statusBarText = interactor.domainPoint(mouseEvent.x, mouseEvent.y) match {
+        case Some((x, y)) =>
+          val z = interactor.functionValue(mouseEvent.x, mouseEvent.y)
+          f"x: $x%.3f   y: $y%.3f   z: $z%.3f"
+        case None => "Model not initialized"
+      }
+      statusBarLabel.text = statusBarText
+    }
   }
 
   private def bindToWrapperDimensions(canvas: Canvas): Unit = {
