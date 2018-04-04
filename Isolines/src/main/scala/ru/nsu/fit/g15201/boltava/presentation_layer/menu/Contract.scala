@@ -3,6 +3,7 @@ package ru.nsu.fit.g15201.boltava.presentation_layer.menu
 import ru.nsu.fit.g15201.boltava.domain_layer.data.FileExtension
 import ru.nsu.fit.g15201.boltava.presentation_layer.IAlertInvoker
 import ru.nsu.fit.g15201.boltava.presentation_layer.base.{IBaseInteractor, IBasePresenter}
+import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.Contract.ColorMapMode
 
 object Contract {
 
@@ -16,6 +17,9 @@ object Contract {
     def onToggleIntersectionDots()
     def onShowAbout()
     def onShowHelp()
+    def onOpenSettings()
+
+    def setColorMapDisplayMode(colorMapMode: ColorMapMode.Value)
 
   }
 

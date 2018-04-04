@@ -2,6 +2,7 @@ package ru.nsu.fit.g15201.boltava
 
 import ru.nsu.fit.g15201.boltava.domain_layer.controllers.MainController
 import ru.nsu.fit.g15201.boltava.presentation_layer.menu.MenuComponent
+import ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.ToolbarComponent
 import ru.nsu.fit.g15201.boltava.presentation_layer.workbench.WorkbenchComponent
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
@@ -16,16 +17,21 @@ object Isolines extends JFXApp {
   val mainController = new MainController
 
   val menuComponent = MenuComponent(mainController.menuInteractor)(stage)
+  val toolbarComponent = ToolbarComponent(mainController.menuInteractor)(stage)
   val workbenchComponent = WorkbenchComponent(mainController.workbenchInteractor)(stage)
 
   val menu = menuComponent.root
   menu.hgrow = Priority.Always
+
+  val toolbar = toolbarComponent.root
+  toolbar.hgrow = Priority.Always
 
   val workbench = workbenchComponent.root
   workbench.vgrow = Priority.Always
 
   val wrapper = new VBox(
     menu,
+    toolbar,
     workbench
   )
 

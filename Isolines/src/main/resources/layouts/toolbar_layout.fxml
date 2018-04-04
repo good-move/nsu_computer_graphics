@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+
+
+<ToolBar
+        fx:controller="ru.nsu.fit.g15201.boltava.presentation_layer.toolbar.ToolbarPresenter"
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+>
+    <HBox>
+
+        <Button text="Open" onMouseClicked="#onOpenModel" >
+            <tooltip><Tooltip text="Open model file"/></tooltip>
+        </Button>
+
+        <Separator orientation="VERTICAL" />
+
+        <ToggleButton text="Show Color Map" onMouseClicked="#onToggleShowColorMap">
+            <tooltip><Tooltip text="Toggle color map display mode"/></tooltip>
+        </ToggleButton>
+
+        <ToggleButton text="Show Grid" onMouseClicked="#onToggleShowGrid">
+            <tooltip><Tooltip text="Toggle grid display mode"/></tooltip>
+        </ToggleButton>
+
+        <ToggleButton text="Show Isolines" onMouseClicked="#onToggleShowIsolines">
+            <tooltip><Tooltip text="Toggle isolines display mode"/></tooltip>
+        </ToggleButton>
+
+        <ToggleButton text="Show Points" onMouseClicked="#onToggleIntersectionDots">
+            <tooltip><Tooltip text="Toggle intersection points display mode"/></tooltip>
+        </ToggleButton>
+
+        <ToggleButton text="Discrete" fx:id="setDiscreteMode" onMouseClicked="#onSetDiscreteMode">
+            <tooltip><Tooltip text="Display color map in discrete mode"/></tooltip>
+        </ToggleButton>
+
+        <ToggleButton text="Interpolated" fx:id="setInterpolatedMode" onMouseClicked="#onSetInterpolatedMode">
+            <tooltip><Tooltip text="Display color map in interpolated mode"/></tooltip>
+        </ToggleButton>
+
+
+        <Separator orientation="VERTICAL" />
+
+        <Button text="Settings" onMouseClicked="#onOpenSettings">
+            <tooltip><Tooltip text="Open settings"/></tooltip>
+        </Button>
+
+    </HBox>
+
+</ToolBar>
