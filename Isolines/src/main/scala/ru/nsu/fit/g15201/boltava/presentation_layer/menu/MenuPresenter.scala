@@ -39,7 +39,6 @@ class MenuPresenter(interactor: IMenuInteractor, stage: Stage) extends IMenuPres
   }
 
   override def onExit(): Unit = {
-    interactor.beforeExit()
     Platform.exit()
   }
 

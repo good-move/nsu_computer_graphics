@@ -59,7 +59,6 @@ class ToolbarPresenter(setDiscreteMode: ToggleButton,
   }
 
   override def onExit(): Unit = {
-    interactor.beforeExit()
     Platform.exit()
   }
 

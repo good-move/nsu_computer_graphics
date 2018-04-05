@@ -19,9 +19,7 @@ abstract class Function2D(protected val _mathDomain: Domain2D) extends IFunction
 
   override def apply(x: Double, y: Double): Double = {
     _domain match {
-      case Some(domain) => calculate(x, y)
-//      case Some(domain) if domain.contains(x, y) => calculate(x, y)
-//      case Some(_) => throw DomainException(s"Point ($x,$y) doesn't belong to function domain")
+      case Some(_) => calculate(x, y)
       case None => throw new IllegalStateException("Domain is not set")
     }
   }

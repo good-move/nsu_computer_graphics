@@ -17,7 +17,7 @@ import scala.util.{Failure, Success, Try}
 class MainController {
 
   private var _settings: Option[Settings] = None
-  private val function: Function2D = new EllipticHyperboloid
+  private val function: Function2D = new SinCosProduct
   private var cellGrid: Option[CellGrid] = None
   private var isoLevels: Option[Seq[Double]] = None
   private val customIsoLevels: ListBuffer[Double] = ListBuffer.empty
@@ -259,10 +259,6 @@ class MainController {
     override def toggleColorMapDisplay(): Unit = {
       colorMapVisible = !colorMapVisible
       subscribers.foreach(s => s.onColorMapVisibilityChanged(colorMapVisible))
-    }
-
-    override def beforeExit(): Unit = {
-      println("beforeExit() invoked")
     }
 
     override def openModel(filePath: String): Unit = {

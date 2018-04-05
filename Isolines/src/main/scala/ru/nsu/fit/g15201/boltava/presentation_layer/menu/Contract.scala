@@ -25,8 +25,6 @@ object Contract {
 
   trait IMenuInteractor extends IBaseInteractor[IMenuPresenter] {
 
-    def beforeExit()
-
     def openModel(filePath: String)
     def modelFileExtension: FileExtension
 

@@ -4,7 +4,6 @@ import ru.nsu.fit.g15201.boltava.domain_layer.logic.settings.FieldParameters
 import ru.nsu.fit.g15201.boltava.presentation_layer.AlertHelper
 import ru.nsu.fit.g15201.boltava.presentation_layer.settings.Contract.{ISettingsInteractor, ISettingsPresenter}
 import scalafx.scene.control.TextField
-import scalafx.scene.input.MouseEvent
 import scalafx.stage.Stage
 import scalafxml.core.macros.sfxml
 
