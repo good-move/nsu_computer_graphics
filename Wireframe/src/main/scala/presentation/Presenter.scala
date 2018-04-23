@@ -31,27 +31,57 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
   private val q = 4
   private val pointRadius = 7
 
-  def onClick(mouseEvent: MouseEvent): Unit = {
+  private var lastClickedPointIndex: Int = -1
+  private var existingPointClicked = false
+  private var pointWasMoved = false
+
+  def onPressed(mouseEvent: MouseEvent): Unit = {
     val clickPoint = Point2D(mouseEvent.x, mouseEvent.y)
 
-    points.find { case Point2D(x, y) =>
-      math.pow(x-clickPoint.x, 2) + math.pow(y-clickPoint.y, 2) <= math.pow(pointRadius, 2)
-    } match {
-      case Some(Point2D(x, y)) =>
-      case _ => addSplineSegment(clickPoint)
+    def pointsIntersect(p1: Point2D, p2: Point2D): Boolean =
+      math.pow(p1.x-p2.x, 2) + math.pow(p1.y-p2.y, 2) <= math.pow(pointRadius, 2)
+
+    lastClickedPointIndex = points.indexWhere { point => pointsIntersect(point, clickPoint) }
+    existingPointClicked = lastClickedPointIndex >= 0
+  }
+
+  def onClick(mouseEvent: MouseEvent): Unit = {
+    val clickPoint = Point2D(mouseEvent.x, mouseEvent.y)
+    val pointToAdd = if (existingPointClicked) points(lastClickedPointIndex)
+                      else clickPoint
+    if (!pointWasMoved) {
+      addAndDrawSplineSegment(pointToAdd)
+    }
+    pointWasMoved = false
+  }
+
+  def onDrag(mouseEvent: MouseEvent): Unit = {
+    if (existingPointClicked) {
+      points(lastClickedPointIndex) = Point2D(mouseEvent.x, mouseEvent.y)
+      pointWasMoved = true
+      cleanCanvas()
+      val ps = splinePoints()
+      drawPivots()
+      drawPoints(ps)
     }
   }
 
-  private def addSplineSegment(point: Point2D): Unit = {
+  private def addAndDrawSplineSegment(point: Point2D): Unit = {
     points += point
-    drawPoints()
+    drawPivots()
 
     if (points.length >= q) {
       drawPoints(splineSegmentPoints())
     }
   }
 
-  private def drawPoints(): Unit = {
+  private def cleanCanvas(): Unit = {
+    canvas.graphicsContext2D.clearRect(
+      0,0,canvas.width.value, canvas.height.value
+    )
+  }
+
+  private def drawPivots(): Unit = {
     val gc = canvas.graphicsContext2D
     gc.fill = Color.Red
     points.foreach { point =>
@@ -83,9 +113,7 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
     }
   }
 
-  private def drawEntireSpline(): Unit = {
-    val splinePoints = points.sliding(q).flatMap(splineSegmentPoints(_))
-    drawPoints(splinePoints.toSeq)
-  }
+  private def splinePoints(): Seq[Point2D] =
+    points.sliding(q).flatMap(splineSegmentPoints(_)).toSeq
 
 }

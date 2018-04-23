@@ -14,7 +14,9 @@
 
 
     <Canvas fx:id="canvas"
+            onMousePressed="#onPressed"
             onMouseClicked="#onClick"
+            onMouseDragged="#onDrag"
             AnchorPane.topAnchor="0"
             AnchorPane.leftAnchor="0"
     />
