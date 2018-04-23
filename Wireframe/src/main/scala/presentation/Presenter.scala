@@ -14,6 +14,8 @@ import scalafx.scene.paint.Color
 import scala.collection.mutable.ListBuffer
 
 // TODO: Change cursor when hovering anchor points
+// TODO: Add Undo function
+// TODO: Add ability to select multiple pivots and move them simultaneously
 
 @sfxml
 class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) extends IPresenter {
@@ -34,7 +36,7 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) extends IPresen
 
   private val points = ListBuffer[Point2D]()
   private val q = 4
-  private val pointRadius = 7
+  private val pointRadius = 9
 
   private var lastClickedPointIndex: Int = -1
   private var existingPointClicked = false
