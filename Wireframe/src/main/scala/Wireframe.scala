@@ -1,9 +1,10 @@
 import breeze.linalg.{DenseMatrix, DenseVector}
 import data_layer.settings.Config
+import presentation.IPresenter
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
-import scalafxml.core.{FXMLLoader, NoDependencyResolver}
+import scalafxml.core.{DependenciesByType, FXMLLoader, NoDependencyResolver}
 import scalafx.Includes._
 
 object Wireframe extends JFXApp {
@@ -13,11 +14,14 @@ object Wireframe extends JFXApp {
     pureconfig.loadConfigOrThrow[Config]
   }
 
-  private val root = new FXMLLoader(getClass.getResource("window.fxml"), NoDependencyResolver).load[javafx.scene.Parent]
-
+  private val loader = new FXMLLoader(
+    getClass.getResource("window.fxml"),
+    NoDependencyResolver
+  )
   stage = new PrimaryStage {
     title = "WireFrame"
-    scene = new Scene(root)
+    scene = new Scene(loader.load[javafx.scene.Parent])
   }
 
+  loader.getController[IPresenter].setScene(stage.scene.value)
 }

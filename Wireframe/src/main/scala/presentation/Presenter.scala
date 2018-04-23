@@ -3,17 +3,20 @@ package presentation
 import breeze.linalg.{DenseMatrix, DenseVector}
 import data_layer.geometry.Point2D
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.input.MouseEvent
+import scalafx.scene.input.{KeyEvent, MouseEvent}
 import scalafx.scene.layout.AnchorPane
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
 import breeze.linalg._
+import scalafx.scene.Scene
 import scalafx.scene.paint.Color
 
 import scala.collection.mutable.ListBuffer
 
+// TODO: Change cursor when hovering anchor points
+
 @sfxml
-class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
+class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) extends IPresenter {
 
   private val M: DenseMatrix[Double] = DenseMatrix(
     (-1.0,  3.0, -3.0,  1.0),
@@ -27,6 +30,8 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
     canvas.width <== wrapperPane.width
   }
 
+  private var scene: Option[Scene] = None
+
   private val points = ListBuffer[Point2D]()
   private val q = 4
   private val pointRadius = 7
@@ -34,6 +39,10 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
   private var lastClickedPointIndex: Int = -1
   private var existingPointClicked = false
   private var pointWasMoved = false
+  private var isControlPressed = false
+
+  private var controlKeyName: Option[String] = None
+
 
   def onPressed(mouseEvent: MouseEvent): Unit = {
     val clickPoint = Point2D(mouseEvent.x, mouseEvent.y)
@@ -43,13 +52,19 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
 
     lastClickedPointIndex = points.indexWhere { point => pointsIntersect(point, clickPoint) }
     existingPointClicked = lastClickedPointIndex >= 0
+    if (isControlPressed && existingPointClicked) {
+      points.remove(lastClickedPointIndex)
+      existingPointClicked = false
+      pointWasMoved = true
+      redrawScene()
+    }
   }
 
   def onClick(mouseEvent: MouseEvent): Unit = {
     val clickPoint = Point2D(mouseEvent.x, mouseEvent.y)
     val pointToAdd = if (existingPointClicked) points(lastClickedPointIndex)
                       else clickPoint
-    if (!pointWasMoved) {
+    if (!pointWasMoved && !existingPointClicked) {
       addAndDrawSplineSegment(pointToAdd)
     }
     pointWasMoved = false
@@ -59,10 +74,7 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
     if (existingPointClicked) {
       points(lastClickedPointIndex) = Point2D(mouseEvent.x, mouseEvent.y)
       pointWasMoved = true
-      cleanCanvas()
-      val ps = splinePoints()
-      drawPivots()
-      drawPoints(ps)
+      redrawScene()
     }
   }
 
@@ -71,7 +83,7 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
     drawPivots()
 
     if (points.length >= q) {
-      drawPoints(splineSegmentPoints())
+      redrawSpline()
     }
   }
 
@@ -115,5 +127,37 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) {
 
   private def splinePoints(): Seq[Point2D] =
     points.sliding(q).flatMap(splineSegmentPoints(_)).toSeq
+
+  private def redrawSpline(): Unit = {
+    if (points.length >= q) {
+      drawPoints(splinePoints())
+    }
+  }
+
+  private def redrawScene(): Unit = {
+    cleanCanvas()
+    drawPivots()
+    redrawSpline()
+  }
+
+  override def setScene(scene: Scene): Unit = {
+    this.scene = Some(scene)
+    setKeyListeners()
+  }
+
+  private def setKeyListeners(): Unit = {
+    scene.foreach( _.onKeyPressed = (event: KeyEvent) => {
+      isControlPressed = event.controlDown
+      if (isControlPressed) {
+        controlKeyName = Some(event.code.name)
+      }
+    })
+
+    scene.foreach(_.onKeyReleased = (event: KeyEvent) => {
+      if (controlKeyName.contains(event.code.name)) {
+        isControlPressed = false
+      }
+    })
+  }
 
 }
