@@ -41,7 +41,7 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) extends IPresen
   private var pointWasMoved = false
   private var isControlPressed = false
 
-  private var controlKeyName: Option[String] = None
+  private var controlKeyName = "Ctrl"
 
 
   def onPressed(mouseEvent: MouseEvent): Unit = {
@@ -148,13 +148,10 @@ class Presenter(val wrapperPane: AnchorPane, val canvas: Canvas) extends IPresen
   private def setKeyListeners(): Unit = {
     scene.foreach( _.onKeyPressed = (event: KeyEvent) => {
       isControlPressed = event.controlDown
-      if (isControlPressed) {
-        controlKeyName = Some(event.code.name)
-      }
     })
 
     scene.foreach(_.onKeyReleased = (event: KeyEvent) => {
-      if (controlKeyName.contains(event.code.name)) {
+      if (controlKeyName == event.code.name) {
         isControlPressed = false
       }
     })
