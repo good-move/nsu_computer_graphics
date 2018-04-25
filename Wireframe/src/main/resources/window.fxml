@@ -4,6 +4,8 @@
 
 <?import javafx.scene.canvas.Canvas?>
 
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Button?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="presentation.Presenter"
@@ -11,14 +13,20 @@
             prefHeight="400.0"
             prefWidth="600.0"
 >
-
-
-    <Canvas fx:id="canvas"
-            onMousePressed="#onPressed"
-            onMouseClicked="#onClick"
-            onMouseDragged="#onDrag"
-            AnchorPane.topAnchor="0"
+    <VBox   AnchorPane.topAnchor="0"
             AnchorPane.leftAnchor="0"
-    />
+    >
+        <ToolBar fx:id="toolbar" >
+            <Button text="Edit Baseline" onMouseClicked="#onEditBaseline" />
+            <Button text="Solid" onMouseClicked="#onShowSolid" />
+            <Button text="All solids" onMouseClicked="#onShowAllSolids" />
+        </ToolBar>
+        <Canvas fx:id="canvas"
+                onMousePressed="#onPressed"
+                onMouseClicked="#onClick"
+                onMouseDragged="#onDrag"
+        />
+
+    </VBox>
 
 </AnchorPane>
