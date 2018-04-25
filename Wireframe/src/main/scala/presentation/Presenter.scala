@@ -32,17 +32,13 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     ( 1.0,  4.0,  1.0,  0.0)
   ) *:* (1.0/6)
 
-  {
-    canvas.height <== wrapperPane.height - toolbar.height
-    canvas.width <== wrapperPane.width
-  }
-
   private var scene: Option[Scene] = None
 
   // General program state
   private val layers = Seq[Layer](new Layer())
+  private var currentLayer = layers.head
   private var workingMode = WorkingMode.Editing
-  private var currentLayer = 0
+  private var currentLayerIndex = 0
 
   private val splinePower = 4
   private val pointRadius = 9
@@ -57,18 +53,28 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val controlKeyName = "Ctrl"
 
 
+
+  {
+    canvas.height <== wrapperPane.height - toolbar.height
+    canvas.width <== wrapperPane.width
+
+    canvas.width.onChange { (_,_, _) => redrawScene() }
+    canvas.height.onChange { (_,_, _) => redrawScene() }
+
+  }
+
+  // [START] ******************** Canvas Event Handlers ********************
+
   def onPressed(mouseEvent: MouseEvent): Unit = {
-    val clickPoint = Point2D(mouseEvent.x, mouseEvent.y)
+    val clickPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
 
     def pointsIntersect(p1: Point2D, p2: Point2D): Boolean =
       math.pow(p1.x-p2.x, 2) + math.pow(p1.y-p2.y, 2) <= math.pow(pointRadius, 2)
 
-    val currentLayerr = layers(currentLayer)
-
-    lastClickedPointIndex = currentLayerr.splinePoints.indexWhere { point => pointsIntersect(point, clickPoint) }
+    lastClickedPointIndex = currentLayer.splinePoints.indexWhere { point => pointsIntersect(point, clickPoint) }
     existingPointClicked = lastClickedPointIndex >= 0
     if (isControlPressed && existingPointClicked) {
-      currentLayerr.splinePoints.remove(lastClickedPointIndex)
+      currentLayer.splinePoints.remove(lastClickedPointIndex)
       existingPointClicked = false
       pointWasMoved = true
       redrawScene()
@@ -76,8 +82,8 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   }
 
   def onClick(mouseEvent: MouseEvent): Unit = {
-    val clickPoint = Point2D(mouseEvent.x, mouseEvent.y)
-    val pointToAdd = if (existingPointClicked) layers(currentLayer).splinePoints(lastClickedPointIndex)
+    val clickPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
+    val pointToAdd = if (existingPointClicked) currentLayer.splinePoints(lastClickedPointIndex)
                       else clickPoint
     if (!pointWasMoved && !existingPointClicked) {
       addAndDrawSplineSegment(pointToAdd)
@@ -87,42 +93,33 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
   def onDrag(mouseEvent: MouseEvent): Unit = {
     if (existingPointClicked) {
-      layers(currentLayer).splinePoints(lastClickedPointIndex) = Point2D(mouseEvent.x, mouseEvent.y)
+      currentLayer.splinePoints(lastClickedPointIndex) = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
       pointWasMoved = true
       redrawScene()
     }
   }
 
+  // [START] ******************** Spline Editing ********************
+
   private def addAndDrawSplineSegment(point: Point2D): Unit = {
-    layers(currentLayer).splinePoints += point
+    currentLayer.splinePoints += point
     drawPivots()
 
-    if (layers(currentLayer).splinePoints.length >= splinePower) {
+    if (currentLayer.splinePoints.length >= splinePower) {
       redrawSpline()
     }
   }
 
-  private def cleanCanvas(): Unit = {
-    canvas.graphicsContext2D.clearRect(
-      0,0,canvas.width.value, canvas.height.value
-    )
-  }
-
-  private def drawPivots(): Unit = {
-    val gc = canvas.graphicsContext2D
-    gc.fill = Color.Red
-    layers(currentLayer).splinePoints.foreach { point =>
-      gc.fillOval(point.x, point.y, pointRadius, pointRadius)
-    }
-  }
+  private def splinePoints(): Seq[Point2D] =
+    currentLayer.splinePoints.sliding(splinePower).flatMap(splineSegmentPoints(_)).toSeq
 
   private def lastSplineSegmentPivots(): Seq[Point2D] = {
-    val points = layers(currentLayer).splinePoints
+    val points = currentLayer.splinePoints
     points.slice(points.length-splinePower, points.length)
   }
 
   private def splineSegmentPoints(segment: Seq[Point2D] = lastSplineSegmentPivots()): Seq[Point2D] = {
-    val delta = 1 / (100.0 * layers(currentLayer).splinePoints.length)
+    val delta = 1 / (100.0 * currentLayer.splinePoints.length)
     val xVector = DenseVector(segment.map(_.x).toArray[Double])
     val yVector = DenseVector(segment.map(_.y).toArray[Double])
 
@@ -135,28 +132,56 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     }
   }
 
+  // [START] ******************** Canvas manipulation functions ********************
+
+  private def cleanCanvas(): Unit = {
+    canvas.graphicsContext2D.clearRect(
+      0,0,canvas.width.value, canvas.height.value
+    )
+  }
+
   private def drawPoints(points: Seq[Point2D]): Unit = {
     val gc = canvas.graphicsContext2D
     gc.stroke = Color.Black
-    points.seq.sliding(2).foreach { case Seq(Point2D(x1, y1), Point2D(x2, y2)) =>
-      gc.strokeLine(x1,y1,x2,y2)
+    points.seq.sliding(2).foreach { case Seq(p1, p2) =>
+      val mapped1 = toPixelCoordinates(p1)
+      val mapped2 = toPixelCoordinates(p2)
+      gc.strokeLine(mapped1.x, mapped1.y, mapped2.x, mapped2.y)
     }
   }
 
-  private def splinePoints(): Seq[Point2D] =
-    layers(currentLayer).splinePoints.sliding(splinePower).flatMap(splineSegmentPoints(_)).toSeq
+  private def drawPivots(): Unit = {
+    val gc = canvas.graphicsContext2D
+    gc.fill = Color.Red
+    currentLayer.splinePoints.foreach { point =>
+      val mappedPoint = toPixelCoordinates(point)
+      gc.fillOval(mappedPoint.x, mappedPoint.y, pointRadius, pointRadius)
+    }
+  }
 
   private def redrawSpline(): Unit = {
-    if (layers(currentLayer).splinePoints.length >= splinePower) {
+    if (currentLayer.splinePoints.length >= splinePower) {
       drawPoints(splinePoints())
     }
   }
 
   private def redrawScene(): Unit = {
     cleanCanvas()
+    drawAxis()
     drawPivots()
     redrawSpline()
   }
+
+  private def drawAxis(): Unit = {
+    val gc = canvas.graphicsContext2D
+    val width = canvas.width.value
+    val height = canvas.height.value
+    gc.strokeLine(width/2, 0, width/2, height)
+    gc.strokeLine(0, height/2, width, height/2)
+  }
+
+  // [END] ******************** Canvas manipulation functions ********************
+
 
   override def setScene(scene: Scene): Unit = {
     this.scene = Some(scene)
@@ -184,5 +209,19 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   }
 
   def onShowAllSolids(): Unit = ???
+
+  private def onLayerIndexChanged(newIndex: Int): Unit = {
+    currentLayerIndex = newIndex
+    currentLayer = layers(newIndex)
+  }
+
+
+  private def toPixelCoordinates(point2D: Point2D): Point2D = point2D match {
+    case Point2D(x, y) => Point2D(x + canvas.width.value / 2, canvas.height.value / 2 - y)
+  }
+
+  private def toSpaceCoordinates(point2D: Point2D): Point2D = point2D match {
+    case Point2D(x, y) => Point2D(x - canvas.width.value / 2, canvas.height.value / 2 - y)
+  }
 
 }
