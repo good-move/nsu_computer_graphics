@@ -60,7 +60,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val controlKeyName = "Ctrl"
 
 
-  private val angleCells = 20
+  private val angleCells = 30
   private val segmentCells = 10
 
   private val a: Double = 0.0
@@ -193,8 +193,11 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     }
 
 
+    val tValues = DenseVector(1d, 1d, 1d, 1d)
     for (t <- tFrom until tUntil by delta) yield {
-      val tValues = DenseVector(t*t*t, t*t, t, 1)
+      tValues(0) = t*t*t
+      tValues(1) = t*t
+      tValues(2) = t
       val x = tValues dot (SplineMatrix * xVector)
       val y = tValues dot (SplineMatrix * yVector)
 
@@ -276,13 +279,13 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
     val transform = currentLayer.tmpRotationMatrix * currentLayer.tmpTranslateMatrix * currentLayer.tmpScaleMatrix
 
+    val transformedVector = DenseVector(0d,0d,0d,1.0)
     val shape = for (angle <- startAngle to endAngle by angleDelta) yield {
       splinePointsSeq.map { case Point2D(x, y) =>
-        val X = cos(angle) * y
-        val Y = sin(angle) * y
-        val Z = x
-
-        val p = transform * DenseVector(X, Y, Z, 1.0)
+        transformedVector(0) = cos(angle) * y
+        transformedVector(1) = sin(angle) * y
+        transformedVector(2) = x
+        val p = transform * transformedVector
         Point2D(p(0), p(1))
       }
     }
@@ -315,12 +318,12 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     redrawScene()
   }
 
-  def onShowSolid(): Unit = {
+  def onShowWireframe(): Unit = {
     workingMode = WorkingMode.Viewing
     redrawScene()
   }
 
-  def onShowAllSolids(): Unit = ???
+  def onShowAllWireframes(): Unit = ???
 
   def onEnableMove(): Unit = {
     this.viewMode = ViewMode.Move

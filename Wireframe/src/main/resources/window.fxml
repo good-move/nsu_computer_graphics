@@ -18,9 +18,9 @@
             AnchorPane.leftAnchor="0"
     >
         <ToolBar fx:id="toolbar" >
-            <Button text="Edit Baseline" onMouseClicked="#onEditBaseline" />
-            <Button text="Solid" onMouseClicked="#onShowSolid" />
-            <Button text="All solids" onMouseClicked="#onShowAllSolids" />
+            <Button text="Edit spline" onMouseClicked="#onEditBaseline" />
+            <Button text="Show wireframe" onMouseClicked="#onShowWireframe" />
+            <Button text="All wireframes" onMouseClicked="#onShowAllWireframes" />
 
             <Separator orientation="VERTICAL" />
 
