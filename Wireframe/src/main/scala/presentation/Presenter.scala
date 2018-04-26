@@ -3,7 +3,7 @@ package presentation
 import breeze.linalg.{DenseMatrix, DenseVector}
 import data_layer.geometry._
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.input.{DragEvent, KeyEvent, MouseDragEvent, MouseEvent}
+import scalafx.scene.input._
 import scalafx.scene.layout.AnchorPane
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
@@ -70,6 +70,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val endAngle: Double = 2 * math.Pi
 
   private var dragAnchor = Point2D(.0,.0)
+  private var scaleFactor = 1d
 
   {
     canvas.height <== wrapperPane.height - toolbar.height
@@ -81,7 +82,14 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     canvas.onMouseReleased = (_) => {
       currentLayer.rotationMatrix = currentLayer.tmpRotationMatrix
       currentLayer.translateMatrix = currentLayer.tmpTranslateMatrix
-      currentLayer.scaleMatrix = currentLayer.tmpScaleMatrix
+    }
+
+    canvas.onScroll = (scrollEvent: ScrollEvent) => {
+      if (workingMode == WorkingMode.Viewing) {
+        scaleFactor += (scrollEvent.deltaY / 1000)
+        currentLayer.tmpScaleMatrix = ScaleMatrix(scaleFactor).matrix
+        redrawScene()
+      }
     }
   }
 
@@ -177,9 +185,13 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private def splineSegmentPoints(segment: Seq[Point2D] = lastSplineSegmentPivots(),
                                   tFrom: Double = 0d,
                                   tUntil: Double = 1d): Seq[Point2D] = {
-    val delta = 1 / (50.0 * currentLayer.splinePivots.length)
-    val xVector = DenseVector(segment.map(_.x).toArray[Double])
-    val yVector = DenseVector(segment.map(_.y).toArray[Double])
+    val delta = 1 / (25.0 * currentLayer.splinePivots.length)
+
+    val (xVector, yVector) = segment match {
+      case Seq(Point2D(x1, y1), Point2D(x2, y2), Point2D(x3, y3), Point2D(x4, y4)) =>
+        (DenseVector(x1, x2, x3, x4), DenseVector(y1, y2, y3, y4))
+    }
+
 
     for (t <- tFrom until tUntil by delta) yield {
       val tValues = DenseVector(t*t*t, t*t, t, 1)
@@ -262,7 +274,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     val splinePointsSeq = segments.flatMap(splineSegmentPoints(_))
 
 
-    val transform = currentLayer.tmpRotationMatrix * currentLayer.tmpTranslateMatrix
+    val transform = currentLayer.tmpRotationMatrix * currentLayer.tmpTranslateMatrix * currentLayer.tmpScaleMatrix
 
     val shape = for (angle <- startAngle to endAngle by angleDelta) yield {
       splinePointsSeq.map { case Point2D(x, y) =>
