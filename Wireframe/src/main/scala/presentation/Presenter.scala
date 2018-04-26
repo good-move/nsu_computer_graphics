@@ -60,17 +60,18 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val controlKeyName = "Ctrl"
 
 
-  private val angleCells = 30
+  private val angleCells = 20
   private val segmentCells = 10
 
   private val a: Double = 0.0
   private val b: Double = 0.9
 
   private val startAngle: Double = 0
-  private val endAngle: Double = 2 * math.Pi
+  private val endAngle: Double = 2*math.Pi
 
   private var dragAnchor = Point2D(.0,.0)
   private var scaleFactor = 1d
+  private var shouldDisplayWireframeBox = false
 
   {
     canvas.height <== wrapperPane.height - toolbar.height
@@ -205,6 +206,26 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     }
   }
 
+  private def createBoxPlanes(width: Double, minZ: Double, maxZ: Double): (Seq[Point3D], Seq[Point3D]) = {
+    val topPlane = Seq(
+      Point3D(width/2, width/2, minZ),
+      Point3D(width/2, -width/2, minZ),
+      Point3D(-width/2, -width/2, minZ),
+      Point3D(-width/2, width/2, minZ),
+      Point3D(width/2, width/2, minZ)
+    )
+
+    val bottomPlane = Seq(
+      Point3D(width/2, width/2, maxZ),
+      Point3D(width/2, -width/2, maxZ),
+      Point3D(-width/2, -width/2, maxZ),
+      Point3D(-width/2, width/2, maxZ),
+      Point3D(width/2, width/2, maxZ)
+    )
+
+    (bottomPlane, topPlane)
+  }
+
   // [START] ******************** Canvas manipulation functions ********************
 
   private def cleanCanvas(): Unit = {
@@ -247,7 +268,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
         drawPivots()
         redrawSpline()
       case WorkingMode.Viewing =>
-        drawSolid()
+        drawWireframe()
     }
 
   }
@@ -260,7 +281,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     gc.strokeLine(0, height/2, width, height/2)
   }
 
-  private def drawSolid(): Unit = {
+  private def drawWireframe(): Unit = {
     val m = currentLayer.splinePivots.length - splinePower
     val startSegmentIndex = (a * m).toInt
     val endSegmentIndex = (b * m).toInt
@@ -279,18 +300,62 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
     val transform = currentLayer.tmpRotationMatrix * currentLayer.tmpTranslateMatrix * currentLayer.tmpScaleMatrix
 
-    val transformedVector = DenseVector(0d,0d,0d,1.0)
+    val transformedVector = DenseVector(0d,0d,0d,1d)
     val shape = for (angle <- startAngle to endAngle by angleDelta) yield {
       splinePointsSeq.map { case Point2D(x, y) =>
         transformedVector(0) = cos(angle) * y
         transformedVector(1) = sin(angle) * y
-        transformedVector(2) = x
+        transformedVector(2) = -x
         val p = transform * transformedVector
         Point2D(p(0), p(1))
       }
     }
 
     shape.foreach { segment => drawPoints(segment) }
+
+    if (shouldDisplayWireframeBox) {
+      drawWireframeBox(splinePointsSeq, transform)
+    }
+
+  }
+
+  private def drawWireframeBox(splinePointsSeq: Seq[Point2D], transform: DenseMatrix[Double]): Unit = {
+    // Shape Box dimensions
+    var minZ = splinePointsSeq.head.x
+    var maxZ = splinePointsSeq.last.x
+    var maxL = 0d
+    splinePointsSeq.foreach { case Point2D(x, y) =>
+      if (x > maxZ) {
+        maxZ = x
+      }
+      if (x < minZ) {
+        minZ = x
+      }
+      if (maxL < y.abs) {
+        maxL = y.abs
+      }
+    }
+
+    val (bottomBoxPlane, topBoxPlane) = createBoxPlanes(width = 2 * maxL, -maxZ, -minZ)
+    val transformedVector = DenseVector(0d,0d,0d,1d)
+
+    def mapPlane(plane: Seq[Point3D]): Seq[Point2D] = plane.map { case Point3D(x, y, z) =>
+      transformedVector(0) = x
+      transformedVector(1) = y
+      transformedVector(2) = z
+      transformedVector(3) = 1d
+      val p = transform * transformedVector
+      Point2D(p(0), p(1))
+    }
+
+    val mappedTopPlane = mapPlane(topBoxPlane)
+    val mappedBottomPlane = mapPlane(bottomBoxPlane)
+
+    drawPoints(mappedTopPlane)
+    drawPoints(mappedBottomPlane)
+    for (i <- mappedBottomPlane.indices) {
+      drawPoints(Seq(mappedTopPlane(i), mappedBottomPlane(i)))
+    }
   }
 
   // [END] ******************** Canvas manipulation functions ********************
@@ -331,6 +396,11 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
   def onEnableRotate(): Unit = {
     this.viewMode = ViewMode.Rotate
+  }
+
+  def onToggleBox(): Unit = {
+    this.shouldDisplayWireframeBox = !this.shouldDisplayWireframeBox
+    redrawScene()
   }
 
   private def onLayerIndexChanged(newIndex: Int): Unit = {

@@ -26,6 +26,12 @@
 
             <Button text="Move" onMouseClicked="#onEnableMove" />
             <Button text="Rotate" onMouseClicked="#onEnableRotate" />
+
+            <Separator orientation="VERTICAL" />
+
+            <Button text="Toggle Box" onMouseClicked="#onToggleBox" />
+
+
         </ToolBar>
         <Canvas fx:id="canvas"
                 onMousePressed="#onPressed"
