@@ -44,15 +44,6 @@ object kVector {
   val vector = DenseVector(0d, 0d, 1d, 1d)
 }
 
-object DoubleExtension {
-
-  implicit class RichDouble(val value: Double) {
-    def ^(power: Double): Double = math.pow(value, power)
-  }
-
-}
-
-
 @sfxml
 class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: Canvas) extends IPresenter {
 
@@ -88,8 +79,8 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val angleCells = 20
   private val segmentCells = 10
 
-  private val a: Double = 0.0
-  private val b: Double = 0.9
+  private val a: Double = 0
+  private val b: Double = 1
 
   private val startAngle: Double = 0
   private val endAngle: Double = 2*math.Pi
@@ -211,7 +202,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private def splineSegmentPoints(segment: Seq[Point2D] = lastSplineSegmentPivots(),
                                   tFrom: Double = 0d,
                                   tUntil: Double = 1d): Seq[Point2D] = {
-    val delta = 1 / (25.0 * currentLayer.splinePivots.length)
+    val delta = 1 / 25.0
 
     val (xVector, yVector) = segment match {
       case Seq(Point2D(x1, y1), Point2D(x2, y2), Point2D(x3, y3), Point2D(x4, y4)) =>
@@ -350,7 +341,6 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     val shiftedOrigin = transform * originVector.vector
 
     def shiftVector(vector: DenseVector[Double]): DenseVector[Double] = {
-      import DoubleExtension._
       val result = transform * ScaleMatrix(length).matrix * vector
       if (result(3) != 1 && result(3) != 0) {
         result /= result(3)
