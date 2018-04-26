@@ -323,8 +323,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
     val splinePointsSeq = segments.flatMap(splineSegmentPoints(_))
 
-
-    val transform = currentLayer.tmpRotationMatrix * currentLayer.tmpTranslateMatrix * currentLayer.tmpScaleMatrix
+    val shapeTransform  = currentLayer.tmpTranslateMatrix * currentLayer.tmpRotationMatrix * currentLayer.tmpScaleMatrix
 
     val transformedVector = DenseVector(0d,0d,0d,1d)
     val shape = for (angle <- startAngle to endAngle by angleDelta) yield {
@@ -332,7 +331,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
         transformedVector(0) = cos(angle) * y
         transformedVector(1) = sin(angle) * y
         transformedVector(2) = -x
-        val p = transform * transformedVector
+        val p = shapeTransform * transformedVector
         Point2D(p(0), p(1))
       }
     }
@@ -341,9 +340,9 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     shape.foreach { segment => drawPoints(segment) }
 
     if (shouldDisplayWireframeBox) {
-      drawWireframeBox(splinePointsSeq, transform)
+      drawWireframeBox(splinePointsSeq, shapeTransform)
     }
-    drawLocalAxis(transform)
+    drawLocalAxis(shapeTransform)
 
   }
 
