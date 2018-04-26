@@ -8,7 +8,7 @@ import scalafx.scene.layout.AnchorPane
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
 import breeze.linalg._
-import breeze.numerics.{cos, sin}
+import breeze.numerics.{cos, sin, sqrt}
 import scalafx.scene.Scene
 import scalafx.scene.control.ToolBar
 import scalafx.scene.paint.Color
@@ -27,6 +27,31 @@ object ViewMode extends Enumeration {
   type ViewMode = Value
   val Rotate, Move = Value
 }
+
+object originVector {
+  val vector = DenseVector(0d, 0d, 0d, 1d)
+}
+
+object iVector {
+  val vector = DenseVector(1d, 0d, 0d, 1d)
+}
+
+object jVector {
+  val vector = DenseVector(0d, 1d, 0d, 1d)
+}
+
+object kVector {
+  val vector = DenseVector(0d, 0d, 1d, 1d)
+}
+
+object DoubleExtension {
+
+  implicit class RichDouble(val value: Double) {
+    def ^(power: Double): Double = math.pow(value, power)
+  }
+
+}
+
 
 @sfxml
 class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: Canvas) extends IPresenter {
@@ -148,8 +173,8 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
             YRotationMatrix(xAngle).matrix
 
         case ViewMode.Move =>
-          val xShift = dragDelta.x / 2
-          val yShift = dragDelta.y / 2
+          val xShift = dragDelta.x
+          val yShift = dragDelta.y
           currentLayer.tmpTranslateMatrix = currentLayer.translateMatrix * TranslateMatrix(xShift, yShift, 0).matrix
       }
       redrawScene()
@@ -234,9 +259,9 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     )
   }
 
-  private def drawPoints(points: Seq[Point2D]): Unit = {
+  private def drawPoints(points: Seq[Point2D], color: Color = Color.Black): Unit = {
     val gc = canvas.graphicsContext2D
-    gc.stroke = Color.Black
+    gc.stroke = color
     points.seq.sliding(2).foreach { case Seq(p1, p2) =>
       val mapped1 = toPixelCoordinates(p1)
       val mapped2 = toPixelCoordinates(p2)
@@ -277,6 +302,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     val gc = canvas.graphicsContext2D
     val width = canvas.width.value
     val height = canvas.height.value
+    gc.stroke = Color.Gray
     gc.strokeLine(width/2, 0, width/2, height)
     gc.strokeLine(0, height/2, width, height/2)
   }
@@ -311,12 +337,36 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
       }
     }
 
+
     shape.foreach { segment => drawPoints(segment) }
 
     if (shouldDisplayWireframeBox) {
       drawWireframeBox(splinePointsSeq, transform)
     }
+    drawLocalAxis(transform)
 
+  }
+
+  private def drawLocalAxis(transform: DenseMatrix[Double], length: Double = 100d): Unit = {
+    val shiftedOrigin = transform * originVector.vector
+
+    def shiftVector(vector: DenseVector[Double]): DenseVector[Double] = {
+      import DoubleExtension._
+      val result = transform * ScaleMatrix(length).matrix * vector
+      if (result(3) != 1 && result(3) != 0) {
+        result /= result(3)
+      }
+      result
+    }
+
+    val iShifted = shiftVector(iVector.vector)
+    val jShifted = shiftVector(jVector.vector)
+    val kShifted = shiftVector(kVector.vector)
+    val origin = Point2D(shiftedOrigin(0), shiftedOrigin(1))
+
+    drawPoints(Seq(origin, Point2D(iShifted(0), iShifted(1))), Color.Red)
+    drawPoints(Seq(origin, Point2D(jShifted(0), jShifted(1))), Color.Green)
+    drawPoints(Seq(origin, Point2D(kShifted(0), kShifted(1))), Color.Blue)
   }
 
   private def drawWireframeBox(splinePointsSeq: Seq[Point2D], transform: DenseMatrix[Double]): Unit = {
