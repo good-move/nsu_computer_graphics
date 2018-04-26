@@ -6,6 +6,7 @@
 
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="presentation.Presenter"
@@ -20,6 +21,11 @@
             <Button text="Edit Baseline" onMouseClicked="#onEditBaseline" />
             <Button text="Solid" onMouseClicked="#onShowSolid" />
             <Button text="All solids" onMouseClicked="#onShowAllSolids" />
+
+            <Separator orientation="VERTICAL" />
+
+            <Button text="Move" onMouseClicked="#onEnableMove" />
+            <Button text="Rotate" onMouseClicked="#onEnableRotate" />
         </ToolBar>
         <Canvas fx:id="canvas"
                 onMousePressed="#onPressed"

@@ -1,13 +1,14 @@
 package presentation
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import data_layer.geometry.Point2D
+import data_layer.geometry._
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.input.{KeyEvent, MouseEvent}
+import scalafx.scene.input.{DragEvent, KeyEvent, MouseDragEvent, MouseEvent}
 import scalafx.scene.layout.AnchorPane
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
 import breeze.linalg._
+import breeze.numerics.{cos, sin}
 import scalafx.scene.Scene
 import scalafx.scene.control.ToolBar
 import scalafx.scene.paint.Color
@@ -20,6 +21,11 @@ import scalafx.scene.paint.Color
 object WorkingMode extends Enumeration {
   type WorkingMode = Value
   val Editing, Viewing = Value
+}
+
+object ViewMode extends Enumeration {
+  type ViewMode = Value
+  val Rotate, Move = Value
 }
 
 @sfxml
@@ -38,6 +44,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val layers = Seq[Layer](new Layer())
   private var currentLayer = layers.head
   private var workingMode = WorkingMode.Editing
+  private var viewMode = ViewMode.Rotate
   private var currentLayerIndex = 0
 
   private val splinePower = 4
@@ -53,6 +60,16 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val controlKeyName = "Ctrl"
 
 
+  private val angleCells = 20
+  private val segmentCells = 10
+
+  private val a: Double = 0.0
+  private val b: Double = 0.9
+
+  private val startAngle: Double = 0
+  private val endAngle: Double = 2 * math.Pi
+
+  private var dragAnchor = Point2D(.0,.0)
 
   {
     canvas.height <== wrapperPane.height - toolbar.height
@@ -61,69 +78,110 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     canvas.width.onChange { (_,_, _) => redrawScene() }
     canvas.height.onChange { (_,_, _) => redrawScene() }
 
+    canvas.onMouseReleased = (_) => {
+      currentLayer.rotationMatrix = currentLayer.tmpRotationMatrix
+      currentLayer.translateMatrix = currentLayer.tmpTranslateMatrix
+      currentLayer.scaleMatrix = currentLayer.tmpScaleMatrix
+    }
   }
 
   // [START] ******************** Canvas Event Handlers ********************
 
-  def onPressed(mouseEvent: MouseEvent): Unit = {
-    val clickPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
+  def onPressed(mouseEvent: MouseEvent): Unit = workingMode match {
+    case WorkingMode.Editing =>
+      val clickPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
 
-    def pointsIntersect(p1: Point2D, p2: Point2D): Boolean =
-      math.pow(p1.x-p2.x, 2) + math.pow(p1.y-p2.y, 2) <= math.pow(pointRadius, 2)
+      def pointsIntersect(p1: Point2D, p2: Point2D): Boolean =
+        math.pow(p1.x-p2.x, 2) + math.pow(p1.y-p2.y, 2) <= math.pow(pointRadius, 2)
 
-    lastClickedPointIndex = currentLayer.splinePoints.indexWhere { point => pointsIntersect(point, clickPoint) }
-    existingPointClicked = lastClickedPointIndex >= 0
-    if (isControlPressed && existingPointClicked) {
-      currentLayer.splinePoints.remove(lastClickedPointIndex)
-      existingPointClicked = false
-      pointWasMoved = true
-      redrawScene()
-    }
+      lastClickedPointIndex = currentLayer.splinePivots.indexWhere { point => pointsIntersect(point, clickPoint) }
+      existingPointClicked = lastClickedPointIndex >= 0
+      if (isControlPressed && existingPointClicked) {
+        currentLayer.splinePivots.remove(lastClickedPointIndex)
+        existingPointClicked = false
+        pointWasMoved = true
+        redrawScene()
+      }
+    case WorkingMode.Viewing =>
+      dragAnchor = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
   }
 
-  def onClick(mouseEvent: MouseEvent): Unit = {
-    val clickPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
-    val pointToAdd = if (existingPointClicked) currentLayer.splinePoints(lastClickedPointIndex)
-                      else clickPoint
-    if (!pointWasMoved && !existingPointClicked) {
-      addAndDrawSplineSegment(pointToAdd)
-    }
-    pointWasMoved = false
+  def onClick(mouseEvent: MouseEvent): Unit = workingMode match {
+    case WorkingMode.Editing =>
+      val clickPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
+      val pointToAdd = if (existingPointClicked) currentLayer.splinePivots(lastClickedPointIndex)
+                        else clickPoint
+      if (!pointWasMoved && !existingPointClicked) {
+        addAndDrawSplineSegment(pointToAdd)
+      }
+      pointWasMoved = false
+    case WorkingMode.Viewing =>
   }
 
-  def onDrag(mouseEvent: MouseEvent): Unit = {
-    if (existingPointClicked) {
-      currentLayer.splinePoints(lastClickedPointIndex) = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
-      pointWasMoved = true
+  def onDrag(mouseEvent: MouseEvent): Unit = workingMode match {
+    case WorkingMode.Editing =>
+      if (existingPointClicked) {
+        currentLayer.splinePivots(lastClickedPointIndex) = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
+        pointWasMoved = true
+        redrawScene()
+      }
+    case WorkingMode.Viewing =>
+      val currentPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
+      val dragDelta =  Point2D(currentPoint.x - dragAnchor.x, currentPoint.y - dragAnchor.y)
+
+      viewMode match {
+        case ViewMode.Rotate =>
+          val xAngle = dragDelta.x / canvas.width.value * math.Pi
+          val yAngle = dragDelta.y / canvas.height.value * math.Pi
+
+          currentLayer.tmpRotationMatrix = currentLayer.rotationMatrix *
+            XRotationMatrix(yAngle).matrix *
+            YRotationMatrix(xAngle).matrix
+
+        case ViewMode.Move =>
+          val xShift = dragDelta.x / 2
+          val yShift = dragDelta.y / 2
+          currentLayer.tmpTranslateMatrix = currentLayer.translateMatrix * TranslateMatrix(xShift, yShift, 0).matrix
+      }
       redrawScene()
-    }
   }
 
   // [START] ******************** Spline Editing ********************
 
   private def addAndDrawSplineSegment(point: Point2D): Unit = {
-    currentLayer.splinePoints += point
+    currentLayer.splinePivots += point
     drawPivots()
 
-    if (currentLayer.splinePoints.length >= splinePower) {
+    if (currentLayer.splinePivots.length >= splinePower) {
       redrawSpline()
     }
   }
 
   private def splinePoints(): Seq[Point2D] =
-    currentLayer.splinePoints.sliding(splinePower).flatMap(splineSegmentPoints(_)).toSeq
+    currentLayer.splinePivots.sliding(splinePower).flatMap(splineSegmentPoints(_)).toSeq
+
+  private def splineSegmentPivots(segmentIndex: Int): Seq[Point2D] = {
+    val points = currentLayer.splinePivots
+    points.slice(segmentIndex,segmentIndex + splinePower)
+  }
+
+  private def splineSegment(from: Int, to: Int): Seq[Seq[Point2D]] = {
+    for (segmentIndex <- from to to) yield splineSegmentPivots(segmentIndex)
+  }
 
   private def lastSplineSegmentPivots(): Seq[Point2D] = {
-    val points = currentLayer.splinePoints
+    val points = currentLayer.splinePivots
     points.slice(points.length-splinePower, points.length)
   }
 
-  private def splineSegmentPoints(segment: Seq[Point2D] = lastSplineSegmentPivots()): Seq[Point2D] = {
-    val delta = 1 / (100.0 * currentLayer.splinePoints.length)
+  private def splineSegmentPoints(segment: Seq[Point2D] = lastSplineSegmentPivots(),
+                                  tFrom: Double = 0d,
+                                  tUntil: Double = 1d): Seq[Point2D] = {
+    val delta = 1 / (50.0 * currentLayer.splinePivots.length)
     val xVector = DenseVector(segment.map(_.x).toArray[Double])
     val yVector = DenseVector(segment.map(_.y).toArray[Double])
 
-    for (t <- 0.0 until 1.0 by delta) yield {
+    for (t <- tFrom until tUntil by delta) yield {
       val tValues = DenseVector(t*t*t, t*t, t, 1)
       val x = tValues dot (SplineMatrix * xVector)
       val y = tValues dot (SplineMatrix * yVector)
@@ -153,14 +211,14 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private def drawPivots(): Unit = {
     val gc = canvas.graphicsContext2D
     gc.fill = Color.Red
-    currentLayer.splinePoints.foreach { point =>
+    currentLayer.splinePivots.foreach { point =>
       val mappedPoint = toPixelCoordinates(point)
       gc.fillOval(mappedPoint.x, mappedPoint.y, pointRadius, pointRadius)
     }
   }
 
   private def redrawSpline(): Unit = {
-    if (currentLayer.splinePoints.length >= splinePower) {
+    if (currentLayer.splinePivots.length >= splinePower) {
       drawPoints(splinePoints())
     }
   }
@@ -168,8 +226,15 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private def redrawScene(): Unit = {
     cleanCanvas()
     drawAxis()
-    drawPivots()
-    redrawSpline()
+
+    workingMode match  {
+      case WorkingMode.Editing =>
+        drawPivots()
+        redrawSpline()
+      case WorkingMode.Viewing =>
+        drawSolid()
+    }
+
   }
 
   private def drawAxis(): Unit = {
@@ -178,6 +243,39 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     val height = canvas.height.value
     gc.strokeLine(width/2, 0, width/2, height)
     gc.strokeLine(0, height/2, width, height/2)
+  }
+
+  private def drawSolid(): Unit = {
+    val m = currentLayer.splinePivots.length - splinePower
+    val startSegmentIndex = (a * m).toInt
+    val endSegmentIndex = (b * m).toInt
+    val segments = splineSegment(startSegmentIndex, endSegmentIndex)
+
+    val firstSegmentStart = a*m - (a*m).toInt
+    val lastSegmentEnd = b*m - (b*m).toInt
+
+    val fsPoints = splineSegmentPoints(segments.head, tFrom = firstSegmentStart)
+    val lsPoints = splineSegmentPoints(segments.head, tUntil = lastSegmentEnd)
+
+    val angleDelta =  (endAngle - startAngle) / angleCells
+
+    val splinePointsSeq = segments.flatMap(splineSegmentPoints(_))
+
+
+    val transform = currentLayer.tmpRotationMatrix * currentLayer.tmpTranslateMatrix
+
+    val shape = for (angle <- startAngle to endAngle by angleDelta) yield {
+      splinePointsSeq.map { case Point2D(x, y) =>
+        val X = cos(angle) * y
+        val Y = sin(angle) * y
+        val Z = x
+
+        val p = transform * DenseVector(X, Y, Z, 1.0)
+        Point2D(p(0), p(1))
+      }
+    }
+
+    shape.foreach { segment => drawPoints(segment) }
   }
 
   // [END] ******************** Canvas manipulation functions ********************
@@ -201,14 +299,24 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   }
 
   def onEditBaseline(): Unit = {
-
+    workingMode = WorkingMode.Editing
+    redrawScene()
   }
 
   def onShowSolid(): Unit = {
-
+    workingMode = WorkingMode.Viewing
+    redrawScene()
   }
 
   def onShowAllSolids(): Unit = ???
+
+  def onEnableMove(): Unit = {
+    this.viewMode = ViewMode.Move
+  }
+
+  def onEnableRotate(): Unit = {
+    this.viewMode = ViewMode.Rotate
+  }
 
   private def onLayerIndexChanged(newIndex: Int): Unit = {
     currentLayerIndex = newIndex
