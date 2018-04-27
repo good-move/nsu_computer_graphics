@@ -8,7 +8,7 @@ import scalafx.scene.layout.AnchorPane
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
 import breeze.linalg._
-import breeze.numerics.{cos, sin, sqrt}
+import breeze.numerics.{cos, sin}
 import scalafx.scene.Scene
 import scalafx.scene.control.ToolBar
 import scalafx.scene.paint.Color
@@ -78,9 +78,10 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
   private val angleCells = 20
   private val segmentCells = 10
+  private val angleScaleFactor = 5d
 
-  private val a: Double = 0
-  private val b: Double = 1
+  private val a: Double = 0.3
+  private val b: Double = 0.7
 
   private val startAngle: Double = 0
   private val endAngle: Double = 2*math.Pi
@@ -96,7 +97,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     canvas.width.onChange { (_,_, _) => redrawScene() }
     canvas.height.onChange { (_,_, _) => redrawScene() }
 
-    canvas.onMouseReleased = (_) => {
+    canvas.onMouseReleased = _ => {
       currentLayer.rotationMatrix = currentLayer.tmpRotationMatrix
       currentLayer.translateMatrix = currentLayer.tmpTranslateMatrix
     }
@@ -186,11 +187,10 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     currentLayer.splinePivots.sliding(splinePower).flatMap(splineSegmentPoints(_)).toSeq
 
   private def splineSegmentPivots(segmentIndex: Int): Seq[Point2D] = {
-    val points = currentLayer.splinePivots
-    points.slice(segmentIndex,segmentIndex + splinePower)
+    currentLayer.splinePivots.slice(segmentIndex, segmentIndex + splinePower)
   }
 
-  private def splineSegment(from: Int, to: Int): Seq[Seq[Point2D]] = {
+  private def splineSegments(from: Int, to: Int): Seq[Seq[Point2D]] = {
     for (segmentIndex <- from to to) yield splineSegmentPivots(segmentIndex)
   }
 
@@ -201,7 +201,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
   private def splineSegmentPoints(segment: Seq[Point2D] = lastSplineSegmentPivots(),
                                   tFrom: Double = 0d,
-                                  tUntil: Double = 1d): Seq[Point2D] = {
+                                  tTo: Double = 1d): Seq[Point2D] = {
     val delta = 1 / 25.0
 
     val (xVector, yVector) = segment match {
@@ -211,7 +211,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
 
     val tValues = DenseVector(1d, 1d, 1d, 1d)
-    for (t <- tFrom until tUntil by delta) yield {
+    for (t <- (tFrom to tTo by delta).union(Seq(tTo))) yield {
       tValues(0) = t*t*t
       tValues(1) = t*t
       tValues(2) = t
@@ -299,25 +299,34 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   }
 
   private def drawWireframe(): Unit = {
-    val m = currentLayer.splinePivots.length - splinePower
-    val startSegmentIndex = (a * m).toInt
-    val endSegmentIndex = (b * m).toInt
-    val segments = splineSegment(startSegmentIndex, endSegmentIndex)
+    val segmentsCount = currentLayer.splinePivots.length - splinePower + 1
+    val leftBound = a * segmentsCount
+    val rightBound = b * segmentsCount
+    val firstSegmentIndex = leftBound.toInt
+    val lastSegmentIndex = rightBound.toInt
+    val firstSegmentStart = leftBound - firstSegmentIndex
+    val lastSegmentEnd = rightBound - lastSegmentIndex
 
-    val firstSegmentStart = a*m - (a*m).toInt
-    val lastSegmentEnd = b*m - (b*m).toInt
+    val intermediateSegments = splineSegments(firstSegmentIndex+1, lastSegmentIndex-1)
 
-    val fsPoints = splineSegmentPoints(segments.head, tFrom = firstSegmentStart)
-    val lsPoints = splineSegmentPoints(segments.head, tUntil = lastSegmentEnd)
-
-    val angleDelta =  (endAngle - startAngle) / angleCells
-
-    val splinePointsSeq = segments.flatMap(splineSegmentPoints(_))
+    val splinePointsSeq = if (firstSegmentIndex != lastSegmentIndex) {
+      val firstSegmentPoints = splineSegmentPoints(splineSegments(firstSegmentIndex, firstSegmentIndex).head, tFrom = firstSegmentStart)
+      val lastSegmentPoints = splineSegmentPoints(splineSegments(lastSegmentIndex, lastSegmentIndex).head, tTo = lastSegmentEnd)
+      firstSegmentPoints.union(intermediateSegments.flatMap(splineSegmentPoints(_))).union(lastSegmentPoints)
+    } else {
+      splineSegmentPoints(
+        splineSegments(firstSegmentIndex, firstSegmentIndex).head,
+        tFrom = firstSegmentStart,
+        tTo = lastSegmentEnd
+      )
+    }
 
     val shapeTransform  = currentLayer.tmpTranslateMatrix * currentLayer.tmpRotationMatrix * currentLayer.tmpScaleMatrix
-
     val transformedVector = DenseVector(0d,0d,0d,1d)
-    val shape = for (angle <- startAngle to endAngle by angleDelta) yield {
+
+    val angleDelta =  (endAngle - startAngle) / angleCells
+    // Calculate vertical frame sets
+    val verticalFrame = for (angle <- startAngle to endAngle by angleDelta) yield {
       splinePointsSeq.map { case Point2D(x, y) =>
         transformedVector(0) = cos(angle) * y
         transformedVector(1) = sin(angle) * y
@@ -326,9 +335,36 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
         Point2D(p(0), p(1))
       }
     }
+    verticalFrame.foreach { segment => drawPoints(segment) }
 
+    // Calculate horizontal frame sets
+    val segmentDelta = segmentsCount / segmentCells.toDouble
+    val verticalTicks = for (t <- (leftBound to rightBound by segmentDelta).union(Seq(rightBound))) yield {
+      val segmentIndex = t.toInt
+      val parameterValue = t - segmentIndex
+      splineSegmentPoints(
+        splineSegments(segmentIndex, segmentIndex).head,
+        parameterValue,
+        parameterValue
+      ).head
+    }
 
-    shape.foreach { segment => drawPoints(segment) }
+    val angleScaledStep = angleDelta / angleScaleFactor
+
+    val horizontalFrame = verticalTicks.map { case Point2D(x, y) =>
+      for {
+        angle <- startAngle to endAngle by angleDelta
+        phi <- angle to (angle + angleDelta) by angleScaledStep
+      } yield {
+        transformedVector(0) = cos(phi) * y
+        transformedVector(1) = sin(phi) * y
+        transformedVector(2) = -x
+        val p = shapeTransform * transformedVector
+        Point2D(p(0), p(1))
+      }
+    }
+
+    horizontalFrame.foreach { level => drawPoints(level) }
 
     if (shouldDisplayWireframeBox) {
       drawWireframeBox(splinePointsSeq, shapeTransform)
