@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.scene.canvas.Canvas?>
-
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Separator?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="presentation.Presenter"
@@ -34,12 +31,10 @@
 
 
         </ToolBar>
-        <Canvas fx:id="canvas"
-                onMousePressed="#onPressed"
-                onMouseClicked="#onClick"
-                onMouseDragged="#onDrag"
-        />
-
+        <HBox>
+            <StackPane fx:id="canvasStack"/>
+            <ListView fx:id="layersList" prefWidth="200"/>
+        </HBox>
     </VBox>
 
 </AnchorPane>

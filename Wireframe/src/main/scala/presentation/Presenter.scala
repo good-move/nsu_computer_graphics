@@ -4,14 +4,14 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import data_layer.geometry._
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.input._
-import scalafx.scene.layout.AnchorPane
+import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
 import breeze.linalg._
 import breeze.numerics.{cos, sin}
 import data_layer.settings.Config
 import scalafx.scene.Scene
-import scalafx.scene.control.ToolBar
+import scalafx.scene.control.{ListView, ToolBar}
 import scalafx.scene.paint.Color
 
 import scala.collection.mutable.ListBuffer
@@ -50,7 +50,8 @@ object kVector {
 @sfxml
 class Presenter(val wrapperPane: AnchorPane,
                 val toolbar: ToolBar,
-                val canvas: Canvas,
+                val canvasStack: StackPane,
+                val layersList: ListView[String],
                 val config: Config) extends IPresenter {
 
   private val SplineMatrix: DenseMatrix[Double] = DenseMatrix(
@@ -63,7 +64,13 @@ class Presenter(val wrapperPane: AnchorPane,
   private var scene: Option[Scene] = None
 
   // General program state
-  private val layers = ListBuffer[Layer](config.wireframes.map(new Layer(_)): _*)
+  private val layers = ListBuffer[Layer](config.wireframes.map { wireframe =>
+    val canvas = new Canvas()
+    configureCanvas(canvas)
+    canvasStack.children.add(canvas)
+    new Layer(canvas, wireframe)
+  }: _*)
+
   private var currentLayer = layers.head
   private var workingMode = WorkingMode.Editing
   private var viewMode = ViewMode.Rotate
@@ -83,30 +90,40 @@ class Presenter(val wrapperPane: AnchorPane,
   private var dragAnchor = Point2D(.0,.0)
   private var shouldDisplayWireframeBox = false
 
+  // constructor
   {
+    redrawScene()
+  }
+
+  private def configureCanvas(canvas: Canvas): Unit = {
     canvas.height <== wrapperPane.height - toolbar.height
-    canvas.width <== wrapperPane.width
+    canvas.width <== wrapperPane.width - layersList.width
 
     canvas.width.onChange { (_,_, _) => redrawScene() }
     canvas.height.onChange { (_,_, _) => redrawScene() }
 
-    canvas.onMouseReleased = _ => {
-      currentLayer.rotationMatrix = currentLayer.tmpRotationMatrix
-      currentLayer.translateMatrix = currentLayer.tmpTranslateMatrix
-    }
-
-    canvas.onScroll = (scrollEvent: ScrollEvent) => {
-      if (workingMode == WorkingMode.Viewing) {
-        currentLayer.scaleFactor += (scrollEvent.deltaY / 1000)
-        currentLayer.tmpScaleMatrix = ScaleMatrix(currentLayer.scaleFactor).matrix
-        redrawScene()
-      }
-    }
+    canvas.onMousePressed = this.onPress
+    canvas.onMouseReleased = this.onRelease
+    canvas.onMouseClicked = this.onClick
+    canvas.onMouseDragged = this.onDrag
+    canvas.onScroll = this.onScroll
   }
 
   // [START] ******************** Canvas Event Handlers ********************
 
-  def onPressed(mouseEvent: MouseEvent): Unit = workingMode match {
+  private def onScroll(scrollEvent: ScrollEvent): Unit = {
+    if (workingMode == WorkingMode.Viewing) {
+      currentLayer.scaleFactor += (scrollEvent.deltaY / 1000)
+      currentLayer.tmpScaleMatrix = ScaleMatrix(currentLayer.scaleFactor).matrix
+      redrawScene()
+    }
+  }
+
+  private def onRelease(mouseEvent: MouseEvent): Unit = {
+    currentLayer.translateMatrix = currentLayer.tmpTranslateMatrix
+  }
+
+  private def onPress(mouseEvent: MouseEvent): Unit = workingMode match {
     case WorkingMode.Editing =>
       val clickPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
 
@@ -150,18 +167,24 @@ class Presenter(val wrapperPane: AnchorPane,
 
       viewMode match {
         case ViewMode.Rotate =>
-          val xAngle = dragDelta.x / canvas.width.value * math.Pi
-          val yAngle = dragDelta.y / canvas.height.value * math.Pi
+          val xAngle = dragDelta.x / currentLayer.canvas.width.value * math.Pi
+          val yAngle = dragDelta.y / currentLayer.canvas.height.value * math.Pi
 
-          currentLayer.tmpRotationMatrix = currentLayer.rotationMatrix *
-            XRotationMatrix(yAngle).matrix *
-            YRotationMatrix(xAngle).matrix
+          if (isControlPressed) {
+            currentLayer.rotationMatrix = currentLayer.rotationMatrix * ZRotationMatrix(xAngle).matrix
+          } else {
+            currentLayer.rotationMatrix = currentLayer.rotationMatrix *
+              XRotationMatrix(yAngle).matrix *
+              YRotationMatrix(xAngle).matrix
+
+          }
 
         case ViewMode.Move =>
           val xShift = dragDelta.x
           val yShift = dragDelta.y
           currentLayer.tmpTranslateMatrix = currentLayer.translateMatrix * TranslateMatrix(xShift, yShift, 0).matrix
       }
+      dragAnchor = currentPoint
       redrawScene()
   }
 
@@ -245,12 +268,14 @@ class Presenter(val wrapperPane: AnchorPane,
   // [START] ******************** Canvas manipulation functions ********************
 
   private def cleanCanvas(): Unit = {
+    val canvas = currentLayer.canvas
     canvas.graphicsContext2D.clearRect(
-      0,0,canvas.width.value, canvas.height.value
+      0, 0, canvas.width.value, canvas.height.value
     )
   }
 
   private def drawPoints(points: Seq[Point2D], color: Color = Color.Black): Unit = {
+    val canvas = currentLayer.canvas
     val gc = canvas.graphicsContext2D
     gc.stroke = color
     points.seq.sliding(2).foreach { case Seq(p1, p2) =>
@@ -261,6 +286,7 @@ class Presenter(val wrapperPane: AnchorPane,
   }
 
   private def drawPivots(): Unit = {
+    val canvas = currentLayer.canvas
     val gc = canvas.graphicsContext2D
     gc.fill = Color.Red
     currentLayer.splinePivots.foreach { point =>
@@ -290,6 +316,7 @@ class Presenter(val wrapperPane: AnchorPane,
   }
 
   private def drawAxis(): Unit = {
+    val canvas = currentLayer.canvas
     val gc = canvas.graphicsContext2D
     val width = canvas.width.value
     val height = canvas.height.value
@@ -321,7 +348,7 @@ class Presenter(val wrapperPane: AnchorPane,
       )
     }
 
-    val shapeTransform  = currentLayer.tmpTranslateMatrix * currentLayer.tmpRotationMatrix * currentLayer.tmpScaleMatrix
+    val shapeTransform  = currentLayer.tmpTranslateMatrix * currentLayer.rotationMatrix * currentLayer.tmpScaleMatrix
     val transformedVector = DenseVector(0d,0d,0d,1d)
 
 
@@ -338,7 +365,13 @@ class Presenter(val wrapperPane: AnchorPane,
         Point2D(p(0), p(1))
       }
     }
-    verticalFrame.foreach { segment => drawPoints(segment) }
+
+    val wireframeColor = Color.rgb(
+      currentLayer.wireframeColor.red,
+      currentLayer.wireframeColor.green,
+      currentLayer.wireframeColor.blue
+    )
+    verticalFrame.foreach { segment => drawPoints(segment, wireframeColor) }
 
     // Calculate horizontal frame sets
     val segmentDelta = segmentsCount / currentLayer.segmentCells.toDouble
@@ -367,7 +400,7 @@ class Presenter(val wrapperPane: AnchorPane,
       }
     }
 
-    horizontalFrame.foreach { level => drawPoints(level) }
+    horizontalFrame.foreach { level => drawPoints(level, wireframeColor) }
 
     if (shouldDisplayWireframeBox) {
       drawWireframeBox(splinePointsSeq, shapeTransform)
@@ -488,11 +521,11 @@ class Presenter(val wrapperPane: AnchorPane,
 
 
   private def toPixelCoordinates(point2D: Point2D): Point2D = point2D match {
-    case Point2D(x, y) => Point2D(x + canvas.width.value / 2, canvas.height.value / 2 - y)
+    case Point2D(x, y) => Point2D(x + currentLayer.canvas.width.value / 2, currentLayer.canvas.height.value / 2 - y)
   }
 
   private def toSpaceCoordinates(point2D: Point2D): Point2D = point2D match {
-    case Point2D(x, y) => Point2D(x - canvas.width.value / 2, canvas.height.value / 2 - y)
+    case Point2D(x, y) => Point2D(x - currentLayer.canvas.width.value / 2, currentLayer.canvas.height.value / 2 - y)
   }
 
 }

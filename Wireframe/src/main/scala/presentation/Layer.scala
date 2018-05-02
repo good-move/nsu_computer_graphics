@@ -2,11 +2,13 @@ package presentation
 
 import breeze.linalg.DenseMatrix
 import data_layer.geometry._
+import data_layer.graphics.Color
 import data_layer.settings.Config
+import scalafx.scene.canvas.Canvas
 
 import scala.collection.mutable.ListBuffer
 
-class Layer(wireframe: WireFrame) {
+class Layer(val canvas: Canvas, private val wireframe: WireFrame) {
 
   private val initDeg = 90/180*math.Pi
 
@@ -24,11 +26,9 @@ class Layer(wireframe: WireFrame) {
 
   val splinePivots: ListBuffer[Point2D] = ListBuffer[Point2D](wireframe.spline: _*)
 
-  var rotationMatrix: DenseMatrix[Double] = DenseMatrix.eye(4)
-  var tmpRotationMatrix: DenseMatrix[Double] =
+  var rotationMatrix: DenseMatrix[Double] =
     XRotationMatrix(wireframe.rotationAngles._1).matrix *
     YRotationMatrix(wireframe.rotationAngles._2).matrix
-
 
   var translateMatrix: DenseMatrix[Double] = DenseMatrix.eye(4)
 
@@ -40,4 +40,7 @@ class Layer(wireframe: WireFrame) {
 
   var scaleMatrix: DenseMatrix[Double] = DenseMatrix.eye(4)
   var tmpScaleMatrix: DenseMatrix[Double] = DenseMatrix.eye(4)
+
+  val wireframeColor: Color = wireframe.color
+
 }
