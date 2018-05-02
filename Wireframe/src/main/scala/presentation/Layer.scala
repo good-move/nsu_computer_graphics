@@ -8,7 +8,7 @@ import scalafx.scene.canvas.Canvas
 
 import scala.collection.mutable.ListBuffer
 
-class Layer(val canvas: Canvas, private val wireframe: WireFrame) {
+class Layer(val canvas: Canvas, private val wireframe: WireFrame, index: Int) {
 
   private val initDeg = 90/180*math.Pi
 
@@ -30,17 +30,19 @@ class Layer(val canvas: Canvas, private val wireframe: WireFrame) {
     XRotationMatrix(wireframe.rotationAngles._1).matrix *
     YRotationMatrix(wireframe.rotationAngles._2).matrix
 
-  var translateMatrix: DenseMatrix[Double] = DenseMatrix.eye(4)
-
-  var tmpTranslateMatrix: DenseMatrix[Double] = TranslateMatrix(
+  var translateMatrix: DenseMatrix[Double] = TranslateMatrix(
     wireframe.pivot.x,
     wireframe.pivot.y,
     wireframe.pivot.z
   ).matrix
 
   var scaleMatrix: DenseMatrix[Double] = DenseMatrix.eye(4)
-  var tmpScaleMatrix: DenseMatrix[Double] = DenseMatrix.eye(4)
 
   val wireframeColor: Color = wireframe.color
+
+  var needsRedraw: Boolean = true
+  var visible: Boolean = false
+
+  def label: String = s"Layer ${index+1}"
 
 }

@@ -10,10 +10,13 @@ import scalafx.Includes._
 import breeze.linalg._
 import breeze.numerics.{cos, sin}
 import data_layer.settings.Config
+import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
 import scalafx.scene.control.{ListView, ToolBar}
+import scalafx.scene.effect.BlendMode
 import scalafx.scene.paint.Color
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 
@@ -50,8 +53,9 @@ object kVector {
 @sfxml
 class Presenter(val wrapperPane: AnchorPane,
                 val toolbar: ToolBar,
+                val rootCanvas: Canvas,
                 val canvasStack: StackPane,
-                val layersList: ListView[String],
+                val layersList: ListView[Layer],
                 val config: Config) extends IPresenter {
 
   private val SplineMatrix: DenseMatrix[Double] = DenseMatrix(
@@ -64,17 +68,17 @@ class Presenter(val wrapperPane: AnchorPane,
   private var scene: Option[Scene] = None
 
   // General program state
-  private val layers = ListBuffer[Layer](config.wireframes.map { wireframe =>
+  private val layers = ListBuffer[Layer](config.wireframes.indices.map { index =>
     val canvas = new Canvas()
     configureCanvas(canvas)
     canvasStack.children.add(canvas)
-    new Layer(canvas, wireframe)
+    new Layer(canvas, config.wireframes(index), index)
   }: _*)
 
-  private var currentLayer = layers.head
+  private var currentLayerIndex = layers.length - 1
+  private var currentLayer = layers(currentLayerIndex)
   private var workingMode = WorkingMode.Editing
   private var viewMode = ViewMode.Rotate
-  private var currentLayerIndex = 0
 
   private val splinePower = 4
   private val pointRadius = 9
@@ -90,17 +94,34 @@ class Presenter(val wrapperPane: AnchorPane,
   private var dragAnchor = Point2D(.0,.0)
   private var shouldDisplayWireframeBox = false
 
+  private val visibleLayers: mutable.Set[Int] = mutable.Set[Int]()
+
   // constructor
   {
-    redrawScene()
+    visibleLayers.add(currentLayerIndex)
+    currentLayer.visible = true
+
+    configureCanvas(rootCanvas)
+    configureLayersList()
+    redrawLayers()
+
+
   }
 
   private def configureCanvas(canvas: Canvas): Unit = {
+
     canvas.height <== wrapperPane.height - toolbar.height
     canvas.width <== wrapperPane.width - layersList.width
 
-    canvas.width.onChange { (_,_, _) => redrawScene() }
-    canvas.height.onChange { (_,_, _) => redrawScene() }
+    canvas.width.onChange { (_,_, _) => {
+      layers.foreach(_.needsRedraw = true)
+      redrawLayers()
+    } }
+
+    canvas.height.onChange { (_,_, _) => {
+      layers.foreach(_.needsRedraw = true)
+      redrawLayers()
+    } }
 
     canvas.onMousePressed = this.onPress
     canvas.onMouseReleased = this.onRelease
@@ -109,18 +130,45 @@ class Presenter(val wrapperPane: AnchorPane,
     canvas.onScroll = this.onScroll
   }
 
+  private def configureLayersList(): Unit = {
+    setListItems()
+
+    layersList.cellFactory = { list =>
+      val cell = new Cell()
+
+      cell.onMouseClicked = _ => {
+        this.onLayerIndexChanged(list.items.value.size() - 1 - cell.getIndex)
+      }
+
+      cell.checkBox.onMouseClicked = _ => {
+        this.toggleLayerVisibility(list.items.value.size() - 1 - cell.getIndex)
+      }
+
+      cell.removeButton.onMouseClicked = _ => {
+        removeLayer(list.items.value.size() - 1 - cell.getIndex)
+      }
+
+      cell
+    }
+  }
+
+  private def setListItems(): Unit = {
+    layersList.items = ObservableBuffer[Layer](layers.reverse)
+  }
+
   // [START] ******************** Canvas Event Handlers ********************
 
   private def onScroll(scrollEvent: ScrollEvent): Unit = {
     if (workingMode == WorkingMode.Viewing) {
       currentLayer.scaleFactor += (scrollEvent.deltaY / 1000)
-      currentLayer.tmpScaleMatrix = ScaleMatrix(currentLayer.scaleFactor).matrix
-      redrawScene()
+      currentLayer.scaleMatrix = ScaleMatrix(currentLayer.scaleFactor).matrix
+      currentLayer.needsRedraw = true
+      redrawLayers()
     }
   }
 
   private def onRelease(mouseEvent: MouseEvent): Unit = {
-    currentLayer.translateMatrix = currentLayer.tmpTranslateMatrix
+    currentLayer.translateMatrix = currentLayer.translateMatrix
   }
 
   private def onPress(mouseEvent: MouseEvent): Unit = workingMode match {
@@ -136,7 +184,7 @@ class Presenter(val wrapperPane: AnchorPane,
         currentLayer.splinePivots.remove(lastClickedPointIndex)
         existingPointClicked = false
         pointWasMoved = true
-        redrawScene()
+        redrawLayers()
       }
     case WorkingMode.Viewing =>
       dragAnchor = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
@@ -159,7 +207,7 @@ class Presenter(val wrapperPane: AnchorPane,
       if (existingPointClicked) {
         currentLayer.splinePivots(lastClickedPointIndex) = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
         pointWasMoved = true
-        redrawScene()
+        redrawLayers()
       }
     case WorkingMode.Viewing =>
       val currentPoint = toSpaceCoordinates(Point2D(mouseEvent.x, mouseEvent.y))
@@ -182,16 +230,17 @@ class Presenter(val wrapperPane: AnchorPane,
         case ViewMode.Move =>
           val xShift = dragDelta.x
           val yShift = dragDelta.y
-          currentLayer.tmpTranslateMatrix = currentLayer.translateMatrix * TranslateMatrix(xShift, yShift, 0).matrix
+          currentLayer.translateMatrix = currentLayer.translateMatrix * TranslateMatrix(xShift, yShift, 0).matrix
       }
+      currentLayer.needsRedraw = true
       dragAnchor = currentPoint
-      redrawScene()
+      redrawLayers()
   }
 
   def onClear(): Unit = {
     if (workingMode == WorkingMode.Editing) {
       currentLayer.splinePivots.clear()
-      redrawScene()
+      redrawLayers()
     }
   }
 
@@ -206,19 +255,19 @@ class Presenter(val wrapperPane: AnchorPane,
     }
   }
 
-  private def splinePoints(): Seq[Point2D] =
-    currentLayer.splinePivots.sliding(splinePower).flatMap(splineSegmentPoints(_)).toSeq
+  private def splinePoints(layer: Layer): Seq[Point2D] =
+    layer.splinePivots.sliding(splinePower).flatMap(splineSegmentPoints(_)).toSeq
 
-  private def splineSegmentPivots(segmentIndex: Int): Seq[Point2D] = {
-    currentLayer.splinePivots.slice(segmentIndex, segmentIndex + splinePower)
+  private def splineSegmentPivots(layer: Layer, segmentIndex: Int): Seq[Point2D] = {
+    layer.splinePivots.slice(segmentIndex, segmentIndex + splinePower)
   }
 
-  private def splineSegments(from: Int, to: Int): Seq[Seq[Point2D]] = {
-    for (segmentIndex <- from to to) yield splineSegmentPivots(segmentIndex)
+  private def splineSegments(layer: Layer, from: Int, to: Int): Seq[Seq[Point2D]] = {
+    for (segmentIndex <- from to to) yield splineSegmentPivots(layer, segmentIndex)
   }
 
-  private def lastSplineSegmentPivots(): Seq[Point2D] = {
-    val points = currentLayer.splinePivots
+  private def lastSplineSegmentPivots(layer: Layer = currentLayer): Seq[Point2D] = {
+    val points = layer.splinePivots
     points.slice(points.length-splinePower, points.length)
   }
 
@@ -267,8 +316,7 @@ class Presenter(val wrapperPane: AnchorPane,
 
   // [START] ******************** Canvas manipulation functions ********************
 
-  private def cleanCanvas(): Unit = {
-    val canvas = currentLayer.canvas
+  private def cleanCanvas(canvas: Canvas): Unit = {
     canvas.graphicsContext2D.clearRect(
       0, 0, canvas.width.value, canvas.height.value
     )
@@ -297,26 +345,36 @@ class Presenter(val wrapperPane: AnchorPane,
 
   private def redrawSpline(): Unit = {
     if (currentLayer.splinePivots.length >= splinePower) {
-      drawPoints(splinePoints())
+      drawPoints(splinePoints(currentLayer))
     }
   }
 
-  private def redrawScene(): Unit = {
-    cleanCanvas()
+  private def redrawLayers(): Unit = {
+    cleanCanvas(rootCanvas)
     drawAxis()
 
     workingMode match  {
       case WorkingMode.Editing =>
+        cleanCanvas(currentLayer.canvas)
         drawPivots()
         redrawSpline()
       case WorkingMode.Viewing =>
-        drawWireframe()
+        for (index <- visibleLayers) {
+          val layer = layers(index)
+
+          if (layer.needsRedraw) {
+            cleanCanvas(layer.canvas)
+            drawWireframe(layer)
+            layer.needsRedraw = false
+          }
+        }
     }
 
   }
 
   private def drawAxis(): Unit = {
-    val canvas = currentLayer.canvas
+    rootCanvas.visible = true
+    val canvas = rootCanvas
     val gc = canvas.graphicsContext2D
     val width = canvas.width.value
     val height = canvas.height.value
@@ -325,36 +383,36 @@ class Presenter(val wrapperPane: AnchorPane,
     gc.strokeLine(0, height/2, width, height/2)
   }
 
-  private def drawWireframe(): Unit = {
-    val segmentsCount = currentLayer.splinePivots.length - splinePower + 1
-    val leftBound = currentLayer.a * segmentsCount
-    val rightBound = currentLayer.b * segmentsCount
+  private def drawWireframe(layer: Layer): Unit = {
+    val segmentsCount = layer.splinePivots.length - splinePower + 1
+    val leftBound = layer.a * segmentsCount
+    val rightBound = layer.b * segmentsCount
     val firstSegmentIndex = leftBound.toInt
     val lastSegmentIndex = rightBound.toInt
     val firstSegmentStart = leftBound - firstSegmentIndex
     val lastSegmentEnd = rightBound - lastSegmentIndex
 
-    val intermediateSegments = splineSegments(firstSegmentIndex+1, lastSegmentIndex-1)
+    val intermediateSegments = splineSegments(layer, firstSegmentIndex+1, lastSegmentIndex-1)
 
     val splinePointsSeq = if (firstSegmentIndex != lastSegmentIndex) {
-      val firstSegmentPoints = splineSegmentPoints(splineSegments(firstSegmentIndex, firstSegmentIndex).head, tFrom = firstSegmentStart)
-      val lastSegmentPoints = splineSegmentPoints(splineSegments(lastSegmentIndex, lastSegmentIndex).head, tTo = lastSegmentEnd)
+      val firstSegmentPoints = splineSegmentPoints(splineSegments(layer, firstSegmentIndex, firstSegmentIndex).head, tFrom = firstSegmentStart)
+      val lastSegmentPoints = splineSegmentPoints(splineSegments(layer, lastSegmentIndex, lastSegmentIndex).head, tTo = lastSegmentEnd)
       firstSegmentPoints ++ intermediateSegments.flatMap(splineSegmentPoints(_)) ++ lastSegmentPoints
     } else {
       splineSegmentPoints(
-        splineSegments(firstSegmentIndex, firstSegmentIndex).head,
+        splineSegments(layer, firstSegmentIndex, firstSegmentIndex).head,
         tFrom = firstSegmentStart,
         tTo = lastSegmentEnd
       )
     }
 
-    val shapeTransform  = currentLayer.tmpTranslateMatrix * currentLayer.rotationMatrix * currentLayer.tmpScaleMatrix
+    val shapeTransform  = layer.translateMatrix * layer.rotationMatrix * layer.scaleMatrix
     val transformedVector = DenseVector(0d,0d,0d,1d)
 
 
-    val startAngle = currentLayer.startAngle
-    val endAngle = currentLayer.endAngle
-    val angleDelta =  (endAngle - startAngle) / currentLayer.angleCells
+    val startAngle = layer.startAngle
+    val endAngle = layer.endAngle
+    val angleDelta =  (endAngle - startAngle) / layer.angleCells
     // Calculate vertical frame sets
     val verticalFrame = for (angle <- startAngle to endAngle by angleDelta) yield {
       splinePointsSeq.map { case Point2D(x, y) =>
@@ -367,25 +425,25 @@ class Presenter(val wrapperPane: AnchorPane,
     }
 
     val wireframeColor = Color.rgb(
-      currentLayer.wireframeColor.red,
-      currentLayer.wireframeColor.green,
-      currentLayer.wireframeColor.blue
+      layer.wireframeColor.red,
+      layer.wireframeColor.green,
+      layer.wireframeColor.blue
     )
     verticalFrame.foreach { segment => drawPoints(segment, wireframeColor) }
 
     // Calculate horizontal frame sets
-    val segmentDelta = segmentsCount / currentLayer.segmentCells.toDouble
+    val segmentDelta = segmentsCount / layer.segmentCells.toDouble
     val verticalTicks = for (t <- (leftBound to rightBound by segmentDelta).union(Seq(rightBound))) yield {
       val segmentIndex = t.toInt
       val parameterValue = t - segmentIndex
       splineSegmentPoints(
-        splineSegments(segmentIndex, segmentIndex).head,
+        splineSegments(layer, segmentIndex, segmentIndex).head,
         parameterValue,
         parameterValue
       ).head
     }
 
-    val angleScaledStep = angleDelta / currentLayer.angleScaleFactor
+    val angleScaledStep = angleDelta / layer.angleScaleFactor
 
     val horizontalFrame = verticalTicks.map { case Point2D(x, y) =>
       for {
@@ -491,12 +549,19 @@ class Presenter(val wrapperPane: AnchorPane,
 
   def onEditBaseline(): Unit = {
     workingMode = WorkingMode.Editing
-    redrawScene()
+    layers.foreach(_.canvas.visible = false)
+    currentLayer.canvas.visible = true
+    currentLayer.needsRedraw = true
+
+    redrawLayers()
   }
 
   def onShowWireframe(): Unit = {
     workingMode = WorkingMode.Viewing
-    redrawScene()
+    layers.foreach(_.canvas.visible = false)
+    visibleLayers.foreach(layers(_).canvas.visible = true)
+
+    redrawLayers()
   }
 
   def onShowAllWireframes(): Unit = ???
@@ -511,12 +576,26 @@ class Presenter(val wrapperPane: AnchorPane,
 
   def onToggleBox(): Unit = {
     this.shouldDisplayWireframeBox = !this.shouldDisplayWireframeBox
-    redrawScene()
+    redrawLayers()
   }
 
   private def onLayerIndexChanged(newIndex: Int): Unit = {
-    currentLayerIndex = newIndex
-    currentLayer = layers(newIndex)
+    // TODO: fix for camera view
+    if (newIndex != currentLayerIndex) {
+      val oldLayerIndex = currentLayerIndex
+      currentLayerIndex = newIndex
+      if (0 <= currentLayerIndex && currentLayerIndex < layers.length) {
+        currentLayer = layers(newIndex)
+        if (workingMode == WorkingMode.Editing) {
+          layers(oldLayerIndex).canvas.visible = false
+          currentLayer.canvas.visible = true
+          currentLayer.needsRedraw = true
+          redrawLayers()
+        }
+      } else {
+        drawAxis()
+      }
+    }
   }
 
 
@@ -526,6 +605,58 @@ class Presenter(val wrapperPane: AnchorPane,
 
   private def toSpaceCoordinates(point2D: Point2D): Point2D = point2D match {
     case Point2D(x, y) => Point2D(x - currentLayer.canvas.width.value / 2, currentLayer.canvas.height.value / 2 - y)
+  }
+
+
+  def onAddLayer(): Unit = {
+
+  }
+
+  private def removeLayer(index: Int): Unit = {
+    println(s"Removing layer $index")
+    if (index == currentLayerIndex) {
+      cleanCanvas(layers(index).canvas)
+    }
+
+    layers.remove(index)
+    visibleLayers.remove(index)
+    canvasStack.children.remove(index+1)
+
+    if (index == currentLayerIndex) {
+      onLayerIndexChanged(index - 1)
+    } else if (index < currentLayerIndex) {
+      currentLayerIndex -= 1
+    }
+
+    setListItems()
+  }
+
+  def onRemoveLayer(): Unit = {
+    if (currentLayerIndex >= 0) {
+      removeLayer(currentLayerIndex)
+    } else {
+      // TODO: make button disabled?
+    }
+  }
+
+  def toggleLayerVisibility(layerIndex: Int): Unit = {
+    println(layerIndex)
+    if (0 <= layerIndex && layerIndex < layers.size) {
+      if (visibleLayers.contains(layerIndex)) {
+        visibleLayers.remove(layerIndex)
+        println(s"Hide $layerIndex")
+      } else {
+        visibleLayers.add(layerIndex)
+        println(s"Show $layerIndex")
+      }
+      val layer = layers(layerIndex)
+      val isLayerVisible = visibleLayers.contains(layerIndex)
+      layer.canvas.visible = isLayerVisible
+      println(visibleLayers)
+      redrawLayers()
+    } else {
+      println("ERROR: index out of bounds")
+    }
   }
 
 }

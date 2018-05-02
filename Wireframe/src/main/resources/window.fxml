@@ -32,8 +32,18 @@
 
         </ToolBar>
         <HBox>
-            <StackPane fx:id="canvasStack"/>
-            <ListView fx:id="layersList" prefWidth="200"/>
+            <StackPane fx:id="canvasStack">
+                <Canvas fx:id="rootCanvas"/>
+            </StackPane>
+            <VBox>
+                <HBox>
+                    <Button text="+"
+                            onMouseClicked="#onAddLayer" />
+                    <Button text="-"
+                            onMouseClicked="#onRemoveLayer"/>
+                </HBox>
+                <ListView fx:id="layersList" prefWidth="200" VBox.vgrow="ALWAYS"/>
+            </VBox>
         </HBox>
     </VBox>
 
