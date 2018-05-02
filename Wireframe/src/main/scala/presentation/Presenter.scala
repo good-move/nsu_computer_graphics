@@ -81,7 +81,7 @@ class Presenter(val wrapperPane: AnchorPane,
     val canvas = new Canvas()
     configureCanvas(canvas)
     canvasStack.children.add(canvas)
-    new Layer(canvas, config.wireframes(index), index)
+    new Layer(canvas, Some(config.wireframes(index)), index)
   }: _*)
 
   private var currentLayerIndex = layers.length - 1
@@ -199,8 +199,8 @@ class Presenter(val wrapperPane: AnchorPane,
 
   private def onScroll(scrollEvent: ScrollEvent): Unit = {
     if (workingMode == WorkingMode.Viewing) {
-      currentLayer.scaleFactor += (scrollEvent.deltaY / 1000)
-      currentLayer.scaleMatrix = ScaleMatrix(currentLayer.scaleFactor).matrix
+      currentLayer.zoomFactor += (scrollEvent.deltaY / 1000)
+      currentLayer.scaleMatrix = ScaleMatrix(currentLayer.zoomFactor).matrix
       currentLayer.needsRedraw = true
       redrawLayers()
     }
@@ -652,11 +652,15 @@ class Presenter(val wrapperPane: AnchorPane,
 
 
   def onAddLayer(): Unit = {
-
+    val layerIndex = layers.lastOption.map(_.index + 1).getOrElse(0)
+    val canvas = new Canvas()
+    configureCanvas(canvas)
+    layers += new Layer(canvas, None, layerIndex)
+    setListItems()
+    canvasStack.children.add(canvas)
   }
 
   private def removeLayer(index: Int): Unit = {
-    println(s"Removing layer $index")
     if (index == currentLayerIndex) {
       cleanCanvas(layers(index).canvas)
     }
@@ -683,7 +687,6 @@ class Presenter(val wrapperPane: AnchorPane,
   }
 
   def toggleLayerVisibility(layerIndex: Int): Unit = {
-    println(layerIndex)
     if (0 <= layerIndex && layerIndex < layers.size) {
       if (visibleLayers.contains(layerIndex)) {
         visibleLayers.remove(layerIndex)
