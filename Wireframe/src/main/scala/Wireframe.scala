@@ -1,11 +1,11 @@
-import breeze.linalg.{DenseMatrix, DenseVector}
 import data_layer.settings.Config
 import presentation.IPresenter
+import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafxml.core.{DependenciesByType, FXMLLoader, NoDependencyResolver}
-import scalafx.Includes._
+import scala.reflect.runtime.universe.typeOf
 
 object Wireframe extends JFXApp {
 
@@ -16,7 +16,7 @@ object Wireframe extends JFXApp {
 
   private val loader = new FXMLLoader(
     getClass.getResource("window.fxml"),
-    NoDependencyResolver
+    new DependenciesByType(Map(typeOf[Config] -> config))
   )
   stage = new PrimaryStage {
     title = "WireFrame"

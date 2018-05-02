@@ -9,9 +9,12 @@ import scalafxml.core.macros.sfxml
 import scalafx.Includes._
 import breeze.linalg._
 import breeze.numerics.{cos, sin}
+import data_layer.settings.Config
 import scalafx.scene.Scene
 import scalafx.scene.control.ToolBar
 import scalafx.scene.paint.Color
+
+import scala.collection.mutable.ListBuffer
 
 
 // TODO: Change cursor when hovering anchor points
@@ -45,7 +48,10 @@ object kVector {
 }
 
 @sfxml
-class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: Canvas) extends IPresenter {
+class Presenter(val wrapperPane: AnchorPane,
+                val toolbar: ToolBar,
+                val canvas: Canvas,
+                val config: Config) extends IPresenter {
 
   private val SplineMatrix: DenseMatrix[Double] = DenseMatrix(
     (-1.0,  3.0, -3.0,  1.0),
@@ -57,7 +63,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private var scene: Option[Scene] = None
 
   // General program state
-  private val layers = Seq[Layer](new Layer())
+  private val layers = ListBuffer[Layer](config.wireframes.map(new Layer(_)): _*)
   private var currentLayer = layers.head
   private var workingMode = WorkingMode.Editing
   private var viewMode = ViewMode.Rotate
@@ -66,6 +72,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val splinePower = 4
   private val pointRadius = 9
 
+  private val controlKeyName = "Ctrl"
 
   // Spline editing state
   private var lastClickedPointIndex: Int = -1
@@ -73,21 +80,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private var pointWasMoved = false
   private var isControlPressed = false
 
-  private val controlKeyName = "Ctrl"
-
-
-  private val angleCells = 10
-  private val segmentCells = 10
-  private val angleScaleFactor = 10d
-
-  private val a: Double = 0
-  private val b: Double = 0.999
-
-  private val startAngle: Double = 0
-  private val endAngle: Double = 2*math.Pi
-
   private var dragAnchor = Point2D(.0,.0)
-  private var scaleFactor = 1d
   private var shouldDisplayWireframeBox = false
 
   {
@@ -104,8 +97,8 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
     canvas.onScroll = (scrollEvent: ScrollEvent) => {
       if (workingMode == WorkingMode.Viewing) {
-        scaleFactor += (scrollEvent.deltaY / 1000)
-        currentLayer.tmpScaleMatrix = ScaleMatrix(scaleFactor).matrix
+        currentLayer.scaleFactor += (scrollEvent.deltaY / 1000)
+        currentLayer.tmpScaleMatrix = ScaleMatrix(currentLayer.scaleFactor).matrix
         redrawScene()
       }
     }
@@ -307,8 +300,8 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
 
   private def drawWireframe(): Unit = {
     val segmentsCount = currentLayer.splinePivots.length - splinePower + 1
-    val leftBound = a * segmentsCount
-    val rightBound = b * segmentsCount
+    val leftBound = currentLayer.a * segmentsCount
+    val rightBound = currentLayer.b * segmentsCount
     val firstSegmentIndex = leftBound.toInt
     val lastSegmentIndex = rightBound.toInt
     val firstSegmentStart = leftBound - firstSegmentIndex
@@ -331,7 +324,10 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     val shapeTransform  = currentLayer.tmpTranslateMatrix * currentLayer.tmpRotationMatrix * currentLayer.tmpScaleMatrix
     val transformedVector = DenseVector(0d,0d,0d,1d)
 
-    val angleDelta =  (endAngle - startAngle) / angleCells
+
+    val startAngle = currentLayer.startAngle
+    val endAngle = currentLayer.endAngle
+    val angleDelta =  (endAngle - startAngle) / currentLayer.angleCells
     // Calculate vertical frame sets
     val verticalFrame = for (angle <- startAngle to endAngle by angleDelta) yield {
       splinePointsSeq.map { case Point2D(x, y) =>
@@ -345,7 +341,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     verticalFrame.foreach { segment => drawPoints(segment) }
 
     // Calculate horizontal frame sets
-    val segmentDelta = segmentsCount / segmentCells.toDouble
+    val segmentDelta = segmentsCount / currentLayer.segmentCells.toDouble
     val verticalTicks = for (t <- (leftBound to rightBound by segmentDelta).union(Seq(rightBound))) yield {
       val segmentIndex = t.toInt
       val parameterValue = t - segmentIndex
@@ -356,7 +352,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
       ).head
     }
 
-    val angleScaledStep = angleDelta / angleScaleFactor
+    val angleScaledStep = angleDelta / currentLayer.angleScaleFactor
 
     val horizontalFrame = verticalTicks.map { case Point2D(x, y) =>
       for {
