@@ -76,12 +76,12 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
   private val controlKeyName = "Ctrl"
 
 
-  private val angleCells = 20
+  private val angleCells = 10
   private val segmentCells = 10
-  private val angleScaleFactor = 5d
+  private val angleScaleFactor = 10d
 
-  private val a: Double = 0.3
-  private val b: Double = 0.7
+  private val a: Double = 0
+  private val b: Double = 0.999
 
   private val startAngle: Double = 0
   private val endAngle: Double = 2*math.Pi
@@ -170,6 +170,13 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
           currentLayer.tmpTranslateMatrix = currentLayer.translateMatrix * TranslateMatrix(xShift, yShift, 0).matrix
       }
       redrawScene()
+  }
+
+  def onClear(): Unit = {
+    if (workingMode == WorkingMode.Editing) {
+      currentLayer.splinePivots.clear()
+      redrawScene()
+    }
   }
 
   // [START] ******************** Spline Editing ********************
@@ -312,7 +319,7 @@ class Presenter(val wrapperPane: AnchorPane, val toolbar: ToolBar, val canvas: C
     val splinePointsSeq = if (firstSegmentIndex != lastSegmentIndex) {
       val firstSegmentPoints = splineSegmentPoints(splineSegments(firstSegmentIndex, firstSegmentIndex).head, tFrom = firstSegmentStart)
       val lastSegmentPoints = splineSegmentPoints(splineSegments(lastSegmentIndex, lastSegmentIndex).head, tTo = lastSegmentEnd)
-      firstSegmentPoints.union(intermediateSegments.flatMap(splineSegmentPoints(_))).union(lastSegmentPoints)
+      firstSegmentPoints ++ intermediateSegments.flatMap(splineSegmentPoints(_)) ++ lastSegmentPoints
     } else {
       splineSegmentPoints(
         splineSegments(firstSegmentIndex, firstSegmentIndex).head,

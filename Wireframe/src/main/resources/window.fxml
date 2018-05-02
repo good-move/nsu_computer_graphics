@@ -26,6 +26,7 @@
 
             <Button text="Move" onMouseClicked="#onEnableMove" />
             <Button text="Rotate" onMouseClicked="#onEnableRotate" />
+            <Button text="Clear" onMouseClicked="#onClear" />
 
             <Separator orientation="VERTICAL" />
 
