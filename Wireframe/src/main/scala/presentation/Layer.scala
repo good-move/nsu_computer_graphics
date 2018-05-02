@@ -3,7 +3,6 @@ package presentation
 import breeze.linalg.DenseMatrix
 import data_layer.geometry._
 import data_layer.graphics.Color
-import data_layer.settings.Config
 import scalafx.scene.canvas.Canvas
 
 import scala.collection.mutable.ListBuffer
@@ -12,15 +11,44 @@ class Layer(val canvas: Canvas, private val wireframe: WireFrame, index: Int) {
 
   private val initDeg = 90/180*math.Pi
 
-  val angleCells = 10
-  val segmentCells = 10
+  var angleCells: Int = 10
+  var segmentCells: Int = 10
   val angleScaleFactor = 10d
 
-  var a: Double = wireframe.domain.segment.start
-  var b: Double = wireframe.domain.segment.end
+  var _a: Double = wireframe.domain.segment.start
+  def a: Double = _a
+  def a_=(value: Double): Unit = {
+    _a = value.max(0).min(0.9999)
+  }
 
-  val startAngle: Double = wireframe.domain.angleRange.start
-  val endAngle: Double = wireframe.domain.angleRange.end
+  var _b: Double = wireframe.domain.segment.end
+
+  def b: Double = _b
+  def  b_=(value: Double): Unit = {
+    _b = value.max(0).min(0.9999)
+  }
+
+  var _startAngle: Double = 0
+
+  {
+    startAngle_=(wireframe.domain.angleRange.start)
+  }
+
+  def startAngle: Double = _startAngle
+  def startAngle_=(angle: Double): Unit = {
+    _startAngle = angle.max(0).min(2*math.Pi)
+  }
+
+  var _endAngle: Double = 0
+
+  {
+    endAngle_=(wireframe.domain.angleRange.end)
+  }
+
+  def endAngle: Double = _endAngle
+  def endAngle_=(angle: Double): Unit = {
+    _endAngle = angle.max(0).min(2*math.Pi)
+  }
 
   var scaleFactor: Double = wireframe.domain.scaleFactor
 

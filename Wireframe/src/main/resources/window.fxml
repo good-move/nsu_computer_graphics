@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.shape.MeshView?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="presentation.Presenter"
@@ -45,6 +46,33 @@
                 <ListView fx:id="layersList" prefWidth="200" VBox.vgrow="ALWAYS"/>
             </VBox>
         </HBox>
+        <VBox fx:id="settingsPane">
+            <Label text="Segment Start" />
+            <TextField fx:id="segmentStartTF" />
+
+            <Label text="Segment End" />
+            <TextField fx:id="segmentEndTF" />
+
+            <Label text="Segment Cells" />
+            <TextField fx:id="segmentCellsTF" />
+
+            <Label text="Angle Start" />
+            <TextField fx:id="angleStartTF" />
+
+            <Label text="Angle End" />
+            <TextField fx:id="angleEndTF" />
+
+            <Label text="Angle Cells" />
+            <TextField fx:id="angleCellsTF" />
+
+            <Label text="Color" />
+            <VBox>
+                <TextField fx:id="redTF" />
+                <TextField fx:id="greenTF" />
+                <TextField fx:id="blueTF" />
+            </VBox>
+
+        </VBox>
     </VBox>
 
 </AnchorPane>

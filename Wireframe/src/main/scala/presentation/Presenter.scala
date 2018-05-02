@@ -4,7 +4,7 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import data_layer.geometry._
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.input._
-import scalafx.scene.layout.{AnchorPane, StackPane}
+import scalafx.scene.layout.{AnchorPane, StackPane, VBox}
 import scalafxml.core.macros.sfxml
 import scalafx.Includes._
 import breeze.linalg._
@@ -12,8 +12,7 @@ import breeze.numerics.{cos, sin}
 import data_layer.settings.Config
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
-import scalafx.scene.control.{ListView, ToolBar}
-import scalafx.scene.effect.BlendMode
+import scalafx.scene.control.{ListView, TextField, ToolBar}
 import scalafx.scene.paint.Color
 
 import scala.collection.mutable
@@ -56,6 +55,16 @@ class Presenter(val wrapperPane: AnchorPane,
                 val rootCanvas: Canvas,
                 val canvasStack: StackPane,
                 val layersList: ListView[Layer],
+                val segmentStartTF: TextField,
+                val segmentEndTF: TextField,
+                val segmentCellsTF: TextField,
+                val angleStartTF: TextField,
+                val angleEndTF: TextField,
+                val angleCellsTF: TextField,
+                val redTF: TextField,
+                val greenTF: TextField,
+                val blueTF: TextField,
+                val settingsPane: VBox,
                 val config: Config) extends IPresenter {
 
   private val SplineMatrix: DenseMatrix[Double] = DenseMatrix(
@@ -106,11 +115,41 @@ class Presenter(val wrapperPane: AnchorPane,
     redrawLayers()
 
 
+    segmentStartTF.text.onChange((_, _, newValue: String) => {
+      currentLayer.a = newValue.toDouble
+      redrawLayer(currentLayer)
+    })
+
+    segmentEndTF.text.onChange((_, _, newValue: String) => {
+      currentLayer.b = newValue.toDouble
+      redrawLayer(currentLayer)
+    })
+
+    angleStartTF.text.onChange((_, _, newValue: String) => {
+      currentLayer.startAngle = newValue.toDouble
+      redrawLayer(currentLayer)
+    })
+
+    angleEndTF.text.onChange((_, _, newValue: String) => {
+      currentLayer.endAngle = newValue.toDouble
+      redrawLayer(currentLayer)
+    })
+
+    segmentCellsTF.text.onChange((_, _, newValue: String) => {
+      currentLayer.segmentCells = newValue.toInt
+      redrawLayer(currentLayer)
+    })
+
+    angleCellsTF.text.onChange((_, _, newValue: String) => {
+      currentLayer.angleCells = newValue.toInt
+      redrawLayer(currentLayer)
+    })
+
   }
 
   private def configureCanvas(canvas: Canvas): Unit = {
 
-    canvas.height <== wrapperPane.height - toolbar.height
+    canvas.height <== wrapperPane.height - toolbar.height - settingsPane.height
     canvas.width <== wrapperPane.width - layersList.width
 
     canvas.width.onChange { (_,_, _) => {
@@ -363,13 +402,17 @@ class Presenter(val wrapperPane: AnchorPane,
           val layer = layers(index)
 
           if (layer.needsRedraw) {
-            cleanCanvas(layer.canvas)
-            drawWireframe(layer)
+            redrawLayer(layer)
             layer.needsRedraw = false
           }
         }
     }
 
+  }
+
+  private def redrawLayer(layer: Layer): Unit = {
+    cleanCanvas(layer.canvas)
+    drawWireframe(layer)
   }
 
   private def drawAxis(): Unit = {
@@ -448,7 +491,7 @@ class Presenter(val wrapperPane: AnchorPane,
     val horizontalFrame = verticalTicks.map { case Point2D(x, y) =>
       for {
         angle <- startAngle to endAngle by angleDelta
-        phi <- angle to (angle + angleDelta) by angleScaledStep
+        phi <- angle to (angle + angleDelta) by angleScaledStep if phi <= endAngle
       } yield {
         transformedVector(0) = cos(phi) * y
         transformedVector(1) = sin(phi) * y
@@ -644,15 +687,12 @@ class Presenter(val wrapperPane: AnchorPane,
     if (0 <= layerIndex && layerIndex < layers.size) {
       if (visibleLayers.contains(layerIndex)) {
         visibleLayers.remove(layerIndex)
-        println(s"Hide $layerIndex")
       } else {
         visibleLayers.add(layerIndex)
-        println(s"Show $layerIndex")
       }
       val layer = layers(layerIndex)
       val isLayerVisible = visibleLayers.contains(layerIndex)
       layer.canvas.visible = isLayerVisible
-      println(visibleLayers)
       redrawLayers()
     } else {
       println("ERROR: index out of bounds")
