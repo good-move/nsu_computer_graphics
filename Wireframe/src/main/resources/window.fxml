@@ -18,7 +18,6 @@
         <ToolBar fx:id="toolbar" >
             <Button text="Edit spline" onMouseClicked="#onEditBaseline" />
             <Button text="Show wireframe" onMouseClicked="#onShowWireframe" />
-            <Button text="All wireframes" onMouseClicked="#onShowAllWireframes" />
 
             <Separator orientation="VERTICAL" />
 

@@ -607,8 +607,6 @@ class Presenter(val wrapperPane: AnchorPane,
     redrawLayers()
   }
 
-  def onShowAllWireframes(): Unit = ???
-
   def onEnableMove(): Unit = {
     this.viewMode = ViewMode.Move
   }
